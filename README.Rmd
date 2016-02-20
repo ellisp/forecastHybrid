@@ -10,16 +10,14 @@ Very much under construction, don't expect it to work yet.
 
 ## Installation
 
-
-```r
+```{r eval = FALSE}
 devtools::install_github("ellisp/forecastHybrid/pkg")
 ```
 
 
 ## Usage
 
-
-```r
+```{r}
 # examples will go here
 ```
 
