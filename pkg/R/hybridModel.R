@@ -35,9 +35,26 @@ hybridModel <- function(y, models = "aten",
    # errorMethod will determine which type of errors to use for weights. Some choices from accuracy()
    # are not appropriate. If weights = "equal", this would be ignored.
    
+   # The dependent variable must be numeric and not a matrix/dataframe
+   if(!is.numeric(y) || !is.null(dim(y))){
+    stop("The time series must be numeric and may not be a matrix or dataframe object")
+   }
+   y <- as.ts(y)
    
-   # This isn't robust yet. We need more robust argument matching
-   numModels <- nchar(models)
+   # Match arguments to ensure validity
+   weights <- match.arg(weights)
+   errorMethod <- match.arg(errorMethod)
+   
+   # Match the specified models
+   expandedModels <- unique(tolower(strsplit(models, split = "")))
+   if(length(expandedModels > 4){
+    stop("Invalid models specified.")
+   }
+   # All characters must be valid
+   if(!(all(expandedModles %in% c("a", "t", "e", "n")))){
+    stop("Invalid models specified.")
+   }
+   
    
    modelResults <- list()
    
