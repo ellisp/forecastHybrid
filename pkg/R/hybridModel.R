@@ -46,12 +46,12 @@ hybridModel <- function(y, models = "aten",
    errorMethod <- match.arg(errorMethod)
    
    # Match the specified models
-   expandedModels <- unique(tolower(strsplit(models, split = "")))
-   if(length(expandedModels > 4){
+   expandedModels <- unique(tolower(unlist(strsplit(models, split = ""))))
+   if(length(expandedModels) > 4){
     stop("Invalid models specified.")
    }
    # All characters must be valid
-   if(!(all(expandedModles %in% c("a", "t", "e", "n")))){
+   if(!(all(expandedModels %in% c("a", "t", "e", "n")))){
     stop("Invalid models specified.")
    }
    
@@ -63,29 +63,28 @@ hybridModel <- function(y, models = "aten",
    # parallelism both within and between models, based on the number of available cores.
    
    # auto.arima(), additional arguments to be implemented
-   if(grep("a", models)){
-      modelResults$auto.arima <- auto.arima(y, xreg = NULL)
+   if(is.element("a", expandedModels)){
+      modelResults$auto.arima <- auto.arima(y, xreg = xreg)
    }
    # tbats(), additional arguments to be implemented
-   if(grep("t", models)){
+   if(is.element("t", expandedModels)){
       modelResults$tbats <- tbats(y)
    }
    # ets(), additional arguments to be implemented
-   if(grep("e", models)){
+   if(is.element("e", expandedModels)){
       modelResults$ets <- ets(y)
    }
    # nnetar(), additional arguments to be implemented
-   if(grep("n", models)){
+   if(is.element("n", expandedModels)){
       modelResults$nnetar <- nnetar(y)
    }
    
    # Set the model weights
    includedModels <- names(modelResults)
-   modelResults$weights <- rep(1 / numModels, numModels)
+   modelResults$weights <- rep(1 / length(expandedModels), length(expandedModels))
    names(modelResults$weights) <- includedModels
    
    class(modelResults) <- "hybridModel"
    modelResults$frequency <- frequency(y)
    return(modelResults)
 }
-
