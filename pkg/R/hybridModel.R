@@ -56,7 +56,7 @@ hybridModel <- function(y, models = "aten",
   }
   
   # xreg must have same number of observations as the timeseries
-  if(!is.null(xreg) & nrow(xreg) != length(y)){
+  if(!is.null(xreg) && nrow(xreg) != length(y)){
     stop("The supplied xreg must have the same number of rows as the timeseries")
   }
   
@@ -91,5 +91,24 @@ hybridModel <- function(y, models = "aten",
   
   class(modelResults) <- "hybridModel"
   modelResults$frequency <- frequency(y)
+  modelResults$models <- includedModels
   return(modelResults)
+}
+
+is.hybridModel <- function(x){
+  inherits(x, "hybridModel")
+}
+
+fitted.hybridModel <- function(x){
+  results <- list()
+  for(i in x$models){
+    results[[i]] <- fitted(x[[i]])
+  }
+}
+
+residuals.hybridModel <- function(x){
+  results <- list()
+  for(i in x$models){
+    results[[i]] <- residuals(x[[i]])
+  }
 }
