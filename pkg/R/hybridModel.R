@@ -24,10 +24,10 @@
 #' print("hello world")
 #'
 hybridModel <- function(y, models = "aten",
-                        xreg = NULL,
-                        weights = c("equal", "insample.errors","cv.errors"),
+                        xreg = NULL, lambda = NULL,
+                        weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("rmse", "mae", "mase"),
-                        parallel = TRUE, num.cores = 2){
+                        parallel = TRUE, num.cores = 2L){
   # Weights could be set to equal (the default), based on in-sample errors, or based on cv errors
   # In-sample errors are methodologically questionable but easy to implement. CV errors are probably
   # methodologicaly sound, but more difficult and computationally expensive to implement.
@@ -37,7 +37,10 @@ hybridModel <- function(y, models = "aten",
   
   # The dependent variable must be numeric and not a matrix/dataframe
   if(!is.numeric(y) || !is.null(dim(y))){
-    stop("The time series must be numeric and may not be a matrix or dataframe object")
+    stop("The time series must be numeric and may not be a matrix or dataframe object.")
+  }
+  if(!length(y)){
+    stop("The time series must have obserations")
   }
   y <- as.ts(y)
   
@@ -47,19 +50,42 @@ hybridModel <- function(y, models = "aten",
   
   # Match the specified models
   expandedModels <- unique(tolower(unlist(strsplit(models, split = ""))))
-  if(length(expandedModels) > 4){
+  if(length(expandedModels) > 4L){
     stop("Invalid models specified.")
   }
   # All characters must be valid
   if(!(all(expandedModels %in% c("a", "t", "e", "n")))){
     stop("Invalid models specified.")
   }
-  
-  # xreg must have same number of observations as the timeseries
-  if(!is.null(xreg) && nrow(xreg) != length(y)){
-    stop("The supplied xreg must have the same number of rows as the timeseries")
+  if(!length(expandedModels)){
+    stop("At least one model type must be specified.")
   }
   
+  # xreg must be a matrix and have same number of observations as the timeseries
+  if(!is.null(xreg)){
+    if(nrow(xreg) != length(y)){
+      stop("The supplied xreg must have the same number of rows as the timeseries.")
+    }
+    if(!is.matrix(xreg) && !is.data.frame(xreg)){
+      stop("The supplied xreg must be a matrix or data.frame.")
+    }
+    xreg <- as.matrix(xreg)
+    if(!is.numeric(xreg)){
+      stop("The supplied xreg must be numeric.")
+    }
+  }
+  
+  # Validate cores and parallel arguments
+  if(!is.logical(parallel)){
+    stop("The parallel argument must be TRUE/FALSE.")
+  }
+  if(!is.numeric(num.cores)){
+    stop("The number of cores specified must be an integer greater than zero.")
+  }
+  if(as.logical((num.cores %% 1L)) || num.cores <= 0L){
+    stop("The number of cores specified must be an integer greater than zero.")
+  }
+
   
   modelResults <- list()
   
@@ -69,7 +95,7 @@ hybridModel <- function(y, models = "aten",
   
   # auto.arima(), additional arguments to be implemented
   if(is.element("a", expandedModels)){
-    modelResults$auto.arima <- auto.arima(y, xreg = xreg)
+    modelResults$auto.arima <- auto.arima(y, xreg = xreg, lambda = lambda)
   }
   # tbats(), additional arguments to be implemented
   if(is.element("t", expandedModels)){
@@ -77,18 +103,22 @@ hybridModel <- function(y, models = "aten",
   }
   # ets(), additional arguments to be implemented
   if(is.element("e", expandedModels)){
-    modelResults$ets <- ets(y)
+    modelResults$ets <- ets(y, lambda = lambda)
   }
   # nnetar(), additional arguments to be implemented
   if(is.element("n", expandedModels)){
-    modelResults$nnetar <- nnetar(y)
+    modelResults$nnetar <- nnetar(y, lambda = lambda)
   }
   
   # Set the model weights
   includedModels <- names(modelResults)
-  modelResults$weights <- rep(1 / length(expandedModels), length(expandedModels))
+  # Weighting methods would go here, equal weighting for now
+  if(weights == "equal"){
+    modelResults$weights <- rep(1 / length(expandedModels), length(expandedModels))
+  }
   names(modelResults$weights) <- includedModels
   
+  # Prepare the hybridModel object
   class(modelResults) <- "hybridModel"
   modelResults$frequency <- frequency(y)
   modelResults$models <- includedModels
@@ -104,6 +134,7 @@ fitted.hybridModel <- function(x){
   for(i in x$models){
     results[[i]] <- fitted(x[[i]])
   }
+  results
 }
 
 residuals.hybridModel <- function(x){
@@ -111,4 +142,5 @@ residuals.hybridModel <- function(x){
   for(i in x$models){
     results[[i]] <- residuals(x[[i]])
   }
+  results
 }
