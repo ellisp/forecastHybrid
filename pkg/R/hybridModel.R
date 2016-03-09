@@ -151,3 +151,19 @@ accuracy.hybridModel <- function(x){
     results[[i]] <- accuracy(x[[i]])
   }
 }
+
+summary.hybridModel <- function(x){
+  print.hybridModel(x)
+}
+
+print.hybridModel <- function(x){
+  cat("Hybrid forecast model comprised of the following models:", x$models, "\n")
+  cat("with the respective weights:", x$weights, "\n\n")
+  for(i in x$models){
+    cat("############\n")
+    cat(i, "\n")
+    cat("############\n")
+    print(x[[i]])
+    cat("\n\n")
+  }
+}
