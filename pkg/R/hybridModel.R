@@ -144,3 +144,10 @@ residuals.hybridModel <- function(x){
   }
   results
 }
+
+accuracy.hybridModel <- function(x){
+  results <- list()
+  for(i in x$models){
+    results[[i]] <- accuracy(x[[i]])
+  }
+}
