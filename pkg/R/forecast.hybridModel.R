@@ -55,7 +55,7 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
   forecasts$pointForecasts <- matrix(numeric(), nrow = h, ncol = length(includedModels))
   colnames(forecasts$pointForecasts) <- includedModels
   if("auto.arima" %in% includedModels){
-    forecasts$auto.arima <- forecast(object$auto.arima, h = h)
+    forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xreg)
     forecasts$pointForecasts[, "auto.arima"] <- forecasts$auto.arima$mean
   }
   if("tbats" %in% includedModels){
