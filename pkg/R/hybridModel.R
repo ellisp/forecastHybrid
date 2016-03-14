@@ -23,7 +23,7 @@
 #' @examples
 #' print("hello world")
 #'
-hybridModel <- function(y, models = "aten",
+hybridModel <- function(y, models = "atens",
                         xreg = NULL, lambda = NULL,
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("rmse", "mae", "mase"),
@@ -54,7 +54,7 @@ hybridModel <- function(y, models = "aten",
     stop("Invalid models specified.")
   }
   # All characters must be valid
-  if(!(all(expandedModels %in% c("a", "t", "e", "n")))){
+  if(!(all(expandedModels %in% c("a", "t", "e", "n", "s")))){
     stop("Invalid models specified.")
   }
   if(!length(expandedModels)){
@@ -108,6 +108,10 @@ hybridModel <- function(y, models = "aten",
   # nnetar(), additional arguments to be implemented
   if(is.element("n", expandedModels)){
     modelResults$nnetar <- nnetar(y, lambda = lambda)
+  }
+  # stlm(), additional arguments to be implemented
+  if(is.element("s", expandedModels)){
+    modelResults$stlm <- stlm(y, lambda = lambda)
   }
   
   # Set the model weights
