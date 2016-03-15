@@ -70,6 +70,11 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
     forecasts$nnetar <- forecast(object$nnetar, h = h)
     forecasts$pointForecasts[, "nnetar"] <- forecasts$nnetar$mean
   }
+  if("stlm" %in% includedModels){
+    forecasts$stlm <- forecast(object$stlm, h = h)
+    forecasts$pointForecasts[, "stlm"] <- forecasts$stlm$mean
+  }
+  
   # Code would unequal weights would be needed here
   finalForecast <- rowSums(forecasts$pointForecast * weightsMatrix)
   # Conver the final forecast into a ts object
