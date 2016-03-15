@@ -50,7 +50,7 @@ hybridModel <- function(y, models = "atens",
   
   # Match the specified models
   expandedModels <- unique(tolower(unlist(strsplit(models, split = ""))))
-  if(length(expandedModels) > 4L){
+  if(length(expandedModels) > 5L){
     stop("Invalid models specified.")
   }
   # All characters must be valid
@@ -85,7 +85,7 @@ hybridModel <- function(y, models = "atens",
   if(as.logical((num.cores %% 1L)) || num.cores <= 0L){
     stop("The number of cores specified must be an integer greater than zero.")
   }
-
+  
   
   modelResults <- list()
   
