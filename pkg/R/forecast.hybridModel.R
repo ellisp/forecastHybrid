@@ -58,10 +58,6 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
     forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xreg)
     forecasts$pointForecasts[, "auto.arima"] <- forecasts$auto.arima$mean
   }
-  if("tbats" %in% includedModels){
-    forecasts$tbats <- forecast(object$tbats, h = h)
-    forecasts$pointForecasts[, "tbats"] <- forecasts$tbats$mean
-  }
   if("ets" %in% includedModels){
     forecasts$ets <- forecast(object$ets, h = h)
     forecasts$pointForecasts[, "ets"] <- forecasts$ets$mean
@@ -71,8 +67,12 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
     forecasts$pointForecasts[, "nnetar"] <- forecasts$nnetar$mean
   }
   if("stlm" %in% includedModels){
-    forecasts$stlm <- forecast(object$stlm, h = h)
+    forecasts$stlm <- forecast(object$stlm, h = h, xreg = xreg)
     forecasts$pointForecasts[, "stlm"] <- forecasts$stlm$mean
+  }
+  if("tbats" %in% includedModels){
+    forecasts$tbats <- forecast(object$tbats, h = h)
+    forecasts$pointForecasts[, "tbats"] <- forecasts$tbats$mean
   }
   
   # Code would unequal weights would be needed here
