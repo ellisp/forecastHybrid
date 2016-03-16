@@ -23,8 +23,9 @@
 #' @examples
 #' print("hello world")
 #'
-hybridModel <- function(y, models = "atens",
-                        xreg = NULL, lambda = NULL,
+hybridModel <- function(y, models = "aenst",
+                        lambda = NULL,
+                        a.args = NULL, t.args = NULL, e.args = NULL, n.args = NULL, s.args = NULL,
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("rmse", "mae", "mase"),
                         parallel = TRUE, num.cores = 2L){
@@ -54,26 +55,28 @@ hybridModel <- function(y, models = "atens",
     stop("Invalid models specified.")
   }
   # All characters must be valid
-  if(!(all(expandedModels %in% c("a", "t", "e", "n", "s")))){
+  if(!(all(expandedModels %in% c("a", "e", "n", "s", "t")))){
     stop("Invalid models specified.")
   }
   if(!length(expandedModels)){
-    stop("At least one model type must be specified.")
+    stop("At least one component model type must be specified.")
   }
-  
-  # xreg must be a matrix and have same number of observations as the timeseries
-  if(!is.null(xreg)){
-    if(nrow(xreg) != length(y)){
-      stop("The supplied xreg must have the same number of rows as the timeseries.")
-    }
-    if(!is.matrix(xreg) && !is.data.frame(xreg)){
-      stop("The supplied xreg must be a matrix or data.frame.")
-    }
-    xreg <- as.matrix(xreg)
-    if(!is.numeric(xreg)){
-      stop("The supplied xreg must be numeric.")
-    }
-  }
+
+  #  Since the xreg argument was removed and placed inside a.args/s.args, this test 
+  # is no longer needed. Do we want to test the a.args/s.args individually?
+#   # xreg must be a matrix and have same number of observations as the timeseries
+#   if(!is.null(a.args$xreg)){
+#     if(nrow(a.args$xreg) != length(y)){
+#       stop("The supplied xreg must have the same number of rows as the timeseries.")
+#     }
+#     if(!is.matrix(a.args$xreg) && !is.data.frame(a.args$xreg)){
+#       stop("The supplied xreg must be a matrix or data.frame.")
+#     }
+#     xreg <- as.matrix(a.args$xreg)
+#     if(!is.numeric(xreg)){
+#       stop("The supplied xreg must be numeric.")
+#     }
+#   }
   
   # Validate cores and parallel arguments
   if(!is.logical(parallel)){
@@ -86,6 +89,23 @@ hybridModel <- function(y, models = "atens",
     stop("The number of cores specified must be an integer greater than zero.")
   }
   
+  # Check a.args/t.args/e.args/n.args/s.args
+  if(!is.null(a.args) && !is.element("a", expandedModels)){
+    warning("auto.arima was not selected in the models argument, but a.args was passed. Ignoring a.args")
+  }
+  if(!is.null(e.args) && !is.element("e", expandedModels)){
+    warning("ets was not selected in the models argument, but e.args was passed. Ignoring a.args")
+  }
+  if(!is.null(n.args) && !is.element("n", expandedModels)){
+    warning("nnetar was not selected in the models argument, but n.args was passed. Ignoring a.args")
+  }
+  if(!is.null(s.args) && !is.element("s", expandedModels)){
+    warning("stlm was not selected in the models argument, but s.args was passed. Ignoring a.args")
+  }
+  if(!is.null(t.args) && !is.element("t", expandedModels)){
+    warning("tbats was not selected in the models argument, but t.args was passed. Ignoring a.args")
+  }
+
   
   modelResults <- list()
   
@@ -95,24 +115,45 @@ hybridModel <- function(y, models = "atens",
   
   # auto.arima(), additional arguments to be implemented
   if(is.element("a", expandedModels)){
-    modelResults$auto.arima <- auto.arima(y, xreg = xreg, lambda = lambda)
-  }
-  # tbats(), additional arguments to be implemented
-  if(is.element("t", expandedModels)){
-    modelResults$tbats <- tbats(y)
+    if(is.null(a.args)){
+      a.args <- list(lambda = lambda)
+    } else if(is.null(a.args$lambda)){
+      a.args$lambda <- lambda
+    }
+    modelResults$auto.arima <- do.call(auto.arima, c(list(y), a.args))
   }
   # ets(), additional arguments to be implemented
   if(is.element("e", expandedModels)){
-    modelResults$ets <- ets(y, lambda = lambda)
+    if(is.null(e.args)){
+      e.args <- list(lambda = lambda)
+    } else if(is.null(e.args$lambda)){
+      e.args$lambda <- lambda
+    }
+    modelResults$ets <- do.call(ets, c(list(y), e.args))
   }
   # nnetar(), additional arguments to be implemented
   if(is.element("n", expandedModels)){
-    modelResults$nnetar <- nnetar(y, lambda = lambda)
+    if(is.null(n.args)){
+      n.args <- list(lambda = lambda)
+    } else if(is.null(n.args$lambda)){
+      n.args$lambda <- lambda
+    }
+    modelResults$nnetar <- do.call(nnetar, c(list(y), n.args))
   }
   # stlm(), additional arguments to be implemented
   if(is.element("s", expandedModels)){
-    modelResults$stlm <- stlm(y, lambda = lambda)
+    if(is.null(s.args)){
+      s.args <- list(lambda = lambda)
+    } else if(is.null(s.args$lambda)){
+      s.args$lambda <- lambda
+    }
+    modelResults$stlm <- do.call(auto.arima, c(list(y), s.args))
   }
+  # tbats(), additional arguments to be implemented
+  if(is.element("t", expandedModels)){
+    modelResults$tbats <- do.call(tbats, c(list(y), e.args))
+  }
+  
   
   # Set the model weights
   includedModels <- names(modelResults)
