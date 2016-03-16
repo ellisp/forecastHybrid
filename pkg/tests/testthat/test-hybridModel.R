@@ -5,8 +5,9 @@ if(require(fpp) & require(forecast) & require(testthat)){
     expect_that(hybridModel(y = 1:10, models = "jten"), throws_error())
     expect_that(hybridModel(y = 1:10, models = 5), throws_error())
     expect_that(hybridModel(y = matrix(1:10, nrow = 5, ncol = 2), models = 5), throws_error())
-    expect_that(hybridModel(y = wineind, xreg = rnorm(length(wineind) - 1)), throws_error())
-    expect_that(hybridModel(y = rnorm(100), models = "a", xreg = matrix(runif(100), nrow = 100)), not(throws_error()))
+    # Test for invalid mistmatch length of y and xreg in a.args/s.args later?
+    expect_warning(expect_that(hybridModel(y = wineind, a.args = list(xreg = rnorm(length(wineind) - 1))), throws_error()))
+    expect_that(hybridModel(y = rnorm(100), models = "a", a.args = list(xreg = matrix(runif(100), nrow = 100))), not(throws_error()))
     expect_that(hybridModel(y = "hello world"), throws_error())
     expect_that(hybridModel(), throws_error())
     expect_that(hybridModel(y = numeric()), throws_error())
