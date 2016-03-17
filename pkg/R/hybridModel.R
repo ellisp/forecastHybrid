@@ -27,7 +27,7 @@ hybridModel <- function(y, models = "aenst",
                         lambda = NULL,
                         a.args = NULL, t.args = NULL, e.args = NULL, n.args = NULL, s.args = NULL,
                         weights = c("equal", "insample.errors", "cv.errors"),
-                        errorMethod = c("rmse", "mae", "mase"),
+                        errorMethod = c("RMSE", "MAE", "MASE"),
                         parallel = TRUE, num.cores = 2L){
   # Weights could be set to equal (the default), based on in-sample errors, or based on cv errors
   # In-sample errors are methodologically questionable but easy to implement. CV errors are probably
@@ -160,6 +160,28 @@ hybridModel <- function(y, models = "aenst",
   # Weighting methods would go here, equal weighting for now
   if(weights == "equal"){
     modelResults$weights <- rep(1 / length(expandedModels), length(expandedModels))
+  } else if(weights == "insample.errors"){
+    # There is probably a better way of accomplishing this
+    # But this ugly approach will work for now
+    modelResults$weights <- rep(0, length(expandedModels))
+    index <- 1
+    for(i in expandedModels){
+      if(i == "a"){
+        modelResults$weights[index] <- accuracy(modelResults$auto.arima)[1, errorMethod]
+      }else if(i == "e"){
+        modelResults$weights[index] <- accuracy(modelResults$ets)[1, errorMethod]
+      } else if(i == "n"){
+        modelResults$weights[index] <- accuracy(modelResults$nnetar)[1, errorMethod]
+      } else if(i == "s"){
+        modelResults$weights[index] <- accuracy(modelResults$stlm)[1, errorMethod]
+      } else if(i == "t"){
+        modelResults$weights[index] <- accuracy(modelResults$tbats)[1, errorMethod]
+      }
+      index <- index + 1
+    }
+    # Scale the weights
+    modelResults$weights <- (1 / modelResults$weights) / sum(1 / modelResults$weights)
+
   }
   names(modelResults$weights) <- includedModels
   
