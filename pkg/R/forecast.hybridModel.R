@@ -15,7 +15,8 @@
 #' @examples
 #' print("hello world")
 #'
-forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * object$frequency, 10), xreg = NULL){
+forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * object$frequency, 10), xreg = NULL,
+                                 level = c(80, 95)){
   
   # Check inputs
   if(!is.hybridModel(object)){
@@ -55,11 +56,11 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
   forecasts$pointForecasts <- matrix(numeric(), nrow = h, ncol = length(includedModels))
   colnames(forecasts$pointForecasts) <- includedModels
   if("auto.arima" %in% includedModels){
-    forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xreg)
+    forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xreg, level = level)
     forecasts$pointForecasts[, "auto.arima"] <- forecasts$auto.arima$mean
   }
   if("ets" %in% includedModels){
-    forecasts$ets <- forecast(object$ets, h = h)
+    forecasts$ets <- forecast(object$ets, h = h, level = level)
     forecasts$pointForecasts[, "ets"] <- forecasts$ets$mean
   }
   if("nnetar" %in% includedModels){
@@ -67,13 +68,40 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
     forecasts$pointForecasts[, "nnetar"] <- forecasts$nnetar$mean
   }
   if("stlm" %in% includedModels){
-    forecasts$stlm <- forecast(object$stlm, h = h, xreg = xreg)
+    forecasts$stlm <- forecast(object$stlm, h = h, xreg = xreg, level = level)
     forecasts$pointForecasts[, "stlm"] <- forecasts$stlm$mean
   }
   if("tbats" %in% includedModels){
-    forecasts$tbats <- forecast(object$tbats, h = h)
+    forecasts$tbats <- forecast(object$tbats, h = h, level = level)
     forecasts$pointForecasts[, "tbats"] <- forecasts$tbats$mean
   }
+  
+  # Construct the upper/lower prediction intervals
+  # This is ugly and should be revisited
+  # Methods besides the extreme cases should also be considered
+  # This also only works with two levels (very bad!)
+  lowerlimit1 <- rep(numeric(), h)
+  lowerlimit2 <- lowerlimit1
+  upperlimit1 <- lowerlimit1
+  upperlimit2 <- lowerlimit1
+  
+  for(i in object$models){
+    if(i != "nnetar"){
+      lowerlimit1 <- cbind(lowerlimit1, matrix(forecasts[[i]]$lower[, 1], ncol = 1))
+      lowerlimit2 <- cbind(lowerlimit2, matrix(forecasts[[i]]$lower[, 2], ncol = 1))
+      upperlimit1 <- cbind(upperlimit1, matrix(forecasts[[i]]$upper[, 1], ncol = 1))
+      upperlimit2 <- cbind(upperlimit2, matrix(forecasts[[i]]$upper[, 2], ncol = 1))
+    }
+  }
+  lowerbounds1 <- as.numeric(apply(lowerlimit1, 1, min))
+  lowerbounds2 <- as.numeric(apply(lowerlimit2, 1, min))
+  upperbounds1 <- as.numeric(apply(upperlimit1, 1, max))
+  upperbounds2 <- as.numeric(apply(upperlimit2, 1, max))
+  forecasts$upper <- matrix(c(upperbounds1, upperbounds2), ncol = 2, byrow = TRUE)
+  forecasts$lower <- matrix(c(lowerbounds1, lowerbounds2), ncol = 2, byrow = TRUE)
+  colnames(forecasts$upper) <- c(paste0(level[1], "%"), paste0(level[2], "%"))
+  colnames(forecasts$lower) <- c(paste0(level[1], "%"), paste0(level[2], "%"))
+  
   
   # Code would unequal weights would be needed here
   finalForecast <- rowSums(forecasts$pointForecast * weightsMatrix)
