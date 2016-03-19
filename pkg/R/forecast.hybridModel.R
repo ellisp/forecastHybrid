@@ -12,8 +12,10 @@
 #' @param h number of periods to forecast ahead
 #' @seealso \code{\link{hybridModel}}
 #' @details more detailed description here 
+#' @return an object of class forecast.
 #' @examples
-#' print("hello world")
+#' mod <- hybridModel(AirPassengers)
+#' plot(forecast(mod))
 #'
 forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * object$frequency, 10), xreg = NULL,
                                  level = c(80, 95)){

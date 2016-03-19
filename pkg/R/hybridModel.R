@@ -5,12 +5,15 @@
 #' Create a hybrid time series model from one to four contributing models
 #' 
 #' @export
+#' @import forecast
 #' @param y a numeric vector or time series
-#' @param models a four character string indicating which contributing models to use: 
-#' a (\code{auto.arima()}), t (\code{tbats()}), e (\code{ets()}) and n (\code{nnetar()})
-#' @param xreg Optionally, a vector or matrix of external regressors, which must 
-#' have the same number of rows as y.  Only used if 'a' is part of the models string
-#' ie if \code{auto.arima} is one of the contributing models
+#' @param models a character string of up to five characters indicating which contributing models to use: 
+#' a (\code{auto.arima()}), e (\code{ets()}), n (\code{nnetar()}), s (\code{stlm()}) and t (\code{tbats()})
+#' @param a.args Arguments to pass to \code{auto.arima()}
+#' @param e.args Arguments to pass to \code{ets()}
+#' @param n.args Arguments to pass to \code{nnetar()}
+#' @param s.args Arguments to pass to \code{stlm()}
+#' @param t.args Arguments to pass to \code{tbats()}
 #' @param weights Method for weighting the forecasts of the various contributing
 #' models.  Defaults to equal, which has shown to be robust and surprisingly better
 #' in many cases than giving more weight to models with better past performance.
@@ -19,13 +22,15 @@
 #' @param parallel  Should parallel processing be used?
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.
 #' @seealso \code{\link{forecast.hybridModel}}
+#' @return An object of class hybridModel
 #' @details more detailed description here 
 #' @examples
-#' print("hello world")
+#' mod <- hybridModel(AirPassengers)
+#' plot(forecast(mod))
 #'
 hybridModel <- function(y, models = "aenst",
                         lambda = NULL,
-                        a.args = NULL, t.args = NULL, e.args = NULL, n.args = NULL, s.args = NULL,
+                        a.args = NULL, e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL, 
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("RMSE", "MAE", "MASE"),
                         parallel = TRUE, num.cores = 2L){
@@ -62,22 +67,6 @@ hybridModel <- function(y, models = "aenst",
     stop("At least one component model type must be specified.")
   }
 
-  #  Since the xreg argument was removed and placed inside a.args/s.args, this test 
-  # is no longer needed. Do we want to test the a.args/s.args individually?
-#   # xreg must be a matrix and have same number of observations as the timeseries
-#   if(!is.null(a.args$xreg)){
-#     if(nrow(a.args$xreg) != length(y)){
-#       stop("The supplied xreg must have the same number of rows as the timeseries.")
-#     }
-#     if(!is.matrix(a.args$xreg) && !is.data.frame(a.args$xreg)){
-#       stop("The supplied xreg must be a matrix or data.frame.")
-#     }
-#     xreg <- as.matrix(a.args$xreg)
-#     if(!is.numeric(xreg)){
-#       stop("The supplied xreg must be numeric.")
-#     }
-#   }
-  
   # Validate cores and parallel arguments
   if(!is.logical(parallel)){
     stop("The parallel argument must be TRUE/FALSE.")
@@ -147,7 +136,7 @@ hybridModel <- function(y, models = "aenst",
     } else if(is.null(s.args$lambda)){
       s.args$lambda <- lambda
     }
-    modelResults$stlm <- do.call(auto.arima, c(list(y), s.args))
+    modelResults$stlm <- do.call(stlm, c(list(y), s.args))
   }
   # tbats(), additional arguments to be implemented
   if(is.element("t", expandedModels)){

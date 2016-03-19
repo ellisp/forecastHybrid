@@ -12,6 +12,9 @@
 
 \item{h}{number of periods to forecast ahead}
 }
+\value{
+an object of class forecast.
+}
 \description{
 Forecast method for hybrid models
 }
@@ -19,7 +22,8 @@ Forecast method for hybrid models
 more detailed description here
 }
 \examples{
-print("hello world")
+mod <- hybridModel(AirPassengers)
+plot(forecast(mod))
 
 }
 \seealso{

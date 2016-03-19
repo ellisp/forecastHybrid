@@ -5,15 +5,25 @@
 \title{Hybrid time series modelling}
 \usage{
 hybridModel(y, models = "aenst", lambda = NULL, a.args = NULL,
-  t.args = NULL, e.args = NULL, n.args = NULL, s.args = NULL,
+  e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL,
   weights = c("equal", "insample.errors", "cv.errors"),
   errorMethod = c("RMSE", "MAE", "MASE"), parallel = TRUE, num.cores = 2L)
 }
 \arguments{
 \item{y}{a numeric vector or time series}
 
-\item{models}{a four character string indicating which contributing models to use: 
-a (\code{auto.arima()}), t (\code{tbats()}), e (\code{ets()}) and n (\code{nnetar()})}
+\item{models}{a character string of up to five characters indicating which contributing models to use: 
+a (\code{auto.arima()}), e (\code{ets()}), n (\code{nnetar()}), s (\code{stlm()}) and t (\code{tbats()})}
+
+\item{a.args}{Arguments to pass to \code{auto.arima()}}
+
+\item{e.args}{Arguments to pass to \code{ets()}}
+
+\item{n.args}{Arguments to pass to \code{nnetar()}}
+
+\item{s.args}{Arguments to pass to \code{stlm()}}
+
+\item{t.args}{Arguments to pass to \code{tbats()}}
 
 \item{weights}{Method for weighting the forecasts of the various contributing
 models.  Defaults to equal, which has shown to be robust and surprisingly better
@@ -23,12 +33,11 @@ in many cases than giving more weight to models with better past performance.}
 
 \item{num.cores}{If \code{parallel=TRUE}, how many cores to use.}
 
-\item{xreg}{Optionally, a vector or matrix of external regressors, which must 
-have the same number of rows as y.  Only used if 'a' is part of the models string
-ie if \code{auto.arima} is one of the contributing models}
-
 \item{errorMethod.}{Method of measuring accuracy to use if weights are not 
 to be equal.}
+}
+\value{
+An object of class hybridModel
 }
 \description{
 Create a hybrid time series model from one to four contributing models
@@ -37,7 +46,8 @@ Create a hybrid time series model from one to four contributing models
 more detailed description here
 }
 \examples{
-print("hello world")
+mod <- hybridModel(AirPassengers)
+plot(forecast(mod))
 
 }
 \seealso{
