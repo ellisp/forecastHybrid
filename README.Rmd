@@ -1,4 +1,4 @@
-[![Travis-CI Build Status](https://travis-ci.org/ellisp/ggseas.svg?branch=master)](https://travis-ci.org/ellisp/ggseas)
+[![Travis-CI Build Status](https://travis-ci.org/ellisp/forecastHybrid.svg?branch=master)](https://travis-ci.org/ellisp/forecastHybrid)
 
 # forecastHybrid
 Convenient functions for ensemble forecasts in R combining approaches from the {forecast} package
