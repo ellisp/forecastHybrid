@@ -13,6 +13,7 @@
 #' @param xreg Future values of regression variables (for use if one of the ensemble methods used
 #' in creating the hybrid forecast was \code{auto.arima})
 #' @param level Confidence level for prediction intervals
+#' @param ... other arguments; currently not used.
 #' @seealso \code{\link{hybridModel}}
 #' @details more detailed description here 
 #' @return an object of class forecast.
@@ -21,7 +22,7 @@
 #' plot(forecast(mod))
 #'
 forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * object$frequency, 10), xreg = NULL,
-                                 level = c(80, 95)){
+                                 level = c(80, 95), ...){
   
   # Check inputs
   if(!is.hybridModel(object)){

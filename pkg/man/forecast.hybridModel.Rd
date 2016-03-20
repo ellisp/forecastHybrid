@@ -5,7 +5,7 @@
 \title{Hybrid forecast}
 \usage{
 \method{forecast}{hybridModel}(object, h = ifelse(object$frequency > 1, 2 *
-  object$frequency, 10), xreg = NULL, level = c(80, 95))
+  object$frequency, 10), xreg = NULL, level = c(80, 95), ...)
 }
 \arguments{
 \item{object}{A hybrid time series model fit with hybridModel()}
@@ -16,6 +16,8 @@
 in creating the hybrid forecast was \code{auto.arima})}
 
 \item{level}{Confidence level for prediction intervals}
+
+\item{...}{other arguments; currently not used.}
 }
 \value{
 an object of class forecast.
