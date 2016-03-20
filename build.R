@@ -6,4 +6,8 @@ library(knitr)
 knit("README.Rmd", "README.md")
 
 document("pkg")
+test("pkg")
+
 build("pkg")
+
+

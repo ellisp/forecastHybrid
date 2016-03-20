@@ -11,8 +11,9 @@ if(require(fpp) & require(forecast) & require(testthat)){
   })
   test_that("Testing forecasts with xreg", {
     mm <- matrix(runif(length(wineind)), nrow = length(wineind))
-    aa <- hybridModel(wineind, models = "as", a.args = list(xreg = mm), s.args = list(xreg = mm))
-    expect_warning(expect_that(forecast(aa, xreg = matrix(rnorm(20), nrow = 20)), not(throws_error())))
+    expect_error(aa <- hybridModel(wineind, models = "as", a.args = list(xreg = mm), s.args = list(xreg = mm)))
+    aa <- hybridModel(wineind, models = "as", a.args = list(xreg = mm))
+    expect_warning(expect_that(tmp <- forecast(aa, xreg = matrix(rnorm(20), nrow = 20)), not(throws_error())))
     #expect_warning(forecast(aa, h = 10, xreg = matrix(rnorm(20), nrow = 20)))
     expect_that(forecast(aa, xreg = matrix(rnorm(24), nrow = 24)), not(throws_error()))
     expect_true(length(forecast(aa, xreg = matrix(rnorm(24), nrow = 24))$mean) == 24L)
