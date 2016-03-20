@@ -1,7 +1,5 @@
-# copied from https://github.com/olmjo/RcppTN/blob/master/.travis.yml 
-
-# this is the only line that needed changing from olmjo's
-sudo: required
+# thanks to https://github.com/travis-ci/travis-ci/issues/5775
+sudo: false
 
 language: r
 r:
@@ -9,25 +7,13 @@ r:
   - release
   - devel
 
-# cache: packages # won't make any difference because with sudo on, can't use container based approach
-
-before_install:
-  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - chmod 755 ./travis-tool.sh
-  - ./travis-tool.sh bootstrap
+cache: packages
 
 install:
-  - cd pkg
-  - ../travis-tool.sh install_deps
-
-
-script: ../travis-tool.sh run_tests
-
-warnings_are_errors: true
-
-on_failure:
-  - ../travis-tool.sh dump_logs
-
+  - Rscript -e 'install.packages(c("devtools","roxygen2","testthat"));devtools::install_deps("pkg")'
+script:
+  - Rscript -e 'devtools::check("pkg")'
+  
 notifications:
   email:
     on_success: change
