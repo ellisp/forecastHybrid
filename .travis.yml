@@ -1,0 +1,32 @@
+# copied from https://github.com/olmjo/RcppTN/blob/master/.travis.yml 
+
+# this is the only line that needed changing from olmjo's
+sudo: required
+
+language: r
+r:
+  - oldrel
+  - release
+  - devel
+
+# cache: packages # won't make any difference because with sudo on, can't use container based approach
+
+before_install:
+  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
+  - chmod 755 ./travis-tool.sh
+  - ./travis-tool.sh bootstrap
+
+install:
+  - cd pkg
+  - ../travis-tool.sh install_deps
+
+
+script: ../travis-tool.sh run_tests
+
+on_failure:
+  - ../travis-tool.sh dump_logs
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
