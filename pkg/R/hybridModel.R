@@ -7,6 +7,8 @@
 #' @export
 #' @import forecast
 #' @param y a numeric vector or time series
+#' @param lambda 
+#' Box-Cox transformation parameter.  Ignored if NULL.  Otherwise, data transformed before model is estimated.  
 #' @param models a character string of up to five characters indicating which contributing models to use: 
 #' a (\code{auto.arima()}), e (\code{ets()}), n (\code{nnetar()}), s (\code{stlm()}) and t (\code{tbats()})
 #' @param a.args Arguments to pass to \code{auto.arima()}
@@ -17,7 +19,7 @@
 #' @param weights Method for weighting the forecasts of the various contributing
 #' models.  Defaults to equal, which has shown to be robust and surprisingly better
 #' in many cases than giving more weight to models with better past performance.
-#' @param errorMethod.  Method of measuring accuracy to use if weights are not 
+#' @param errorMethod  Method of measuring accuracy to use if weights are not 
 #' to be equal.
 #' @param parallel  Should parallel processing be used?
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.

@@ -15,6 +15,8 @@ hybridModel(y, models = "aenst", lambda = NULL, a.args = NULL,
 \item{models}{a character string of up to five characters indicating which contributing models to use: 
 a (\code{auto.arima()}), e (\code{ets()}), n (\code{nnetar()}), s (\code{stlm()}) and t (\code{tbats()})}
 
+\item{lambda}{Box-Cox transformation parameter.  Ignored if NULL.  Otherwise, data transformed before model is estimated.}
+
 \item{a.args}{Arguments to pass to \code{auto.arima()}}
 
 \item{e.args}{Arguments to pass to \code{ets()}}
@@ -29,12 +31,12 @@ a (\code{auto.arima()}), e (\code{ets()}), n (\code{nnetar()}), s (\code{stlm()}
 models.  Defaults to equal, which has shown to be robust and surprisingly better
 in many cases than giving more weight to models with better past performance.}
 
+\item{errorMethod}{Method of measuring accuracy to use if weights are not 
+to be equal.}
+
 \item{parallel}{Should parallel processing be used?}
 
 \item{num.cores}{If \code{parallel=TRUE}, how many cores to use.}
-
-\item{errorMethod.}{Method of measuring accuracy to use if weights are not 
-to be equal.}
 }
 \value{
 An object of class hybridModel

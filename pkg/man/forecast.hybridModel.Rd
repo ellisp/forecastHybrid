@@ -11,6 +11,11 @@
 \item{object}{A hybrid time series model fit with hybridModel()}
 
 \item{h}{number of periods to forecast ahead}
+
+\item{xreg}{Future values of regression variables (for use if one of the ensemble methods used
+in creating the hybrid forecast was \code{auto.arima})}
+
+\item{level}{Confidence level for prediction intervals}
 }
 \value{
 an object of class forecast.

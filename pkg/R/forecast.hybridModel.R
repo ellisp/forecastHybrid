@@ -10,6 +10,9 @@
 #' @import forecast
 #' @param object A hybrid time series model fit with hybridModel()
 #' @param h number of periods to forecast ahead
+#' @param xreg Future values of regression variables (for use if one of the ensemble methods used
+#' in creating the hybrid forecast was \code{auto.arima})
+#' @param level Confidence level for prediction intervals
 #' @seealso \code{\link{hybridModel}}
 #' @details more detailed description here 
 #' @return an object of class forecast.
