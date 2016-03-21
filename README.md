@@ -26,14 +26,21 @@ hm1 <- hybridModel(wineind, models = "aet", weights = "equal")
 plot(forecast(hm1, h = 48))
 
 # Build the ensemble model on the same data but this time use auto.arima, nnetar, stlm, and tbats models.
-hm1 <- hybridModel(wineind, models = "anst", weights = "equal")
+hm2 <- hybridModel(wineind, models = "anst", weights = "equal")
 
 # Now plot the forecast for the next 48 periods
-plot(forecast(hm2, h = 48)
+plot(forecast(hm2, h = 48))
 
 # Extract the point forecasts from this model
 fc <- forecast(hm2, h = 48)
 fc$mean
 
+# Extract the (default) upper 80% and 95% prediction intervals
+fc$upper
+# Extract the (default) lower 80% and 95% prediction intervals
+fc$lower
+
+# Produce a forecast with prediction interavals at the 70%, 80%, 90%, and 95% levels
+fc2 <- forecast(hm2, h = 48, level = c(70, 80, 90, 95))
 ```
 
