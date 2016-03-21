@@ -5,10 +5,12 @@
 #' @export
 #' @import forecast
 #' @param object A hybrid time series model fit with hybridModel()
-#' @param h number of periods to forecast ahead
+#' @param Number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast 
+#' periods is set to the number of rows of \code{xreg}.
 #' @param xreg Future values of regression variables (for use if one of the ensemble methods used
 #' in creating the hybrid forecast was \code{auto.arima} or \code{stlm} and a xreg was used in the fit)
 #' @param level Confidence level for prediction intervals
+#' @param If \code{TRUE}, level is set to \code{seq(51,99,by=3)}. This is suitable for fan plots.
 #' @param ... other arguments; currently not used.
 #' @seealso \code{\link{hybridModel}}
 #' @details more detailed description here 
@@ -18,7 +20,7 @@
 #' plot(forecast(mod))
 #'
 forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * object$frequency, 10), xreg = NULL,
-                                 level = c(80, 95), ...){
+                                 level = c(80, 95), fan = FALSE, ...){
   
   # Check inputs
   if(!is.hybridModel(object)){
@@ -48,6 +50,18 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
     stop("The forecast horizon h must be a positive integer.")
   }
   
+  # Allow for fan prediction intervals
+  if(fan){
+    level <- seq(51, 99, by = 3)
+  } else {
+    if(min(level) > 0 && max(level) < 1){
+      level <- 100 * level
+    } else if(min(level) < 0 || max(level) > 99.99){
+      stop("Confidence limit out of range")
+    }
+  }
+
+  
   # This code is pretty ugly, There is probably a better way of doing this.
   forecastWeights <- object$weights
   weightsMatrix <- matrix(rep(forecastWeights, times = h), nrow = h, byrow = TRUE)
@@ -76,32 +90,33 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
     forecasts$pointForecasts[, "tbats"] <- forecasts$tbats$mean
   }
   
-  # Construct the upper/lower prediction intervals
-  # This is ugly and should be revisited
-  # Methods besides the extreme cases should also be considered
-  # This also only works with two levels (very bad!)
-  lowerlimit1 <- rep(numeric(), h)
-  lowerlimit2 <- lowerlimit1
-  upperlimit1 <- lowerlimit1
-  upperlimit2 <- lowerlimit1
+#   # Construct the upper/lower prediction intervals
+#   # This is ugly and should be revisited
+#   # Methods besides the extreme cases should also be considered
+#   # This also only works with two levels (very bad!)
+#   lowerlimit1 <- rep(numeric(), h)
+#   lowerlimit2 <- lowerlimit1
+#   upperlimit1 <- lowerlimit1
+#   upperlimit2 <- lowerlimit1
+#   
+#   for(i in object$models){
+#     if(i != "nnetar"){
+#       lowerlimit1 <- cbind(lowerlimit1, matrix(forecasts[[i]]$lower[, 1], ncol = 1))
+#       lowerlimit2 <- cbind(lowerlimit2, matrix(forecasts[[i]]$lower[, 2], ncol = 1))
+#       upperlimit1 <- cbind(upperlimit1, matrix(forecasts[[i]]$upper[, 1], ncol = 1))
+#       upperlimit2 <- cbind(upperlimit2, matrix(forecasts[[i]]$upper[, 2], ncol = 1))
+#     }
+#   }
+#   lowerbounds1 <- as.numeric(apply(lowerlimit1, 1, min))
+#   lowerbounds2 <- as.numeric(apply(lowerlimit2, 1, min))
+#   upperbounds1 <- as.numeric(apply(upperlimit1, 1, max))
+#   upperbounds2 <- as.numeric(apply(upperlimit2, 1, max))
+#   forecasts$upper <- matrix(c(upperbounds1, upperbounds2), ncol = 2, byrow = TRUE)
+#   forecasts$lower <- matrix(c(lowerbounds1, lowerbounds2), ncol = 2, byrow = TRUE)
+#   colnames(forecasts$upper) <- c(paste0(level[1], "%"), paste0(level[2], "%"))
+#   colnames(forecasts$lower) <- c(paste0(level[1], "%"), paste0(level[2], "%"))
   
-  for(i in object$models){
-    if(i != "nnetar"){
-      lowerlimit1 <- cbind(lowerlimit1, matrix(forecasts[[i]]$lower[, 1], ncol = 1))
-      lowerlimit2 <- cbind(lowerlimit2, matrix(forecasts[[i]]$lower[, 2], ncol = 1))
-      upperlimit1 <- cbind(upperlimit1, matrix(forecasts[[i]]$upper[, 1], ncol = 1))
-      upperlimit2 <- cbind(upperlimit2, matrix(forecasts[[i]]$upper[, 2], ncol = 1))
-    }
-  }
-  lowerbounds1 <- as.numeric(apply(lowerlimit1, 1, min))
-  lowerbounds2 <- as.numeric(apply(lowerlimit2, 1, min))
-  upperbounds1 <- as.numeric(apply(upperlimit1, 1, max))
-  upperbounds2 <- as.numeric(apply(upperlimit2, 1, max))
-  forecasts$upper <- matrix(c(upperbounds1, upperbounds2), ncol = 2, byrow = TRUE)
-  forecasts$lower <- matrix(c(lowerbounds1, lowerbounds2), ncol = 2, byrow = TRUE)
-  colnames(forecasts$upper) <- c(paste0(level[1], "%"), paste0(level[2], "%"))
-  colnames(forecasts$lower) <- c(paste0(level[1], "%"), paste0(level[2], "%"))
-  
+
   
   # Apply the weights to the individual forecasts and create the final point forecast
   finalForecast <- rowSums(forecasts$pointForecast * weightsMatrix)
@@ -111,10 +126,49 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
                       end = end(forecasts[[object$models[1]]]$mean),
                       frequency = object$frequency)
   
-  # Build a forecast object
+  # Construct the prediction intervals
+  # This is a template for when we have some means to 
+  nint <- length(level)
+  upper <- lower <- matrix(NA, ncol = nint, nrow = length(finalForecast))
+  # Prediction intervals for nnetar do not currently work, so exclude these
+  piModels <- object$models[object$models != "nnetar"]
+  # Produce each upper/lower limit
+  for(i in 1:nint){
+    # Produce the upper/lower limit for each model for a given level
+    tmpUpper <- tmpLower <- matrix(NA, nrow = h, ncol = length(piModels))
+    j2 <- 1
+    for(j in piModels){
+      tmpUpper[, j2] <- as.numeric(forecasts[[j]]$upper[, i])
+      tmpLower[, j2] <- as.numeric(forecasts[[j]]$lower[, i])
+      j2 <- j2 + 1
+    }
+    # upper/lower prediction intervals are the extreme values for now
+    upper[, i] <- apply(tmpUpper, 1, FUN = max)
+    lower[, i] <- apply(tmpLower, 1, FUN = min)
+  }
+  if(!is.finite(max(upper))){
+    warning("Upper prediction intervals are not finite.")
+  }
+  colnames(lower) <- colnames(upper) <- paste0(level, "%")
+  forecasts$lower <- lower
+  forecasts$upper <- upper
+  
+  # Build the mean forecast as a ts object
+  tsp.x <- tsp(object$x)
+  if (!is.null(tsp.x)){
+    start.f <- tsp(object$x)[2] + 1/object$frequency
+  } else{
+    start.f <- length(object$x) + 1
+  }
+  stop.f <- start.f + h / object$frequency
   forecasts$mean <- finalForecast
+#   ts(data = finalForecast, start = start.f, end = stop.f,
+#                        frequency = object$frequency)
+  
+  # Build a forecast object
   forecasts$x <- forecasts[[object$models[1]]]$x
   forecasts$method <- paste0(object$models, " with weight ", object$weights)
+  forecasts$level <- level
   # Code for inplementing confidence intervals will go here
   #forecasts$finalForecast$lower <- NA
   #forecasts$finalForecast$uppwer <- NA
