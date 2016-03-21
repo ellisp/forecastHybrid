@@ -1,5 +1,3 @@
-# TODO Add in additional arguments (e.g. max.p, max.q, model = "ZZZ" like in your implementation of hybridf())
-
 #' Hybrid time series modelling
 #' 
 #' Create a hybrid time series model from one to four contributing models
@@ -77,7 +75,7 @@ hybridModel <- function(y, models = "aenst",
   if(!length(expandedModels)){
     stop("At least one component model type must be specified.")
   }
-
+  
   # Validate cores and parallel arguments
   if(!is.logical(parallel)){
     stop("The parallel argument must be TRUE/FALSE.")
@@ -105,7 +103,7 @@ hybridModel <- function(y, models = "aenst",
   if(!is.null(t.args) && !is.element("t", expandedModels)){
     warning("tbats was not selected in the models argument, but t.args was passed. Ignoring a.args")
   }
-
+  
   
   modelResults <- list()
   
@@ -181,13 +179,14 @@ hybridModel <- function(y, models = "aenst",
     }
     # Scale the weights
     modelResults$weights <- (1 / modelResults$weights) / sum(1 / modelResults$weights)
-
+    
   }
   names(modelResults$weights) <- includedModels
   
   # Prepare the hybridModel object
   class(modelResults) <- "hybridModel"
   modelResults$frequency <- frequency(y)
+  modelResults$x <- y
   modelResults$models <- includedModels
   return(modelResults)
 }
