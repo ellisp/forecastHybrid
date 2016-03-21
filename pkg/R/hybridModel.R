@@ -18,17 +18,26 @@
 #' @param t.args Arguments to pass to \code{tbats()}
 #' @param weights Method for weighting the forecasts of the various contributing
 #' models.  Defaults to equal, which has shown to be robust and surprisingly better
-#' in many cases than giving more weight to models with better past performance.
+#' in many cases than giving more weight to models with better past performance. Weights
+#' utilizing insample errors are also available. Cross validated errors are currently unimplemented.
 #' @param errorMethod  Method of measuring accuracy to use if weights are not 
-#' to be equal.
-#' @param parallel  Should parallel processing be used?
+#' to be equal. Root mean square error (RMSE), mean absolute error (MAE) and mean absolute scaled error (MASE)
+#' are supported.
+#' @param parallel  Should parallel processing be used between models? This is currently unimplemented.
+#' Parallelization will still occur within individual models that suport it and can be controlled using a.args and t.args.
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.
 #' @seealso \code{\link{forecast.hybridModel}}
-#' @return An object of class hybridModel
-#' @details more detailed description here 
+#' @return An object of class hybridModel. The individual component models are stored inside of the object
+#' and can be accessed for all the regular manipulations available in the forecast package.
+#' @details The hybridModel function fits multiple individual model specifications to allow easy creation
+#' of ensemble forecasts. While default settings for the individual component models work quite well
+#' in most cases, fine control can be exerted by passing detailed arguments to the component models in the
+#' a.args, e.args, n.args, s.args, and t.args lists.
 #' @examples
-#' mod <- hybridModel(AirPassengers)
-#' plot(forecast(mod))
+#' mod1 <- hybridModel(AirPassengers)
+#' plot(forecast(mod1))
+#' mod2 <- hybridModel(AirPassengers, models = "aent", weights = "insample.errors", errorMethod = "MASE")
+#' mod3 <- hybridModel(AirPassengers, models = "ae", a.args = list(max.p = 7, mas.q = 7, approximation = FALSE))
 #'
 hybridModel <- function(y, models = "aenst",
                         lambda = NULL,
