@@ -1,7 +1,3 @@
-# TODO This function will need substantial work. We'll need to build an object of the "forecast" class.
-# We'll need to consider prediction intervals as well. Don't include, simulate them from bootstrap,
-# or use extreme values from the individual components of the model?
-
 #' Hybrid forecast
 #' 
 #' Forecast method for hybrid models
@@ -11,7 +7,7 @@
 #' @param object A hybrid time series model fit with hybridModel()
 #' @param h number of periods to forecast ahead
 #' @param xreg Future values of regression variables (for use if one of the ensemble methods used
-#' in creating the hybrid forecast was \code{auto.arima})
+#' in creating the hybrid forecast was \code{auto.arima} or \code{stlm} and a xreg was used in the fit)
 #' @param level Confidence level for prediction intervals
 #' @param ... other arguments; currently not used.
 #' @seealso \code{\link{hybridModel}}
@@ -51,8 +47,6 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
   if(as.logical((h %% 1L)) || h <= 0L){
     stop("The forecast horizon h must be a positive integer.")
   }
-  
-  
   
   # This code is pretty ugly, There is probably a better way of doing this.
   forecastWeights <- object$weights
@@ -109,7 +103,7 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
   colnames(forecasts$lower) <- c(paste0(level[1], "%"), paste0(level[2], "%"))
   
   
-  # Code would unequal weights would be needed here
+  # Apply the weights to the individual forecasts and create the final point forecast
   finalForecast <- rowSums(forecasts$pointForecast * weightsMatrix)
   # Conver the final forecast into a ts object
   finalForecast <- ts(finalForecast,
@@ -126,8 +120,5 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
   #forecasts$finalForecast$uppwer <- NA
   #forecasts$finalForecast$level <- NA
   class(forecasts) <- "forecast"
-  
-  
-  # We'll need to package this as an object of class "forecast", including prediction intervals, if applicable.
   return(forecasts)
 }
