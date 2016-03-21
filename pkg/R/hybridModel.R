@@ -36,8 +36,8 @@
 #' @examples
 #' mod1 <- hybridModel(AirPassengers)
 #' plot(forecast(mod1))
-#' mod2 <- hybridModel(AirPassengers, models = "aent", weights = "insample.errors", errorMethod = "MASE")
-#' mod3 <- hybridModel(AirPassengers, models = "ae", a.args = list(max.p = 7, mas.q = 7, approximation = FALSE))
+#' mod2 <- hybridModel(AirPassengers, models = "aest", weights = "insample.errors", errorMethod = "MASE")
+#' mod3 <- hybridModel(AirPassengers, models = "aen", a.args = list(max.p = 7, mas.q = 7, approximation = FALSE))
 #'
 hybridModel <- function(y, models = "aenst",
                         lambda = NULL,
