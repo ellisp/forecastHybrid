@@ -3,3 +3,4 @@
 S3method(forecast,hybridModel)
 export(hybridModel)
 import(forecast)
+import(fpp)
