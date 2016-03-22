@@ -4,6 +4,7 @@
 #' 
 #' @export
 #' @import forecast
+#' @import fpp
 #' @param y a numeric vector or time series
 #' @param lambda 
 #' Box-Cox transformation parameter.  Ignored if NULL.  Otherwise, data transformed before model is estimated.  
@@ -34,8 +35,10 @@
 #' @examples
 #' mod1 <- hybridModel(AirPassengers)
 #' plot(forecast(mod1))
-#' mod2 <- hybridModel(AirPassengers, models = "aet", weights = "insample.errors", errorMethod = "MASE")
-#' mod3 <- hybridModel(AirPassengers, models = "aens", a.args = list(max.p = 7, max.q = 7, approximation = FALSE))
+#' mod2 <- hybridModel(AirPassengers, models = "aet",
+#' weights = "insample.errors", errorMethod = "MASE")
+#' mod3 <- hybridModel(AirPassengers, models = "aens",
+#' a.args = list(max.p = 7, max.q = 7, approximation = FALSE))
 #'
 hybridModel <- function(y, models = "aenst",
                         lambda = NULL,
