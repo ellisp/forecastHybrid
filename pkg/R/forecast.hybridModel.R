@@ -4,13 +4,14 @@
 #' 
 #' @export
 #' @import forecast
+#' @import fpp
 #' @param object A hybrid time series model fit with hybridModel()
-#' @param Number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast 
+#' @param h Number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast 
 #' periods is set to the number of rows of \code{xreg}.
 #' @param xreg Future values of regression variables (for use if one of the ensemble methods used
 #' in creating the hybrid forecast was \code{auto.arima} or \code{stlm} and a xreg was used in the fit)
 #' @param level Confidence level for prediction intervals
-#' @param If \code{TRUE}, level is set to \code{seq(51,99,by=3)}. This is suitable for fan plots.
+#' @param fan If \code{TRUE}, level is set to \code{seq(51,99,by=3)}. This is suitable for fan plots.
 #' @param ... other arguments; currently not used.
 #' @seealso \code{\link{hybridModel}}
 #' @details more detailed description here 
