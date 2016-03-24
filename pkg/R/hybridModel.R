@@ -129,7 +129,7 @@ hybridModel <- function(y, models = "aenst",
   }
   
   # A model run should include at least two component models
-  if(length(expandedModels) <= 2L){
+  if(length(expandedModels) < 2L){
     stop("A hybridModel must contain at least two component models.")
   }
   
