@@ -32,6 +32,12 @@
 #' of ensemble forecasts. While default settings for the individual component models work quite well
 #' in most cases, fine control can be exerted by passing detailed arguments to the component models in the
 #' a.args, e.args, n.args, s.args, and t.args lists.
+#' Characteristics of the input series can cause problems for certain types of models and paramesters.
+#' For example, \code{stlm()} models require that the input series be seasonal, and there furthemore
+#' must be more than two seasonal periods of data for the decomposition. If it is not the case, \code{hybridModel()}
+#' will remove the \code{stlm()} model so an error does not occur. The \code{ets()} model does not handle 
+#' a series well with a seasonal period longer than 24 and will ignore the seasonality. In this case,
+#' \code{hybridModel()} will also drop the \code{ets()} model from the ensemble.
 #' @examples
 #' mod1 <- hybridModel(AirPassengers)
 #' plot(forecast(mod1))
@@ -107,6 +113,25 @@ hybridModel <- function(y, models = "aenst",
     warning("tbats was not selected in the models argument, but t.args was passed. Ignoring a.args")
   }
   
+  # Check for problems for specific models (e.g. long seasonality for ets and non-seasonal for stlm)
+  if(is.element("e", expandedModels) && frequency(y) >=24){
+    warning("frequency(y) >= 24. The ets model will not be used.")
+    expandedModels <- expandedModels[expandedModels != "e"]
+  }
+  if(is.element("s", expandedModels)){
+    if(frequency(y) < 2L){
+      warning("The stlm model requires that the input data be a seasonal ts object. The stlm model will not be used.")
+      expandedModels <- expandedModels[expandedModels != "s"]
+    } else if(frequency(y) * 2L >= length(y)){
+      warning("The stlm model requres a series more than twice as long as the seasonal period. The stlm model will not be used.")
+      expandedModels <- expandedModels[expandedModels != "s"]
+    }
+  }
+  
+  # A model run should include at least two component models
+  if(length(expandedModels) <= 2L){
+    stop("A hybridModel must contain at least two component models.")
+  }
   
   modelResults <- list()
   
@@ -114,7 +139,7 @@ hybridModel <- function(y, models = "aenst",
   # since this has better performance. As an enhancement, users with >4 cores could benefit by running
   # parallelism both within and between models, based on the number of available cores.
   
-  # auto.arima(), additional arguments to be implemented
+  # auto.arima()
   if(is.element("a", expandedModels)){
     if(is.null(a.args)){
       a.args <- list(lambda = lambda)
@@ -123,7 +148,7 @@ hybridModel <- function(y, models = "aenst",
     }
     modelResults$auto.arima <- do.call(auto.arima, c(list(y), a.args))
   }
-  # ets(), additional arguments to be implemented
+  # ets()
   if(is.element("e", expandedModels)){
     if(is.null(e.args)){
       e.args <- list(lambda = lambda)
@@ -132,7 +157,7 @@ hybridModel <- function(y, models = "aenst",
     }
     modelResults$ets <- do.call(ets, c(list(y), e.args))
   }
-  # nnetar(), additional arguments to be implemented
+  # nnetar()
   if(is.element("n", expandedModels)){
     if(is.null(n.args)){
       n.args <- list(lambda = lambda)
@@ -141,7 +166,7 @@ hybridModel <- function(y, models = "aenst",
     }
     modelResults$nnetar <- do.call(nnetar, c(list(y), n.args))
   }
-  # stlm(), additional arguments to be implemented
+  # stlm()
   if(is.element("s", expandedModels)){
     if(is.null(s.args)){
       s.args <- list(lambda = lambda)
@@ -150,7 +175,7 @@ hybridModel <- function(y, models = "aenst",
     }
     modelResults$stlm <- do.call(stlm, c(list(y), s.args))
   }
-  # tbats(), additional arguments to be implemented
+  # tbats()
   if(is.element("t", expandedModels)){
     modelResults$tbats <- do.call(tbats, c(list(y), e.args))
   }
@@ -236,3 +261,10 @@ print.hybridModel <- function(x){
     cat("\n\n")
   }
 }
+
+# skeleton for the plot method
+# plot.hybridModel <- function(x){
+#   # nnetar and stlm currently don't have plot methods
+#   plotModels <- x$models[x$models != "nnetar" && x$models != "stlm"]
+#   
+# }
