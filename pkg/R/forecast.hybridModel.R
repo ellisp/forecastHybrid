@@ -91,34 +91,6 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
     forecasts$pointForecasts[, "tbats"] <- forecasts$tbats$mean
   }
   
-#   # Construct the upper/lower prediction intervals
-#   # This is ugly and should be revisited
-#   # Methods besides the extreme cases should also be considered
-#   # This also only works with two levels (very bad!)
-#   lowerlimit1 <- rep(numeric(), h)
-#   lowerlimit2 <- lowerlimit1
-#   upperlimit1 <- lowerlimit1
-#   upperlimit2 <- lowerlimit1
-#   
-#   for(i in object$models){
-#     if(i != "nnetar"){
-#       lowerlimit1 <- cbind(lowerlimit1, matrix(forecasts[[i]]$lower[, 1], ncol = 1))
-#       lowerlimit2 <- cbind(lowerlimit2, matrix(forecasts[[i]]$lower[, 2], ncol = 1))
-#       upperlimit1 <- cbind(upperlimit1, matrix(forecasts[[i]]$upper[, 1], ncol = 1))
-#       upperlimit2 <- cbind(upperlimit2, matrix(forecasts[[i]]$upper[, 2], ncol = 1))
-#     }
-#   }
-#   lowerbounds1 <- as.numeric(apply(lowerlimit1, 1, min))
-#   lowerbounds2 <- as.numeric(apply(lowerlimit2, 1, min))
-#   upperbounds1 <- as.numeric(apply(upperlimit1, 1, max))
-#   upperbounds2 <- as.numeric(apply(upperlimit2, 1, max))
-#   forecasts$upper <- matrix(c(upperbounds1, upperbounds2), ncol = 2, byrow = TRUE)
-#   forecasts$lower <- matrix(c(lowerbounds1, lowerbounds2), ncol = 2, byrow = TRUE)
-#   colnames(forecasts$upper) <- c(paste0(level[1], "%"), paste0(level[2], "%"))
-#   colnames(forecasts$lower) <- c(paste0(level[1], "%"), paste0(level[2], "%"))
-  
-
-  
   # Apply the weights to the individual forecasts and create the final point forecast
   finalForecast <- rowSums(forecasts$pointForecast * weightsMatrix)
   # Conver the final forecast into a ts object
@@ -128,7 +100,6 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
                       frequency = object$frequency)
   
   # Construct the prediction intervals
-  # This is a template for when we have some means to 
   nint <- length(level)
   upper <- lower <- matrix(NA, ncol = nint, nrow = length(finalForecast))
   # Prediction intervals for nnetar do not currently work, so exclude these
@@ -144,11 +115,12 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
       j2 <- j2 + 1
     }
     # upper/lower prediction intervals are the extreme values for now
+    # We can modify it for other approaches by changing the FUN here
     upper[, i] <- apply(tmpUpper, 1, FUN = max)
     lower[, i] <- apply(tmpLower, 1, FUN = min)
   }
-  if(!is.finite(max(upper))){
-    warning("Upper prediction intervals are not finite.")
+  if(!is.finite(max(upper)) || !is.finite(min(lower))){
+    warning("Prediction intervals are not finite.")
   }
   colnames(lower) <- colnames(upper) <- paste0(level, "%")
   forecasts$lower <- lower
@@ -163,17 +135,11 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
   }
   stop.f <- start.f + h / object$frequency
   forecasts$mean <- finalForecast
-#   ts(data = finalForecast, start = start.f, end = stop.f,
-#                        frequency = object$frequency)
   
   # Build a forecast object
   forecasts$x <- forecasts[[object$models[1]]]$x
   forecasts$method <- paste0(object$models, " with weight ", object$weights)
   forecasts$level <- level
-  # Code for inplementing confidence intervals will go here
-  #forecasts$finalForecast$lower <- NA
-  #forecasts$finalForecast$uppwer <- NA
-  #forecasts$finalForecast$level <- NA
   class(forecasts) <- "forecast"
   return(forecasts)
 }
