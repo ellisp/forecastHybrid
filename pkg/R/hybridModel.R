@@ -263,8 +263,38 @@ print.hybridModel <- function(x){
 }
 
 # skeleton for the plot method
-# plot.hybridModel <- function(x){
-#   # nnetar and stlm currently don't have plot methods
-#   plotModels <- x$models[x$models != "nnetar" && x$models != "stlm"]
-#   
-# }
+#' Plot a hybridModel object
+#' 
+#' Plot the original series and the fitted values from each component model
+#' 
+#' @export
+#' @import forecast
+#' @import fpp
+#' @param object An object of class hybridModel to plot.
+#' @seealso \code{\link{hybridModel}}
+#' @return None. Function produces a plot.
+#' @details The original series is plotted in black. Fitted values for the 
+#' individual component models are plotted in other colors. Prior to the
+#' release of forecast 6.3, stlm objects will be ignored since they
+#' do not contain a fitted() or residual() method.
+#' @examples
+#' hm <- hybridModel(woolyrnq, models = "aenst")
+#' plot(hm)
+#' 
+plot.hybridModel <- function(object, ...){
+  # nnetar and stlm currently don't have plot methods
+  plotModels <- object$models[object$models != "stlm"]
+  # Set the highest and lowest axis scale
+  ymax <- max(sapply(plotModels, FUN = function(i) max(fitted(object[[i]]), na.rm = TRUE)))
+  ymin <- min(sapply(plotModels, FUN = function(i) min(fitted(object[[i]]), na.rm = TRUE)))
+  range <- ymax - ymin
+  plot(object$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range),
+       ylab = "y", xlab = "time")
+  title("Plot of original series (black) and fitted component models", outer = TRUE)
+  #count <- 2
+  for(i in seq_along(plotModels)){
+    lines(fitted(object[[plotModels[i]]]), col = i + 1)
+    #count <- count + 1
+  }
+  legend("top", plotModels, fill = 2:(length(plotModels) + 1), horiz = TRUE)
+}
