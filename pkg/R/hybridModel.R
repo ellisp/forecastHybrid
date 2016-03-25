@@ -51,7 +51,7 @@ hybridModel <- function(y, models = "aenst",
                         a.args = NULL, e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL, 
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("RMSE", "MAE", "MASE"),
-                        parallel = TRUE, num.cores = 2L){
+                        parallel = FALSE, num.cores = 2L){
   # Weights could be set to equal (the default), based on in-sample errors, or based on cv errors
   # In-sample errors are methodologically questionable but easy to implement. CV errors are probably
   # methodologicaly sound, but more difficult and computationally expensive to implement.
@@ -131,6 +131,14 @@ hybridModel <- function(y, models = "aenst",
   # A model run should include at least two component models
   if(length(expandedModels) < 2L){
     stop("A hybridModel must contain at least two component models.")
+  }
+  
+  # Check for currently unimplemented features
+  if(parallel){
+    warning("The 'parallel' argument is currently unimplemented. Ignoring for now.")
+  }
+  if(weights == "cv.errors"){
+    warning("Cross validated error weights are currently unimplemented. Ignoring for now.")
   }
   
   modelResults <- list()
@@ -265,36 +273,51 @@ print.hybridModel <- function(x){
 # skeleton for the plot method
 #' Plot a hybridModel object
 #' 
-#' Plot the original series and the fitted values from each component model
+#' Plot a representation of the hybridModel
 #' 
 #' @export
 #' @import forecast
 #' @import fpp
 #' @param object An object of class hybridModel to plot.
+#' @param type If \code{type = "fit"}, plot the original series and the individual fitted models.
+#' If \code{type = "models"}, use the regular plot methods from the component models, i.e.
+#' \code{\link{plot.Arima}}, \code{\link{plot.ets}}, \code{\link{plot.tbats}}.
 #' @seealso \code{\link{hybridModel}}
 #' @return None. Function produces a plot.
-#' @details The original series is plotted in black. Fitted values for the 
+#' @details For \code{type = "fit"}The original series is plotted in black. Fitted values for the 
 #' individual component models are plotted in other colors. Prior to the
 #' release of forecast 6.3, stlm objects will be ignored since they
-#' do not contain a fitted() or residual() method.
+#' do not contain a \code{\link{fitted}} or \code{\link{residuals}} method.
+#' For \code{type = "models"}, each individual component model is plotted. Since
+#' there is not plot method for \code{stlm} or \code{nnetar} objects, these component
+#' models are not plotted.
 #' @examples
 #' hm <- hybridModel(woolyrnq, models = "aenst")
-#' plot(hm)
+#' plot(hm, tpe = "fit")
+#' plot(hm, type = "models")
 #' 
-plot.hybridModel <- function(object, ...){
-  # nnetar and stlm currently don't have plot methods
-  plotModels <- object$models[object$models != "stlm"]
-  # Set the highest and lowest axis scale
-  ymax <- max(sapply(plotModels, FUN = function(i) max(fitted(object[[i]]), na.rm = TRUE)))
-  ymin <- min(sapply(plotModels, FUN = function(i) min(fitted(object[[i]]), na.rm = TRUE)))
-  range <- ymax - ymin
-  plot(object$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range),
-       ylab = "y", xlab = "time")
-  title("Plot of original series (black) and fitted component models", outer = TRUE)
-  #count <- 2
-  for(i in seq_along(plotModels)){
-    lines(fitted(object[[plotModels[i]]]), col = i + 1)
-    #count <- count + 1
+plot.hybridModel <- function(object, type = c("fit", "models")){
+  type <- match.arg(type)
+  if(type == "fit"){
+    # stlm currently doesn't have a fitted() method
+    plotModels <- object$models[object$models != "stlm"]
+    # Set the highest and lowest axis scale
+    ymax <- max(sapply(plotModels, FUN = function(i) max(fitted(object[[i]]), na.rm = TRUE)))
+    ymin <- min(sapply(plotModels, FUN = function(i) min(fitted(object[[i]]), na.rm = TRUE)))
+    range <- ymax - ymin
+    plot(object$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range),
+         ylab = "y", xlab = "time")
+    title("Plot of original series (black) and fitted component models", outer = TRUE)
+    #count <- 2
+    for(i in seq_along(plotModels)){
+      lines(fitted(object[[plotModels[i]]]), col = i + 1)
+      #count <- count + 1
+    }
+    legend("top", plotModels, fill = 2:(length(plotModels) + 1), horiz = TRUE)
+  } else if(type == "models"){
+    plotModels <- object$models[object$models != "stlm" & object$models != "nnetar"]
+    for(i in seq_along(plotModels)){
+      plot(object[[plotModels[i]]])
+    }
   }
-  legend("top", plotModels, fill = 2:(length(plotModels) + 1), horiz = TRUE)
 }
