@@ -293,7 +293,7 @@ print.hybridModel <- function(x){
 #' models are not plotted.
 #' @examples
 #' hm <- hybridModel(woolyrnq, models = "aenst")
-#' plot(hm, tpe = "fit")
+#' plot(hm, type = "fit")
 #' plot(hm, type = "models")
 #' 
 plot.hybridModel <- function(object, type = c("fit", "models")){
