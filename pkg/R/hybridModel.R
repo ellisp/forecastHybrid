@@ -1,20 +1,20 @@
 #' Hybrid time series modelling
 #' 
-#' Create a hybrid time series model from one to four contributing models
+#' Create a hybrid time series model from two to five component models.
 #' 
 #' @export
 #' @import forecast
 #' @import fpp
-#' @param y a numeric vector or time series
+#' @param y A numeric vector or time series
 #' @param lambda 
-#' Box-Cox transformation parameter.  Ignored if NULL.  Otherwise, data transformed before model is estimated.  
-#' @param models a character string of up to five characters indicating which contributing models to use: 
-#' a (\code{auto.arima()}), e (\code{ets()}), n (\code{nnetar()}), s (\code{stlm()}) and t (\code{tbats()})
-#' @param a.args Arguments to pass to \code{auto.arima()}
-#' @param e.args Arguments to pass to \code{ets()}
-#' @param n.args Arguments to pass to \code{nnetar()}
-#' @param s.args Arguments to pass to \code{stlm()}
-#' @param t.args Arguments to pass to \code{tbats()}
+#' Box-Cox transformation parameter.  Ignored if NULL.  Otherwise, data transformed before model is estimated.
+#' @param models A character string of up to five characters indicating which contributing models to use: 
+#' a (\code{\link{auto.arima}}), e (\code{\link{ets}}), n (\code{\link{nnetar}}), s (\code{\link{stlm}}) and t (\code{\link{tbats}})
+#' @param a.args Arguments to pass to \code{\link{auto.arima}}
+#' @param e.args Arguments to pass to \code{\link{ets}}
+#' @param n.args Arguments to pass to \code{\link{nnetar}}
+#' @param s.args Arguments to pass to \code{\link{stlm}}
+#' @param t.args Arguments to pass to \code{\link{tbats}}
 #' @param weights Method for weighting the forecasts of the various contributing
 #' models.  Defaults to equal, which has shown to be robust and surprisingly better
 #' in many cases than giving more weight to models with better past performance. Weights
@@ -23,21 +23,23 @@
 #' to be equal. Root mean square error (RMSE), mean absolute error (MAE) and mean absolute scaled error (MASE)
 #' are supported.
 #' @param parallel  Should parallel processing be used between models? This is currently unimplemented.
-#' Parallelization will still occur within individual models that suport it and can be controlled using a.args and t.args.
+#' Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.
-#' @seealso \code{\link{forecast.hybridModel}}
+#' @seealso \code{\link{forecast.hybridModel}}, \code{\link{auto.arima}}, \code{\link{ets}}, \code{\link{nnetar}},
+#' \code{\link{stlm}}, and \code{\link{tbats}}
 #' @return An object of class hybridModel. The individual component models are stored inside of the object
 #' and can be accessed for all the regular manipulations available in the forecast package.
 #' @details The hybridModel function fits multiple individual model specifications to allow easy creation
 #' of ensemble forecasts. While default settings for the individual component models work quite well
 #' in most cases, fine control can be exerted by passing detailed arguments to the component models in the
 #' a.args, e.args, n.args, s.args, and t.args lists.
+#' \cr
 #' Characteristics of the input series can cause problems for certain types of models and paramesters.
-#' For example, \code{stlm()} models require that the input series be seasonal, and there furthemore
+#' For example, \code{\link{stlm}} models require that the input series be seasonal, and there furthemore
 #' must be more than two seasonal periods of data for the decomposition. If it is not the case, \code{hybridModel()}
-#' will remove the \code{stlm()} model so an error does not occur. The \code{ets()} model does not handle 
+#' will remove the \code{stlm} model so an error does not occur. The \code{\link{ets}} model does not handle 
 #' a series well with a seasonal period longer than 24 and will ignore the seasonality. In this case,
-#' \code{hybridModel()} will also drop the \code{ets()} model from the ensemble.
+#' \code{hybridModel()} will also drop the \code{ets} model from the ensemble.
 #' @examples
 #' mod1 <- hybridModel(AirPassengers)
 #' plot(forecast(mod1))
@@ -227,10 +229,12 @@ hybridModel <- function(y, models = "aenst",
   return(modelResults)
 }
 
+#' @export
 is.hybridModel <- function(x){
   inherits(x, "hybridModel")
 }
 
+#' @export
 fitted.hybridModel <- function(x){
   results <- list()
   for(i in x$models){
@@ -239,6 +243,7 @@ fitted.hybridModel <- function(x){
   results
 }
 
+#' @export
 residuals.hybridModel <- function(x){
   results <- list()
   for(i in x$models){
@@ -247,6 +252,12 @@ residuals.hybridModel <- function(x){
   results
 }
 
+#' Accuracy measures for hybridModel objects
+#' 
+#' Return the in-sample accuracy measures for the component models of the hybridModel
+#' @export
+#' @param x The input hybridModel
+#' #' @seealso \code{\link{accuracy}}
 accuracy.hybridModel <- function(x){
   results <- list()
   for(i in x$models){
@@ -254,26 +265,26 @@ accuracy.hybridModel <- function(x){
   }
 }
 
+#' @export
 summary.hybridModel <- function(x){
   print.hybridModel(x)
 }
 
+#' @export
 print.hybridModel <- function(x){
-  cat("Hybrid forecast model comprised of the following models:", x$models, "\n")
-  cat("with the respective weights:", x$weights, "\n\n")
+  cat("Hybrid forecast model comprised of the following models: ")
+  cat(x$models, sep = ", ")
+  cat("\n")
   for(i in x$models){
     cat("############\n")
-    cat(i, "\n")
-    cat("############\n")
-    print(x[[i]])
-    cat("\n\n")
+    cat(i, "with weight", x$weights[i], "\n")
+    #cat("############\n")
   }
 }
 
-# skeleton for the plot method
 #' Plot a hybridModel object
 #' 
-#' Plot a representation of the hybridModel
+#' Plot a representation of the hybridModel.
 #' 
 #' @export
 #' @import forecast
@@ -281,10 +292,12 @@ print.hybridModel <- function(x){
 #' @param object An object of class hybridModel to plot.
 #' @param type If \code{type = "fit"}, plot the original series and the individual fitted models.
 #' If \code{type = "models"}, use the regular plot methods from the component models, i.e.
-#' \code{\link{plot.Arima}}, \code{\link{plot.ets}}, \code{\link{plot.tbats}}.
+#' \code{\link{plot.Arima}}, \code{\link{plot.ets}}, \code{\link{plot.tbats}}. Note: no plot
+#' methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
+#' \code{type = "models"}
 #' @seealso \code{\link{hybridModel}}
 #' @return None. Function produces a plot.
-#' @details For \code{type = "fit"}The original series is plotted in black. Fitted values for the 
+#' @details For \code{type = "fit"}, the original series is plotted in black. Fitted values for the 
 #' individual component models are plotted in other colors. Prior to the
 #' release of forecast 6.3, stlm objects will be ignored since they
 #' do not contain a \code{\link{fitted}} or \code{\link{residuals}} method.
@@ -307,7 +320,7 @@ plot.hybridModel <- function(object, type = c("fit", "models")){
     range <- ymax - ymin
     plot(object$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range),
          ylab = "y", xlab = "time")
-    title("Plot of original series (black) and fitted component models", outer = TRUE)
+    title(main = "Plot of original series (black) and fitted component models", outer = TRUE)
     #count <- 2
     for(i in seq_along(plotModels)){
       lines(fitted(object[[plotModels[i]]]), col = i + 1)
