@@ -1,6 +1,6 @@
 #' Hybrid forecast
 #' 
-#' Forecast method for hybrid models
+#' Forecast method for hybrid models.
 #' 
 #' @export
 #' @import forecast
@@ -11,11 +11,11 @@
 #' @param xreg Future values of regression variables (for use if one of the ensemble methods used
 #' in creating the hybrid forecast was \code{auto.arima} or \code{stlm} and a xreg was used in the fit)
 #' @param level Confidence level for prediction intervals
-#' @param fan If \code{TRUE}, level is set to \code{seq(51,99,by=3)}. This is suitable for fan plots.
+#' @param fan If \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.
 #' @param ... other arguments; currently not used.
 #' @seealso \code{\link{hybridModel}}
-#' @details more detailed description here 
-#' @return an object of class forecast.
+#' @details If \code{xreg} was used in construcing the \code{hybridModel}, it must also be passed into \code{forecast.hybridModel}
+#' @return An object of class forecast.
 #' @examples
 #' mod <- hybridModel(AirPassengers)
 #' plot(forecast(mod))
