@@ -5,28 +5,31 @@
 \title{Hybrid forecast}
 \usage{
 \method{forecast}{hybridModel}(object, h = ifelse(object$frequency > 1, 2 *
-  object$frequency, 10), xreg = NULL, level = c(80, 95), ...)
+  object$frequency, 10), xreg = NULL, level = c(80, 95), fan = FALSE, ...)
 }
 \arguments{
 \item{object}{A hybrid time series model fit with hybridModel()}
 
-\item{h}{number of periods to forecast ahead}
+\item{h}{Number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast 
+periods is set to the number of rows of \code{xreg}.}
 
 \item{xreg}{Future values of regression variables (for use if one of the ensemble methods used
-in creating the hybrid forecast was \code{auto.arima})}
+in creating the hybrid forecast was \code{auto.arima} or \code{stlm} and a xreg was used in the fit)}
 
 \item{level}{Confidence level for prediction intervals}
+
+\item{fan}{If \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.}
 
 \item{...}{other arguments; currently not used.}
 }
 \value{
-an object of class forecast.
+An object of class forecast.
 }
 \description{
-Forecast method for hybrid models
+Forecast method for hybrid models.
 }
 \details{
-more detailed description here
+If \code{xreg} was used in construcing the \code{hybridModel}, it must also be passed into \code{forecast.hybridModel}
 }
 \examples{
 mod <- hybridModel(AirPassengers)

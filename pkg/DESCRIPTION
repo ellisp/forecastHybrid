@@ -1,8 +1,8 @@
 Package: forecastHybrid
 Title: Convenient Functions for Ensemble Time Series Forecasts
-Version: 0.0.1
+Version: 0.0.1.9000
 Authors@R: c(
-   person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("aut", "cre")),
+   person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("ctb", "cre")),
    person("David", "Shaub", role = c("aut"))
    )
 Description: Convenient functions for ensemble forecasts in R combining

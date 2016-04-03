@@ -7,52 +7,72 @@
 hybridModel(y, models = "aenst", lambda = NULL, a.args = NULL,
   e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL,
   weights = c("equal", "insample.errors", "cv.errors"),
-  errorMethod = c("RMSE", "MAE", "MASE"), parallel = TRUE, num.cores = 2L)
+  errorMethod = c("RMSE", "MAE", "MASE"), parallel = FALSE,
+  num.cores = 2L)
 }
 \arguments{
-\item{y}{a numeric vector or time series}
+\item{y}{A numeric vector or time series}
 
-\item{models}{a character string of up to five characters indicating which contributing models to use: 
-a (\code{auto.arima()}), e (\code{ets()}), n (\code{nnetar()}), s (\code{stlm()}) and t (\code{tbats()})}
+\item{models}{A character string of up to five characters indicating which contributing models to use: 
+a (\code{\link{auto.arima}}), e (\code{\link{ets}}), n (\code{\link{nnetar}}), s (\code{\link{stlm}}) and t (\code{\link{tbats}})}
 
 \item{lambda}{Box-Cox transformation parameter.  Ignored if NULL.  Otherwise, data transformed before model is estimated.}
 
-\item{a.args}{Arguments to pass to \code{auto.arima()}}
+\item{a.args}{Arguments to pass to \code{\link{auto.arima}}}
 
-\item{e.args}{Arguments to pass to \code{ets()}}
+\item{e.args}{Arguments to pass to \code{\link{ets}}}
 
-\item{n.args}{Arguments to pass to \code{nnetar()}}
+\item{n.args}{Arguments to pass to \code{\link{nnetar}}}
 
-\item{s.args}{Arguments to pass to \code{stlm()}}
+\item{s.args}{Arguments to pass to \code{\link{stlm}}}
 
-\item{t.args}{Arguments to pass to \code{tbats()}}
+\item{t.args}{Arguments to pass to \code{\link{tbats}}}
 
 \item{weights}{Method for weighting the forecasts of the various contributing
 models.  Defaults to equal, which has shown to be robust and surprisingly better
-in many cases than giving more weight to models with better past performance.}
+in many cases than giving more weight to models with better past performance. Weights
+utilizing insample errors are also available. Cross validated errors are currently unimplemented.}
 
 \item{errorMethod}{Method of measuring accuracy to use if weights are not 
-to be equal.}
+to be equal. Root mean square error (RMSE), mean absolute error (MAE) and mean absolute scaled error (MASE)
+are supported.}
 
-\item{parallel}{Should parallel processing be used?}
+\item{parallel}{Should parallel processing be used between models? This is currently unimplemented.
+Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.}
 
 \item{num.cores}{If \code{parallel=TRUE}, how many cores to use.}
 }
 \value{
-An object of class hybridModel
+An object of class hybridModel. The individual component models are stored inside of the object
+and can be accessed for all the regular manipulations available in the forecast package.
 }
 \description{
-Create a hybrid time series model from one to four contributing models
+Create a hybrid time series model from two to five component models.
 }
 \details{
-more detailed description here
+The hybridModel function fits multiple individual model specifications to allow easy creation
+of ensemble forecasts. While default settings for the individual component models work quite well
+in most cases, fine control can be exerted by passing detailed arguments to the component models in the
+a.args, e.args, n.args, s.args, and t.args lists.
+\cr
+Characteristics of the input series can cause problems for certain types of models and paramesters.
+For example, \code{\link{stlm}} models require that the input series be seasonal, and there furthemore
+must be more than two seasonal periods of data for the decomposition. If it is not the case, \code{hybridModel()}
+will remove the \code{stlm} model so an error does not occur. The \code{\link{ets}} model does not handle 
+a series well with a seasonal period longer than 24 and will ignore the seasonality. In this case,
+\code{hybridModel()} will also drop the \code{ets} model from the ensemble.
 }
 \examples{
-mod <- hybridModel(AirPassengers)
-plot(forecast(mod))
+mod1 <- hybridModel(AirPassengers)
+plot(forecast(mod1))
+mod2 <- hybridModel(AirPassengers, models = "aet",
+weights = "insample.errors", errorMethod = "MASE")
+mod3 <- hybridModel(AirPassengers, models = "aens",
+a.args = list(max.p = 7, max.q = 7, approximation = FALSE))
 
 }
 \seealso{
-\code{\link{forecast.hybridModel}}
+\code{\link{forecast.hybridModel}}, \code{\link{auto.arima}}, \code{\link{ets}}, \code{\link{nnetar}},
+\code{\link{stlm}}, and \code{\link{tbats}}
 }
 
