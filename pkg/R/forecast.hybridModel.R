@@ -99,6 +99,15 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
                       end = end(forecasts[[object$models[1]]]$mean),
                       frequency = object$frequency)
   
+  # Apply the weights to construct the fitted values
+  # This will fail with stlm objects, so don't expect accuracy() to
+  # work for now. This will be fixed in forecast 7
+  fits <- sapply(includedModels, FUN = function(x) fitted(object[[x]]))
+  fitsWeightsMatrix <- matrix(rep(forecastWeights, times = nrow(fits)),
+                              nrow = nrow(fits), byrow = TRUE)
+  fits <- rowSums(fits * fitsWeightsMatrix)
+  resid <- object$x - fits
+  
   # Construct the prediction intervals
   nint <- length(level)
   upper <- lower <- matrix(NA, ncol = nint, nrow = length(finalForecast))
@@ -135,6 +144,15 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
   }
   stop.f <- start.f + h / object$frequency
   forecasts$mean <- finalForecast
+  
+  # Add the fitted and residuals values
+  if(is.ts(object$x)){
+    fits <- ts(fits)
+    resid <- ts(resid)
+    tsp(fits) <- tsp(resid) <- tsp(object$x)
+  }
+  forecasts$fitted <- fits
+  forecasts$residuals <- resid
   
   # Build a forecast object
   forecasts$x <- forecasts[[object$models[1]]]$x
