@@ -225,7 +225,7 @@ hybridModel <- function(y, models = "aenst",
   # This will fail with stlm objects, so don't expect accuracy() to
   # work for now. This will be fixed in forecast 7
   if(is.element("nnetar", includedModels) || is.element("nnetar", includedModels)){
-    cat("nnetar/stlm models will not output fitted/residual measures for now.")
+    cat("nnetar/stlm models will not output fitted/residual measures for now.\n")
     fits <- NULL
     resid <- NULL
   } else{
