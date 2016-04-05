@@ -221,11 +221,33 @@ hybridModel <- function(y, models = "aenst",
   }
   names(modelResults$weights) <- includedModels
   
+  # Apply the weights to construct the fitted values
+  # This will fail with stlm objects, so don't expect accuracy() to
+  # work for now. This will be fixed in forecast 7
+  if(is.element("nnetar", includedModels) || is.element("nnetar", includedModels)){
+    cat("nnetar/stlm models will not output fitted/residual measures for now.")
+    fits <- NULL
+    resid <- NULL
+  } else{
+    fits <- sapply(includedModels, FUN = function(x) fitted(modelResults[[x]]))
+    fitsWeightsMatrix <- matrix(rep(modelResults$weights[includedModels], times = nrow(fits)),
+                                nrow = nrow(fits), byrow = TRUE)
+    fits <- rowSums(fits * fitsWeightsMatrix)
+    resid <- y - fits
+    if (!is.null(tsp(y))){
+      fits <- ts(fits)
+      resid <- ts(fits)
+      tsp(fits) <- tsp(resid) <- tsp(y)
+    }
+  }
+  
   # Prepare the hybridModel object
   class(modelResults) <- "hybridModel"
   modelResults$frequency <- frequency(y)
   modelResults$x <- y
   modelResults$models <- includedModels
+  modelResults$fitted <- fits
+  modelResults$residuals <- resid
   return(modelResults)
 }
 
@@ -252,17 +274,38 @@ residuals.hybridModel <- function(x){
   results
 }
 
+
+#' Generic method for accuracy
+#' 
+#' @export
+accuracy.default <- accuracy
+
+#' Generic method for accuracy
+#' 
+#' @export
+accuracy <- function(x, ...){
+  UseMethod("accuracy", x)
+}
+
 #' Accuracy measures for hybridModel objects
 #' 
 #' Return the in-sample accuracy measures for the component models of the hybridModel
 #' @export
 #' @param x The input hybridModel
+#' @param individual If \code{TRUE}, return the accuracy of the component models instead
+#' of the accuracy for the whole ensemble model.
 #' #' @seealso \code{\link{accuracy}}
-accuracy.hybridModel <- function(x){
-  results <- list()
-  for(i in x$models){
-    results[[i]] <- accuracy(x[[i]])
+#' @return The accuracy of the ensemble or individual component models
+#' 
+accuracy.hybridModel <- function(x, individual = FALSE){
+  if(individual){
+    results <- list()
+    for(i in x$models){
+      results[[i]] <- accuracy(x[[i]])
+    }
+    return(results)
   }
+  return(accuracy(x$fitted, getResponse(x)))
 }
 
 #' @export
