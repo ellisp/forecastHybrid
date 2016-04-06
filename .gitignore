@@ -22,3 +22,5 @@ vignettes/*.pdf
 # build 
 *.tar.gz
 forecastHybrid.Rcheck*
+
+extended-tests/m3test.rda

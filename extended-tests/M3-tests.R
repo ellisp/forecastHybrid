@@ -19,8 +19,8 @@ pi_accuracy <- function(fc, yobs){
 
 # adapt the below
 #============forecasting with default values===============
-# num_series <- length(M3) # ie 3003
-num_series <- 10 # while developing
+num_series <- length(M3) # ie 3003
+#num_series <- 10 # while developing
 
 # 26 methods possible
 all_methods <- c(
@@ -41,7 +41,7 @@ for(j in 1:k){
 
 # fit models
 for(i in 1:num_series){
-   cat(i, "\n")        # let me know how it's going as it loops through...
+   cat("\n", i, "\n")        # let me know how it's going as it loops through...
    series <- M3[[i]]
    x <- series$x      # ie the data to be fitted
    
