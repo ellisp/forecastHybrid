@@ -35,5 +35,6 @@ if(require(fpp) & require(forecast) & require(testthat)){
     exampleModel <- hybridModel(wineind)
     expect_true(is.hybridModel(exampleModel))
     expect_true(length(fitted(exampleModel)) == length(residuals(exampleModel)))
+    expect_true(length(fitted(exampleModel, individual = TRUE)) == length(residuals(exampleModel, individual = TRUE)))
   })
 }
