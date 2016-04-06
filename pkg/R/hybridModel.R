@@ -256,22 +256,46 @@ is.hybridModel <- function(x){
   inherits(x, "hybridModel")
 }
 
+#' Extract Model Fitted Values
+#' 
+#' Extract the model fitted values from the \code{hybridModel} object.
 #' @export
-fitted.hybridModel <- function(x){
-  results <- list()
-  for(i in x$models){
-    results[[i]] <- fitted(x[[i]])
+#' @param x The input hybridModel
+#' @param individual If \code{TRUE}, return the fitted values of the component models instead
+#' of the fitted values for the whole ensemble model.
+#' #' @seealso \code{\link{accuracy}}
+#' @return The fitted values of the ensemble or individual component models
+#' 
+fitted.hybridModel <- function(x, individual = FALSE){
+  if(individual){
+    results <- list()
+    for(i in x$models){
+      results[[i]] <- fitted(x[[i]])
+    }
+    return(results)
   }
-  results
+  return(x$fitted)
 }
 
+#' Extract Model Residuals
+#' 
+#' Extract the model residuals from the \code{hybridModel} object.
 #' @export
-residuals.hybridModel <- function(x){
-  results <- list()
-  for(i in x$models){
-    results[[i]] <- residuals(x[[i]])
+#' @param x The input hybridModel
+#' @param individual If \code{TRUE}, return the residuals of the component models instead
+#' of the residuals for the whole ensemble model.
+#' #' @seealso \code{\link{accuracy}}
+#' @return The residuals of the ensemble or individual component models
+#' 
+residuals.hybridModel <- function(x, individual = FALSE){
+  if(individual){
+    results <- list()
+    for(i in x$models){
+      results[[i]] <- residuals(x[[i]])
+    }
+    return(results)
   }
-  results
+  return(x$residuals)
 }
 
 
