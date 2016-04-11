@@ -222,23 +222,15 @@ hybridModel <- function(y, models = "aenst",
   names(modelResults$weights) <- includedModels
   
   # Apply the weights to construct the fitted values
-  # This will fail with stlm objects, so don't expect accuracy() to
-  # work for now. This will be fixed in forecast 7
-  if(is.element("nnetar", includedModels) || is.element("nnetar", includedModels)){
-    cat("nnetar/stlm models will not output fitted/residual measures for now.\n")
-    fits <- NULL
-    resid <- NULL
-  } else{
-    fits <- sapply(includedModels, FUN = function(x) fitted(modelResults[[x]]))
-    fitsWeightsMatrix <- matrix(rep(modelResults$weights[includedModels], times = nrow(fits)),
-                                nrow = nrow(fits), byrow = TRUE)
-    fits <- rowSums(fits * fitsWeightsMatrix)
-    resid <- y - fits
-    if (!is.null(tsp(y))){
-      fits <- ts(fits)
-      resid <- ts(fits)
-      tsp(fits) <- tsp(resid) <- tsp(y)
-    }
+  fits <- sapply(includedModels, FUN = function(x) fitted(modelResults[[x]]))
+  fitsWeightsMatrix <- matrix(rep(modelResults$weights[includedModels], times = nrow(fits)),
+                              nrow = nrow(fits), byrow = TRUE)
+  fits <- rowSums(fits * fitsWeightsMatrix)
+  resid <- y - fits
+  if (!is.null(tsp(y))){
+    fits <- ts(fits)
+    resid <- ts(fits)
+    tsp(fits) <- tsp(resid) <- tsp(y)
   }
   
   # Prepare the hybridModel object
@@ -378,9 +370,8 @@ print.hybridModel <- function(x){
 #' 
 plot.hybridModel <- function(object, type = c("fit", "models")){
   type <- match.arg(type)
+  plotModels <- object$models
   if(type == "fit"){
-    # stlm currently doesn't have a fitted() method
-    plotModels <- object$models[object$models != "stlm"]
     # Set the highest and lowest axis scale
     ymax <- max(sapply(plotModels, FUN = function(i) max(fitted(object[[i]]), na.rm = TRUE)))
     ymin <- min(sapply(plotModels, FUN = function(i) min(fitted(object[[i]]), na.rm = TRUE)))
@@ -388,10 +379,8 @@ plot.hybridModel <- function(object, type = c("fit", "models")){
     plot(object$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range),
          ylab = "y", xlab = "time")
     title(main = "Plot of original series (black) and fitted component models", outer = TRUE)
-    #count <- 2
     for(i in seq_along(plotModels)){
       lines(fitted(object[[plotModels[i]]]), col = i + 1)
-      #count <- count + 1
     }
     legend("top", plotModels, fill = 2:(length(plotModels) + 1), horiz = TRUE)
   } else if(type == "models"){
