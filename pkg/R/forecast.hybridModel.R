@@ -100,8 +100,6 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
                       frequency = object$frequency)
   
   # Apply the weights to construct the fitted values
-  # This will fail with stlm objects, so don't expect accuracy() to
-  # work for now. This will be fixed in forecast 7
   fits <- sapply(includedModels, FUN = function(x) fitted(object[[x]]))
   fitsWeightsMatrix <- matrix(rep(forecastWeights, times = nrow(fits)),
                               nrow = nrow(fits), byrow = TRUE)
