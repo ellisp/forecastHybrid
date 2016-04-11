@@ -9,7 +9,7 @@ Description: Convenient functions for ensemble forecasts in R combining
     approaches from the 'forecast' package.
 Depends:
     R (>= 3.1.2),
-    forecast,
+    forecast (>= 7.0),
     fpp
 License: GPL-3
 LazyData: true
