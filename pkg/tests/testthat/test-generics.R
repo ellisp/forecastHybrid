@@ -2,7 +2,7 @@
 if(require(fpp) & require(forecast) & require(testthat)){
   context("Testing generic functions")
   set.seed(2345)
-  hm <- hybridModel(y = 10 + rnorm(100), models = "aenst")
+  expect_warning(hm <- hybridModel(y = 10 + rnorm(100), models = "aenst"))
   test_that("Testing summary and print methods", {
     expect_that(summary(hm), not(throws_error()))
     expect_that(print(hm), not(throws_error()))
