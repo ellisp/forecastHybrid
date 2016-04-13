@@ -3,14 +3,19 @@ Title: Convenient Functions for Ensemble Time Series Forecasts
 Version: 0.0.1.9000
 Authors@R: c(
    person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("ctb", "cre")),
-   person("David", "Shaub", role = c("aut"))
+   person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre"))
    )
 Description: Convenient functions for ensemble forecasts in R combining
     approaches from the 'forecast' package.
 Depends:
     R (>= 3.1.2),
     forecast (>= 7.0),
-    fpp
+    fpp (>= 0.5)
+Imports: 
+    forecast (>= 7.0),
+    fpp (>= 0.5)
+Enhances:
+    forecast
 License: GPL-3
 LazyData: true
 RoxygenNote: 5.0.1
