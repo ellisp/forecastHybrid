@@ -9,6 +9,9 @@ r:
 
 cache: packages
 
+r_github_packages:
+  - jimhester/covr
+
 install:
   - Rscript -e 'install.packages(c("devtools","roxygen2","testthat"));devtools::install_deps("pkg")'
 script:
