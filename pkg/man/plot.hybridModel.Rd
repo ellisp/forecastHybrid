@@ -4,16 +4,18 @@
 \alias{plot.hybridModel}
 \title{Plot a hybridModel object}
 \usage{
-plot.hybridModel(object, type = c("fit", "models"))
+\method{plot}{hybridModel}(x, type = c("fit", "models"), ...)
 }
 \arguments{
-\item{object}{An object of class hybridModel to plot.}
+\item{x}{An object of class hybridModel to plot.}
 
 \item{type}{If \code{type = "fit"}, plot the original series and the individual fitted models.
 If \code{type = "models"}, use the regular plot methods from the component models, i.e.
 \code{\link{plot.Arima}}, \code{\link{plot.ets}}, \code{\link{plot.tbats}}. Note: no plot
 methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
 \code{type = "models"}}
+
+\item{...}{Other arguments (ignored).}
 }
 \value{
 None. Function produces a plot.
@@ -34,7 +36,6 @@ models are not plotted.
 hm <- hybridModel(woolyrnq, models = "aenst")
 plot(hm, type = "fit")
 plot(hm, type = "models")
-
 }
 \seealso{
 \code{\link{hybridModel}}
