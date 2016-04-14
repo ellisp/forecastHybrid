@@ -245,9 +245,9 @@ hybridModel <- function(y, models = "aenst",
 
 #' Test if teh object is a hybridModel object
 #'
-#'@export
-#'@param x The input object
-#' @value A boolean for if the object is a \code{hybridModel} object.
+#' @export
+#' @param x The input object
+#' @return A boolean for if the object is a \code{hybridModel} object is returned.
 #'
 is.hybridModel <- function(x){
   inherits(x, "hybridModel")
