@@ -243,7 +243,12 @@ hybridModel <- function(y, models = "aenst",
   return(modelResults)
 }
 
-#' 
+#' Test if teh object is a hybridModel object
+#'
+#'@export
+#'@param x The input object
+#' @value A boolean for if the object is a \code{hybridModel} object.
+#'
 is.hybridModel <- function(x){
   inherits(x, "hybridModel")
 }
@@ -326,12 +331,19 @@ accuracy.hybridModel <- function(x, individual = FALSE){
   return(accuracy(x$fitted, getResponse(x)))
 }
 
-#' 
+#' Print a summary of the hybridModel object
+#'
+#' @param x The input \code{hybridModel} object
+#' @details Print the names of the individual component models and their weights.
 summary.hybridModel <- function(x){
   print.hybridModel(x)
 }
 
+#' Print information about the hybridModel object
+#'
+#'@param x The input \code{hybridModel} object
 #' @export
+#' @details Print the names of the individual component models and their weights.
 print.hybridModel <- function(x){
   cat("Hybrid forecast model comprised of the following models: ")
   cat(x$models, sep = ", ")
