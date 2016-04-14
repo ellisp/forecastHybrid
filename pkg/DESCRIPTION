@@ -3,8 +3,8 @@ Title: Convenient Functions for Ensemble Time Series Forecasts
 Version: 0.1.0
 Date: 2016-04-14
 Authors@R: c(
-   person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre"))
-   person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("ctb")),
+   person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
+   person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("ctb"))
    )
 Description: Convenient functions for ensemble forecasts in R combining
     approaches from the 'forecast' package. Forecasts generated from auto.arima, ets,
