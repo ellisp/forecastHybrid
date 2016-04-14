@@ -243,11 +243,11 @@ hybridModel <- function(y, models = "aenst",
   return(modelResults)
 }
 
-#' Test if teh object is a hybridModel object
+#' Test if the object is a hybridModel object
 #'
 #' @export
 #' @param x The input object
-#' @return A boolean for if the object is a \code{hybridModel} object is returned.
+#' @return A boolean indicating if the object is a \code{hybridModel} is returned.
 #'
 is.hybridModel <- function(x){
   inherits(x, "hybridModel")
@@ -257,42 +257,44 @@ is.hybridModel <- function(x){
 #' 
 #' Extract the model fitted values from the \code{hybridModel} object.
 #' @export
-#' @param x The input hybridModel
+#' @param object The input hybridModel
 #' @param individual If \code{TRUE}, return the fitted values of the component models instead
 #' of the fitted values for the whole ensemble model.
+#' @param ... Other arguments (ignored).
 #' @seealso \code{\link{accuracy}}
 #' @return The fitted values of the ensemble or individual component models
 #' 
-fitted.hybridModel <- function(x, individual = FALSE){
+fitted.hybridModel <- function(object, individual = FALSE, ...){
   if(individual){
     results <- list()
-    for(i in x$models){
-      results[[i]] <- fitted(x[[i]])
+    for(i in object$models){
+      results[[i]] <- fitted(object[[i]])
     }
     return(results)
   }
-  return(x$fitted)
+  return(object$fitted)
 }
 
 #' Extract Model Residuals
 #' 
 #' Extract the model residuals from the \code{hybridModel} object.
 #' @export
-#' @param x The input hybridModel
+#' @param object The input hybridModel
 #' @param individual If \code{TRUE}, return the residuals of the component models instead
 #' of the residuals for the whole ensemble model.
+#' @param ... Other arguments (ignored).
 #' @seealso \code{\link{accuracy}}
 #' @return The residuals of the ensemble or individual component models
 #' 
-residuals.hybridModel <- function(x, individual = FALSE){
+residuals.hybridModel <- function(object, individual = FALSE, ...){
   if(individual){
     results <- list()
-    for(i in x$models){
-      results[[i]] <- residuals(x[[i]])
+    for(i in object$models){
+      results[[i]] <- residuals(object[[i]])
     }
     return(results)
   }
-  return(x$residuals)
+  return(object$residuals)
 }
 
 
@@ -319,32 +321,32 @@ accuracy.default <-  function(f, x, test = NULL, d = NULL, D = NULL){
 
 #' Generic method for accuracy
 #' 
-#' @param x The input object
-#' @param ... Additional arguments
+#' @param f The input object
+#' @param ... Other arguments (ignored).
 #' 
-accuracy <- function(x, ...){
-  UseMethod("accuracy", x)
+accuracy <- function(f, ...){
+  UseMethod("accuracy")
 }
 
 #' Accuracy measures for hybridModel objects
 #' 
 #' Return the in-sample accuracy measures for the component models of the hybridModel
 #' @export
-#' @param x The input hybridModel
+#' @param f The input hybridModel
 #' @param individual If \code{TRUE}, return the accuracy of the component models instead
 #' of the accuracy for the whole ensemble model.
 #' @seealso \code{\link{accuracy}}
 #' @return The accuracy of the ensemble or individual component models
 #' 
-accuracy.hybridModel <- function(x, individual = FALSE){
+accuracy.hybridModel <- function(f, individual = FALSE){
   if(individual){
     results <- list()
-    for(i in x$models){
-      results[[i]] <- accuracy(x[[i]])
+    for(i in f$models){
+      results[[i]] <- accuracy(f[[i]])
     }
     return(results)
   }
-  return(accuracy(x$fitted, getResponse(x)))
+  return(accuracy(f$fitted, getResponse(f)))
 }
 
 #' Print a summary of the hybridModel object
@@ -353,16 +355,17 @@ accuracy.hybridModel <- function(x, individual = FALSE){
 #' @details Print the names of the individual component models and their weights.
 #' 
 summary.hybridModel <- function(x){
-  print.hybridModel(x)
+  print(x)
 }
 
 #' Print information about the hybridModel object
 #'
 #' @param x The input \code{hybridModel} object
+#' @param ... Other arguments (ignored).
 #' @export
 #' @details Print the names of the individual component models and their weights.
 #' 
-print.hybridModel <- function(x){
+print.hybridModel <- function(x, ...){
   cat("Hybrid forecast model comprised of the following models: ")
   cat(x$models, sep = ", ")
   cat("\n")
@@ -380,12 +383,13 @@ print.hybridModel <- function(x){
 #' @method plot hybridModel
 #' @import forecast
 #' @import fpp
-#' @param object An object of class hybridModel to plot.
+#' @param x An object of class hybridModel to plot.
 #' @param type If \code{type = "fit"}, plot the original series and the individual fitted models.
 #' If \code{type = "models"}, use the regular plot methods from the component models, i.e.
 #' \code{\link{plot.Arima}}, \code{\link{plot.ets}}, \code{\link{plot.tbats}}. Note: no plot
 #' methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
 #' \code{type = "models"}
+#' @param ... Other arguments (ignored).
 #' @seealso \code{\link{hybridModel}}
 #' @return None. Function produces a plot.
 #' @details For \code{type = "fit"}, the original series is plotted in black. Fitted values for the 
@@ -401,25 +405,25 @@ print.hybridModel <- function(x){
 #' plot(hm, type = "models")
 #' @export
 #' 
-plot.hybridModel <- function(object, type = c("fit", "models")){
+plot.hybridModel <- function(x, type = c("fit", "models"), ...){
   type <- match.arg(type)
-  plotModels <- object$models
+  plotModels <- x$models
   if(type == "fit"){
     # Set the highest and lowest axis scale
-    ymax <- max(sapply(plotModels, FUN = function(i) max(fitted(object[[i]]), na.rm = TRUE)))
-    ymin <- min(sapply(plotModels, FUN = function(i) min(fitted(object[[i]]), na.rm = TRUE)))
+    ymax <- max(sapply(plotModels, FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
+    ymin <- min(sapply(plotModels, FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
     range <- ymax - ymin
-    plot(object$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range),
+    plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range),
          ylab = "y", xlab = "time")
     title(main = "Plot of original series (black) and fitted component models", outer = TRUE)
     for(i in seq_along(plotModels)){
-      lines(fitted(object[[plotModels[i]]]), col = i + 1)
+      lines(fitted(x[[plotModels[i]]]), col = i + 1)
     }
     legend("top", plotModels, fill = 2:(length(plotModels) + 1), horiz = TRUE)
   } else if(type == "models"){
-    plotModels <- object$models[object$models != "stlm" & object$models != "nnetar"]
+    plotModels <- x$models[x$models != "stlm" & x$models != "nnetar"]
     for(i in seq_along(plotModels)){
-      plot(object[[plotModels[i]]])
+      plot(x[[plotModels[i]]])
     }
   }
 }
