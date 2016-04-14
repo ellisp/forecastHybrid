@@ -293,12 +293,14 @@ residuals.hybridModel <- function(x, individual = FALSE){
 
 #' Generic method for accuracy
 #' 
-#' 
+#' @param x The input object
+#' @param ... Additional arguments
 accuracy.default <- accuracy
 
 #' Generic method for accuracy
 #' 
-#' 
+#' @param x The input object
+#' @param ... Additional arguments
 accuracy <- function(x, ...){
   UseMethod("accuracy", x)
 }
