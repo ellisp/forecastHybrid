@@ -243,7 +243,7 @@ hybridModel <- function(y, models = "aenst",
   return(modelResults)
 }
 
-#' @export
+#' 
 is.hybridModel <- function(x){
   inherits(x, "hybridModel")
 }
@@ -293,12 +293,12 @@ residuals.hybridModel <- function(x, individual = FALSE){
 
 #' Generic method for accuracy
 #' 
-#' @export
+#' 
 accuracy.default <- accuracy
 
 #' Generic method for accuracy
 #' 
-#' @export
+#' 
 accuracy <- function(x, ...){
   UseMethod("accuracy", x)
 }
@@ -324,7 +324,7 @@ accuracy.hybridModel <- function(x, individual = FALSE){
   return(accuracy(x$fitted, getResponse(x)))
 }
 
-#' @export
+#' 
 summary.hybridModel <- function(x){
   print.hybridModel(x)
 }
