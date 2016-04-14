@@ -260,7 +260,7 @@ is.hybridModel <- function(x){
 #' @param x The input hybridModel
 #' @param individual If \code{TRUE}, return the fitted values of the component models instead
 #' of the fitted values for the whole ensemble model.
-#' #' @seealso \code{\link{accuracy}}
+#' @seealso \code{\link{accuracy}}
 #' @return The fitted values of the ensemble or individual component models
 #' 
 fitted.hybridModel <- function(x, individual = FALSE){
@@ -281,7 +281,7 @@ fitted.hybridModel <- function(x, individual = FALSE){
 #' @param x The input hybridModel
 #' @param individual If \code{TRUE}, return the residuals of the component models instead
 #' of the residuals for the whole ensemble model.
-#' #' @seealso \code{\link{accuracy}}
+#' @seealso \code{\link{accuracy}}
 #' @return The residuals of the ensemble or individual component models
 #' 
 residuals.hybridModel <- function(x, individual = FALSE){
@@ -327,7 +327,7 @@ accuracy <- function(x, ...){
 #' @param x The input hybridModel
 #' @param individual If \code{TRUE}, return the accuracy of the component models instead
 #' of the accuracy for the whole ensemble model.
-#' #' @seealso \code{\link{accuracy}}
+#' @seealso \code{\link{accuracy}}
 #' @return The accuracy of the ensemble or individual component models
 #' 
 accuracy.hybridModel <- function(x, individual = FALSE){
@@ -369,7 +369,7 @@ print.hybridModel <- function(x){
 #' 
 #' Plot a representation of the hybridModel.
 #' 
-#' @export
+#' @method plot hybridModel
 #' @import forecast
 #' @import fpp
 #' @param object An object of class hybridModel to plot.
@@ -391,6 +391,7 @@ print.hybridModel <- function(x){
 #' hm <- hybridModel(woolyrnq, models = "aenst")
 #' plot(hm, type = "fit")
 #' plot(hm, type = "models")
+#' @export
 #' 
 plot.hybridModel <- function(object, type = c("fit", "models")){
   type <- match.arg(type)
