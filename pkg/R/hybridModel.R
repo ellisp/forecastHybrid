@@ -298,24 +298,30 @@ residuals.hybridModel <- function(x, individual = FALSE){
 
 #' Generic method for accuracy
 #' 
-#' @param f An object of class "forecast", or a numerical vector containing forecasts.
-#' It will also work with Arima, ets and lm objects if x is omitted – in which case
+#' @param f An object of class forecast, or a numerical vector containing forecasts.
+#' It will also work with Arima, ets and lm objects if x is omitted - in which case
 #' in-sample accuracy measures are returned.
 #' @param x An optional numerical vector containing actual values of the same length
 #' as object, or a time series overlapping with the times of f.
-#' @param test ndicator of which elements of x and f to test. If test is NULL,
-#' all elements are used. Otherwise test is a numeric vector containing the indices
-#' of the elements to use in the test.
-#' @param d An integer indicating the number of lag-1 differences to be used for the
-#' denominator in MASE calculation. Default value is 1 for non-seasonal series and 0 for seasonal series.
-#' @param D An integer indicating the number of seasonal differences to be used for the denominator
-#' in MASE calculation. Default value is 0 for non-seasonal series and 1 for seasonal series.
-accuracy.default <- accuracy
+#' @param test Indicator of which elements of x and f to test. If test is NULL, all
+#' elements are used. Otherwise test is a numeric vector containing the indices of
+#' the elements to use in the test.
+#' @param d An integer indicating the number of lag-1 differences to be used for
+#' the denominator in MASE calculation. Default value is 1 for non-seasonal series
+#' and 0 for seasonal series.
+#' @param D An integer indicating the number of seasonal differences to be used
+#' for the denominator in MASE calculation. Default value is 0 for non-seasonal
+#' series and 1 for seasonal series.
+#' 
+accuracy.default <-  function(f, x, test = NULL, d = NULL, D = NULL){
+   forecast::accuracy(f, x, test, d, D)
+}
 
 #' Generic method for accuracy
 #' 
 #' @param x The input object
 #' @param ... Additional arguments
+#' 
 accuracy <- function(x, ...){
   UseMethod("accuracy", x)
 }
@@ -345,6 +351,7 @@ accuracy.hybridModel <- function(x, individual = FALSE){
 #'
 #' @param x The input \code{hybridModel} object
 #' @details Print the names of the individual component models and their weights.
+#' 
 summary.hybridModel <- function(x){
   print.hybridModel(x)
 }
@@ -354,6 +361,7 @@ summary.hybridModel <- function(x){
 #' @param x The input \code{hybridModel} object
 #' @export
 #' @details Print the names of the individual component models and their weights.
+#' 
 print.hybridModel <- function(x){
   cat("Hybrid forecast model comprised of the following models: ")
   cat(x$models, sep = ", ")
