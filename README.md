@@ -6,6 +6,10 @@ Convenient functions for ensemble forecasts in R combining approaches from the [
 The package is still under heavy development, but many basic features have been implemented. Some features (such as optimized parallelization between rather than within models, cross validation for determing model error rates, and automatically selecting the optimal combination of base models) have not yet been developed.
 
 ## Installation
+The stable release of the package is hosted on [CRAN](https://cran.r-project.org/web/packages/forecastHybrid/index.html) and can be installed as usual:
+````r
+install.packages("forecastHybrid")
+````
 
 The latest development version can be installed using the [devtools](https://cran.r-project.org/web/packages/devtools/index.html) package.
 
@@ -13,8 +17,7 @@ The latest development version can be installed using the [devtools](https://cra
 ```r
 devtools::install_github("ellisp/forecastHybrid/pkg")
 ```
-Stable releases on CRAN are planned.
-
+Version updates to CRAN will be published frequently after new features are implemented, so the development version is not recommended unless you plan to modify the code.
 
 ## Usage
 
