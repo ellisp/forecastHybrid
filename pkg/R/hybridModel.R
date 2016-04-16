@@ -4,6 +4,8 @@
 #' 
 #' @export
 #' @import forecast
+#' @import stats
+#' @import graphics
 #' @import fpp
 #' @param y A numeric vector or time series
 #' @param lambda 
@@ -41,12 +43,15 @@
 #' a series well with a seasonal period longer than 24 and will ignore the seasonality. In this case,
 #' \code{hybridModel()} will also drop the \code{ets} model from the ensemble.
 #' @examples
+#' \dontrun{
+#' 
 #' mod1 <- hybridModel(AirPassengers)
 #' plot(forecast(mod1))
 #' mod2 <- hybridModel(AirPassengers, models = "aet",
 #' weights = "insample.errors", errorMethod = "MASE")
 #' mod3 <- hybridModel(AirPassengers, models = "aens",
 #' a.args = list(max.p = 7, max.q = 7, approximation = FALSE))
+#' }
 #'
 hybridModel <- function(y, models = "aenst",
                         lambda = NULL,
@@ -400,9 +405,11 @@ print.hybridModel <- function(x, ...){
 #' there is not plot method for \code{stlm} or \code{nnetar} objects, these component
 #' models are not plotted.
 #' @examples
+#' \dontrun{
 #' hm <- hybridModel(woolyrnq, models = "aenst")
 #' plot(hm, type = "fit")
 #' plot(hm, type = "models")
+#' }
 #' @export
 #' 
 plot.hybridModel <- function(x, type = c("fit", "models"), ...){
