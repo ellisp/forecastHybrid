@@ -17,8 +17,10 @@
 #' @details If \code{xreg} was used in construcing the \code{hybridModel}, it must also be passed into \code{forecast.hybridModel}
 #' @return An object of class forecast.
 #' @examples
+#' \dontrun{
 #' mod <- hybridModel(AirPassengers)
 #' plot(forecast(mod))
+#' }
 #'
 forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * object$frequency, 10), xreg = NULL,
                                  level = c(80, 95), fan = FALSE, ...){
