@@ -23,6 +23,7 @@ if(require(fpp) & require(forecast) & require(testthat)){
     expect_that(hybridModel(y = rnorm(100), models = "ae", a.args = list(xreg = matrix(runif(100), nrow = 100))), not(throws_error()))
     expect_warning(hybridModel(y = rnorm(10), models = "en", a.args = list(lambda = 0.5)))
     expect_that(hybridModel(wineind, models = "atens"), not(throws_error()))
+    expect_that(hybridModel(wineind, models = "es", weights = "insample.errors"), not(throws_error()))
   })
   test_that("Testing model matching", {
     set.seed(123456)
@@ -31,10 +32,12 @@ if(require(fpp) & require(forecast) & require(testthat)){
     expect_that(hybridModel(y = rnorm(20), models = "nNeTEEEeA"), not(throws_error()))
   })
   context("Testing generic functions")
-  test_that("Testing is.hybridModel(), fitted.hybridModel(), and residuals.hybridModel()", {
+  test_that("Testing is.hybridModel(), fitted.hybridModel(), residuals.hybridModel(), and accuracy.hybridModel()", {
     exampleModel <- hybridModel(wineind)
     expect_true(is.hybridModel(exampleModel))
     expect_true(length(fitted(exampleModel)) == length(residuals(exampleModel)))
     expect_true(length(fitted(exampleModel, individual = TRUE)) == length(residuals(exampleModel, individual = TRUE)))
+    #expect_that(accuracy(exampleModel), not(throws_error()))
+    #expect_that(accuracy(exampleModel, individual = TRUE), not(throws_error()))
   })
 }
