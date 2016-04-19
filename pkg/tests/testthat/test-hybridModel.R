@@ -55,5 +55,7 @@ if(require(fpp) & require(forecast) & require(testthat)){
     # accuracy test and plot tests needed
     #expect_that(accuracy(exampleModel), not(throws_error()))
     #expect_that(accuracy(exampleModel, individual = TRUE), not(throws_error()))
+    expect_that(plot(exampleModel, type = "fit"), not(throws_error()))
+    expect_that(plot(exampleModel, type = "models"), not(throws_error()))
   })
 }
