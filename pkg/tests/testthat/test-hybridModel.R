@@ -37,7 +37,7 @@ if(require(fpp) & require(forecast) & require(testthat)){
     expect_that(hybridModel(y = rnorm(100), models = "ae", a.args = list(xreg = matrix(runif(100), nrow = 100))), not(throws_error()))
     expect_warning(hybridModel(y = rnorm(10), models = "en", a.args = list(lambda = 0.5)))
     expect_that(hybridModel(wineind, models = "atens"), not(throws_error()))
-    expect_that(hybridModel(wineind, models = "es", weights = "insample.errors"), not(throws_error()))
+    expect_that(hybridModel(wineind, models = "aenst", weights = "insample.errors"), not(throws_error()))
     expect_that(hybridModel(wineind, models = "ae", e.args = list(lambda = 0.5)), not(throws_error()))
   })
   test_that("Testing model matching", {
