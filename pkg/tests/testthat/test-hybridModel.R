@@ -11,7 +11,7 @@ if(require(fpp) & require(forecast) & require(testthat)){
     expect_error(hybridModel())
     expect_error(hybridModel(y = numeric()))
     expect_error(hybridModel(y = "aten"))
-    expect_error(hybridModel(y = "abcderfghijk"))
+    expect_error(hybridModel(y = wineind, models = "abcderfghijk"))
     expect_error(hybridModel(wineind, models = "a"))
     expect_error(hybridModel(wineind, num.cores = -1L))
     expect_error(hybridModel(wineind, num.cores = 3.3))
@@ -27,10 +27,10 @@ if(require(fpp) & require(forecast) & require(testthat)){
     expect_warning(hybridModel(wineind, models = "an", s.args = list()))
     expect_warning(hybridModel(wineind, models = "an", t.args = list()))
     expect_warning(hybridModel(ts(rnorm(50), f = 24), models = "aen"))
-    #expect_warning(hybridModel(ts(rnorm(20), f = 12), models = "ans"))
+    expect_warning(hybridModel(ts(rnorm(20), f = 12), models = "ans"))
     # Currently unimplemented features
     expect_warning(hybridModel(wineind, models = "ae", parallel = TRUE))
-    #expect_warning(hybridModel(wineind, models = "ae", weights = "cv.errors"))
+    expect_warning(hybridModel(wineind, models = "ae", weights = "cv.errors"))
   })
   test_that("Testing valid inputs", {
     set.seed(54321)
