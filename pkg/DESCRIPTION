@@ -1,17 +1,24 @@
 Package: forecastHybrid
 Title: Convenient Functions for Ensemble Time Series Forecasts
-Version: 0.0.1.9000
+Version: 0.1.6
+Date: 2016-04-15
 Authors@R: c(
-   person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("ctb", "cre")),
-   person("David", "Shaub", role = c("aut"))
+   person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
+   person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("ctb"))
    )
 Description: Convenient functions for ensemble forecasts in R combining
-    approaches from the 'forecast' package.
+    approaches from the 'forecast' package. Forecasts generated from auto.arima(), ets(),
+    nnetar(), stlm(), and tbats() can be combined with equal weights or weights based on
+    in-sample errors. Future methods such as cross validation are planned.
 Depends:
-    R (>= 3.1.2),
-    forecast,
-    fpp
+    R (>= 3.1.1),
+    forecast (>= 7.1),
+    fpp (>= 0.5)
 License: GPL-3
+URL: https://github.com/ellisp/forecastHybrid
+BugReports: https://github.com/ellisp/forecastHybrid/issues
 LazyData: true
 RoxygenNote: 5.0.1
 Suggests: testthat
+ByteCompile: true
+NeedsCompilation: no

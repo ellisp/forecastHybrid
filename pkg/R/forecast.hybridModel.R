@@ -5,20 +5,29 @@
 #' @export
 #' @import forecast
 #' @import fpp
-#' @param object A hybrid time series model fit with hybridModel()
-#' @param h Number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast 
+#' @param object a hybrid time series model fit with \link{hybridModel}.
+#' @param h number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast 
 #' periods is set to the number of rows of \code{xreg}.
-#' @param xreg Future values of regression variables (for use if one of the ensemble methods used
-#' in creating the hybrid forecast was \code{auto.arima} or \code{stlm} and a xreg was used in the fit)
-#' @param level Confidence level for prediction intervals
-#' @param fan If \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.
+#' @param xreg future values of regression variables (for use if one of the ensemble methods used
+#' in creating the hybrid forecast was \code{auto.arima} or \code{stlm} and a \code{xreg} was used in the fit)
+#' @param level confidence level for prediction intervals. This can be expressed as a decimal between 0.0 and 1.0 or numeric
+#' between 0 and 100.
+#' @param fan if \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.
 #' @param ... other arguments; currently not used.
 #' @seealso \code{\link{hybridModel}}
-#' @details If \code{xreg} was used in construcing the \code{hybridModel}, it must also be passed into \code{forecast.hybridModel}
-#' @return An object of class forecast.
+#' @details if \code{xreg} was used in construcing the \code{hybridModel}, it must also be passed into \code{forecast.hybridModel}
+#' @return An object of class \link[forecast]{forecast}.
 #' @examples
+#' \dontrun{
 #' mod <- hybridModel(AirPassengers)
-#' plot(forecast(mod))
+#' # View the point forecasts, upper prediction intervals, and lower prediction intervals
+#' fc <- forecast(mod)
+#' fc$mean
+#' fc$upper
+#' fc$lower
+#' # Plot the forecast
+#' plot(fc)
+#' }
 #'
 forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * object$frequency, 10), xreg = NULL,
                                  level = c(80, 95), fan = FALSE, ...){
@@ -79,7 +88,7 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
     forecasts$pointForecasts[, "ets"] <- forecasts$ets$mean
   }
   if("nnetar" %in% includedModels){
-    forecasts$nnetar <- forecast(object$nnetar, h = h)
+    forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xreg)
     forecasts$pointForecasts[, "nnetar"] <- forecasts$nnetar$mean
   }
   if("stlm" %in% includedModels){
@@ -98,6 +107,13 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
                       start = start(forecasts[[object$models[1]]]$mean),
                       end = end(forecasts[[object$models[1]]]$mean),
                       frequency = object$frequency)
+  
+  # Apply the weights to construct the fitted values
+  fits <- sapply(includedModels, FUN = function(x) fitted(object[[x]]))
+  fitsWeightsMatrix <- matrix(rep(forecastWeights, times = nrow(fits)),
+                              nrow = nrow(fits), byrow = TRUE)
+  fits <- rowSums(fits * fitsWeightsMatrix)
+  resid <- object$x - fits
   
   # Construct the prediction intervals
   nint <- length(level)
@@ -128,13 +144,22 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
   
   # Build the mean forecast as a ts object
   tsp.x <- tsp(object$x)
-  if (!is.null(tsp.x)){
-    start.f <- tsp(object$x)[2] + 1/object$frequency
-  } else{
-    start.f <- length(object$x) + 1
-  }
-  stop.f <- start.f + h / object$frequency
+#   if (!is.null(tsp.x)){
+#     start.f <- tsp(object$x)[2] + 1/object$frequency
+#   } else{
+#     start.f <- length(object$x) + 1
+#   }
+#   stop.f <- start.f + h / object$frequency
   forecasts$mean <- finalForecast
+  
+  # Add the fitted and residuals values
+  if(is.ts(object$x)){
+    fits <- ts(fits)
+    resid <- ts(resid)
+    tsp(fits) <- tsp(resid) <- tsp(object$x)
+  }
+  forecasts$fitted <- fits
+  forecasts$residuals <- resid
   
   # Build a forecast object
   forecasts$x <- forecasts[[object$models[1]]]$x

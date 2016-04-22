@@ -11,18 +11,34 @@ if(require(fpp) & require(forecast) & require(testthat)){
     expect_error(hybridModel())
     expect_error(hybridModel(y = numeric()))
     expect_error(hybridModel(y = "aten"))
+    expect_error(hybridModel(y = wineind, models = "abcderfghijk"))
     expect_error(hybridModel(wineind, models = "a"))
     expect_error(hybridModel(wineind, num.cores = -1L))
     expect_error(hybridModel(wineind, num.cores = 3.3))
     expect_error(hybridModel(wineind, num.cores = "a"))
     expect_error(hybridModel(wineind, models = ""))
+    expect_error(hybridModel(wineind, parallel = "a"))
     
+  })
+  test_that("Testing for warnings", {
+    expect_warning(hybridModel(wineind, models = "en", a.args = list()))
+    expect_warning(hybridModel(wineind, models = "an", e.args = list()))
+    expect_warning(hybridModel(wineind, models = "ae", n.args = list()))
+    expect_warning(hybridModel(wineind, models = "an", s.args = list()))
+    expect_warning(hybridModel(wineind, models = "an", t.args = list()))
+    expect_warning(hybridModel(ts(rnorm(50), f = 24), models = "aen"))
+    expect_warning(hybridModel(ts(rnorm(20), f = 12), models = "aes"))
+    # Currently unimplemented features
+    expect_warning(hybridModel(wineind, models = "ae", parallel = TRUE))
+    expect_warning(hybridModel(wineind, models = "ae", weights = "cv.errors"))
   })
   test_that("Testing valid inputs", {
     set.seed(54321)
     expect_that(hybridModel(y = rnorm(100), models = "ae", a.args = list(xreg = matrix(runif(100), nrow = 100))), not(throws_error()))
     expect_warning(hybridModel(y = rnorm(10), models = "en", a.args = list(lambda = 0.5)))
     expect_that(hybridModel(wineind, models = "atens"), not(throws_error()))
+    expect_that(hybridModel(wineind, models = "aenst", weights = "insample.errors"), not(throws_error()))
+    expect_that(hybridModel(wineind, models = "ae", e.args = list(lambda = 0.5)), not(throws_error()))
   })
   test_that("Testing model matching", {
     set.seed(123456)
@@ -31,9 +47,14 @@ if(require(fpp) & require(forecast) & require(testthat)){
     expect_that(hybridModel(y = rnorm(20), models = "nNeTEEEeA"), not(throws_error()))
   })
   context("Testing generic functions")
-  test_that("Testing is.hybridModel(), fitted.hybridModel(), and residuals.hybridModel()", {
+  test_that("Testing is.hybridModel(), fitted.hybridModel(), residuals.hybridModel(), and accuracy.hybridModel()", {
     exampleModel <- hybridModel(wineind)
     expect_true(is.hybridModel(exampleModel))
     expect_true(length(fitted(exampleModel)) == length(residuals(exampleModel)))
+    expect_true(length(fitted(exampleModel, individual = TRUE)) == length(residuals(exampleModel, individual = TRUE)))
+    expect_that(accuracy(exampleModel), not(throws_error()))
+    expect_that(accuracy(exampleModel, individual = TRUE), not(throws_error()))
+    expect_that(plot(exampleModel, type = "fit"), not(throws_error()))
+    expect_that(plot(exampleModel, type = "models"), not(throws_error()))
   })
 }
