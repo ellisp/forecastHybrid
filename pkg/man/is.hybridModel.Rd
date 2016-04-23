@@ -7,7 +7,7 @@
 is.hybridModel(x)
 }
 \arguments{
-\item{x}{The input object}
+\item{x}{the input object.}
 }
 \value{
 A boolean indicating if the object is a \code{hybridModel} is returned.

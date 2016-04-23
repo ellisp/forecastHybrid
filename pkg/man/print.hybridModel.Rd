@@ -7,9 +7,9 @@
 \method{print}{hybridModel}(x, ...)
 }
 \arguments{
-\item{x}{The input \code{hybridModel} object}
+\item{x}{the input \code{hybridModel} object.}
 
-\item{...}{Other arguments (ignored).}
+\item{...}{other arguments (ignored).}
 }
 \description{
 Print information about the hybridModel object

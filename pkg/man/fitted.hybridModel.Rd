@@ -7,15 +7,15 @@
 \method{fitted}{hybridModel}(object, individual = FALSE, ...)
 }
 \arguments{
-\item{object}{The input hybridModel}
+\item{object}{the input hybridModel.}
 
-\item{individual}{If \code{TRUE}, return the fitted values of the component models instead
+\item{individual}{if \code{TRUE}, return the fitted values of the component models instead
 of the fitted values for the whole ensemble model.}
 
-\item{...}{Other arguments (ignored).}
+\item{...}{other arguments (ignored).}
 }
 \value{
-The fitted values of the ensemble or individual component models
+The fitted values of the ensemble or individual component models.
 }
 \description{
 Extract the model fitted values from the \code{hybridModel} object.

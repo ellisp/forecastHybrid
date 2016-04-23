@@ -8,32 +8,41 @@
   object$frequency, 10), xreg = NULL, level = c(80, 95), fan = FALSE, ...)
 }
 \arguments{
-\item{object}{A hybrid time series model fit with hybridModel()}
+\item{object}{a hybrid time series model fit with \link{hybridModel}.}
 
-\item{h}{Number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast 
+\item{h}{number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast 
 periods is set to the number of rows of \code{xreg}.}
 
-\item{xreg}{Future values of regression variables (for use if one of the ensemble methods used
-in creating the hybrid forecast was \code{auto.arima} or \code{stlm} and a xreg was used in the fit)}
+\item{xreg}{future values of regression variables (for use if one of the ensemble methods used
+in creating the hybrid forecast was \code{auto.arima} or \code{stlm} and a \code{xreg} was used in the fit)}
 
-\item{level}{Confidence level for prediction intervals}
+\item{level}{confidence level for prediction intervals. This can be expressed as a decimal between 0.0 and 1.0 or numeric
+between 0 and 100.}
 
-\item{fan}{If \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.}
+\item{fan}{if \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.}
 
 \item{...}{other arguments; currently not used.}
 }
 \value{
-An object of class forecast.
+An object of class \link[forecast]{forecast}.
 }
 \description{
 Forecast method for hybrid models.
 }
 \details{
-If \code{xreg} was used in construcing the \code{hybridModel}, it must also be passed into \code{forecast.hybridModel}
+if \code{xreg} was used in construcing the \code{hybridModel}, it must also be passed into \code{forecast.hybridModel}
 }
 \examples{
+\dontrun{
 mod <- hybridModel(AirPassengers)
-plot(forecast(mod))
+# View the point forecasts, upper prediction intervals, and lower prediction intervals
+fc <- forecast(mod)
+fc$mean
+fc$upper
+fc$lower
+# Plot the forecast
+plot(fc)
+}
 
 }
 \seealso{

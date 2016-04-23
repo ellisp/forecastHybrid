@@ -11,33 +11,34 @@ hybridModel(y, models = "aenst", lambda = NULL, a.args = NULL,
   num.cores = 2L)
 }
 \arguments{
-\item{y}{A numeric vector or time series}
+\item{y}{A numeric vector or time series.}
 
 \item{models}{A character string of up to five characters indicating which contributing models to use: 
-a (\code{\link{auto.arima}}), e (\code{\link{ets}}), n (\code{\link{nnetar}}), s (\code{\link{stlm}}) and t (\code{\link{tbats}})}
+a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), n (\code{\link[forecast]{nnetar}}),
+s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}})}
 
 \item{lambda}{Box-Cox transformation parameter.  Ignored if NULL.  Otherwise, data transformed before model is estimated.}
 
-\item{a.args}{Arguments to pass to \code{\link{auto.arima}}}
+\item{a.args}{an optional list of arguments to pass to \code{\link[forecast]{auto.arima}}.}
 
-\item{e.args}{Arguments to pass to \code{\link{ets}}}
+\item{e.args}{an optional list of arguments to pass to \code{\link[forecast]{ets}}.}
 
-\item{n.args}{Arguments to pass to \code{\link{nnetar}}}
+\item{n.args}{an optional list of arguments to pass to \code{\link[forecast]{nnetar}}.}
 
-\item{s.args}{Arguments to pass to \code{\link{stlm}}}
+\item{s.args}{an optional list of arguments to pass to \code{\link[forecast]{stlm}}.}
 
-\item{t.args}{Arguments to pass to \code{\link{tbats}}}
+\item{t.args}{an optional list of arguments to pass to \code{\link[forecast]{tbats}}.}
 
-\item{weights}{Method for weighting the forecasts of the various contributing
-models.  Defaults to equal, which has shown to be robust and surprisingly better
-in many cases than giving more weight to models with better past performance. Weights
-utilizing insample errors are also available. Cross validated errors are currently unimplemented.}
+\item{weights}{method for weighting the forecasts of the various contributing
+models.  Defaults to \code{equal}, which has shown to be robust and surprisingly better
+in many cases than giving more weight to models with better in-sample performance. Weights
+utilizing in-sample errors are also available. Cross validated errors are currently unimplemented.}
 
-\item{errorMethod}{Method of measuring accuracy to use if weights are not 
-to be equal. Root mean square error (RMSE), mean absolute error (MAE) and mean absolute scaled error (MASE)
+\item{errorMethod}{method of measuring accuracy to use if weights are not 
+to be equal. Root mean square error (\code{RMSE}), mean absolute error (\code{MAE}) and mean absolute scaled error (\code{MASE})
 are supported.}
 
-\item{parallel}{Should parallel processing be used between models? This is currently unimplemented.
+\item{parallel}{a boolean indicating if  parallel processing should be used between models. This is currently unimplemented.
 Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.}
 
 \item{num.cores}{If \code{parallel=TRUE}, how many cores to use.}
@@ -47,32 +48,41 @@ An object of class hybridModel. The individual component models are stored insid
 and can be accessed for all the regular manipulations available in the forecast package.
 }
 \description{
-Create a hybrid time series model from two to five component models.
+Create a hybrid time series model with two to five component models.
 }
 \details{
-The hybridModel function fits multiple individual model specifications to allow easy creation
+The \code{hybridModel} function fits multiple individual model specifications to allow easy creation
 of ensemble forecasts. While default settings for the individual component models work quite well
 in most cases, fine control can be exerted by passing detailed arguments to the component models in the
-a.args, e.args, n.args, s.args, and t.args lists.
+\code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
 \cr
 Characteristics of the input series can cause problems for certain types of models and paramesters.
-For example, \code{\link{stlm}} models require that the input series be seasonal, and there furthemore
-must be more than two seasonal periods of data for the decomposition. If it is not the case, \code{hybridModel()}
-will remove the \code{stlm} model so an error does not occur. The \code{\link{ets}} model does not handle 
+For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal; furthemore, the
+data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)}) for the decomposition to succeed.
+If this is not the case, \code{hybridModel()}
+will remove the \code{stlm} model so an error does not occur. Similarly, \code{nnetar} models require that
+\code{length(y) >= 2 * frequency(y)}, so these models will be removed if the condition is not satisfied
+The \code{\link[forecast]{ets}} model does not handle 
 a series well with a seasonal period longer than 24 and will ignore the seasonality. In this case,
 \code{hybridModel()} will also drop the \code{ets} model from the ensemble.
 }
 \examples{
+\dontrun{
+
 mod1 <- hybridModel(AirPassengers)
 plot(forecast(mod1))
 mod2 <- hybridModel(AirPassengers, models = "aet",
 weights = "insample.errors", errorMethod = "MASE")
 mod3 <- hybridModel(AirPassengers, models = "aens",
 a.args = list(max.p = 7, max.q = 7, approximation = FALSE))
+# View the component auto.arima() and stlm() models
+mod3$auto.arima
+mod3$stlm
+}
 
 }
 \seealso{
-\code{\link{forecast.hybridModel}}, \code{\link{auto.arima}}, \code{\link{ets}}, \code{\link{nnetar}},
-\code{\link{stlm}}, and \code{\link{tbats}}
+\code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}}, \code{\link[forecast]{ets}}, \code{\link[forecast]{nnetar}},
+\code{\link[forecast]{stlm}}, \code{\link[forecast]{tbats}}
 }
 

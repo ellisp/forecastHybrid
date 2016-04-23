@@ -15,7 +15,7 @@ of the residuals for the whole ensemble model.}
 \item{...}{Other arguments (ignored).}
 }
 \value{
-The residuals of the ensemble or individual component models
+The residuals of the ensemble or individual component models.
 }
 \description{
 Extract the model residuals from the \code{hybridModel} object.

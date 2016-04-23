@@ -7,7 +7,7 @@
 \method{summary}{hybridModel}(x)
 }
 \arguments{
-\item{x}{The input \code{hybridModel} object}
+\item{x}{the input \code{hybridModel} object.}
 }
 \description{
 Print a summary of the hybridModel object
