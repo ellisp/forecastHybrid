@@ -1,24 +1,11 @@
-# adapt http://robjhyndman.com/m3comparisons.R
+# adapted from http://robjhyndman.com/m3comparisons.R
+# This is an extended test of the hybridForecast approach
+# on 3,003 series; partly to identify bugs, partly to 
+# assess relative performance
 
 library(Mcomp)
 
 
-pi_accuracy <- function(fc, yobs){
-   # checks the success of prediction intervals of an object of class 
-   # forecast with actual values
-   if(length(yobs) != length(fc$mean)){
-      stop("yobs needs to be the same length as the forecast period.")
-   }
-   n <- length(yobs)
-   yobsm <- cbind(yobs, yobs)
-   In <- (yobsm > fc$lower & yobsm < fc$upper) 
-   colnames(In) <- c("Series 1", "Series 2")
-   Success <- colMeans(In)
-   return(list(In = In, Success = Success, n = n))
-}
-
-# adapt the below
-#============forecasting with default values===============
 num_series <- length(M3) # ie 3003
 #num_series <- 10 # while developing
 
@@ -32,10 +19,11 @@ all_methods <- c(
 k <- length(all_methods) # ie 26 methods
 
 
-# set up list of k empty matrices to hold the results
+# set up list of k empty matrices with 18 columns to hold the results
+# (predicting 18 periods out for each series)
 forecasts <- list()
 for(j in 1:k){
-   forecasts[[j]] <- matrix(NA, nrow = num_series, ncol=18)
+   forecasts[[j]] <- matrix(NA, nrow = num_series, ncol = 18)
 }
 
 
@@ -46,6 +34,7 @@ for(i in 1:num_series){
    x <- series$x      # ie the data to be fitted
    
    for(j in 1:k){
+      # stlm only works for seasonal data, so skip any hybrids containing stlm if not seasonal:
       if(M3[[i]]$period == "YEARLY" & any(grepl("s", all_methods[j]))){
          next()
       } else {
@@ -74,11 +63,29 @@ for(i in 1:num_series){
 
 
 m3table <- matrix(NA, nrow = k, ncol = 3)
-m3table[ ,1] <- rowMeans(mape, na.rm = TRUE)
-m3table[ ,2] <- rowMeans(smape, na.rm = TRUE)
+m3table[ ,1] <- rowMeans(smape, na.rm = TRUE)
+m3table[ ,2] <- rowMeans(mape, na.rm = TRUE)
 m3table[ ,3] <- rowMeans(mase, na.rm = TRUE)
 
 m3df <- data.frame(m3table)
-names(m3df) <- c("mape", "smape", "mase")
+names(m3df) <- c("smape", "mape", "mase")
 m3df$method <- all_methods
 m3df
+
+
+
+# all models with t in them failed for series 2733 in the original run but this
+# is a bug that's fixed now
+
+
+# series <- M3[[2733]]
+# x <- series$x    
+# plot(x)
+# series$description
+# series$period
+# series$st
+# frequency(x)
+# 
+# fc <- forecast(hybridModel(x, models = "aet"), h = 18)
+# plot(fc)
+# fc$mean
