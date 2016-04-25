@@ -275,13 +275,14 @@ is.hybridModel <- function(x){
 #' Extract Model Fitted Values
 #' 
 #' Extract the model fitted values from the \code{hybridModel} object.
-#' @export
+#' 
 #' @param object the input hybridModel.
 #' @param individual if \code{TRUE}, return the fitted values of the component models instead
 #' of the fitted values for the whole ensemble model.
 #' @param ... other arguments (ignored).
 #' @seealso \code{\link{accuracy}}
 #' @return The fitted values of the ensemble or individual component models.
+#' @export
 #' 
 fitted.hybridModel <- function(object, individual = FALSE, ...){
   if(individual){
@@ -319,30 +320,32 @@ residuals.hybridModel <- function(object, individual = FALSE, ...){
 
 #' Generic method for accuracy
 #' 
-#' @param f An object of class forecast, or a numerical vector containing forecasts.
+#' @param f an object of class forecast, or a numerical vector containing forecasts.
 #' It will also work with Arima, ets and lm objects if x is omitted - in which case
 #' in-sample accuracy measures are returned.
-#' @param x An optional numerical vector containing actual values of the same length
+#' @param x an optional numerical vector containing actual values of the same length
 #' as object, or a time series overlapping with the times of f.
-#' @param test Indicator of which elements of x and f to test. If test is NULL, all
+#' @param test indicator of which elements of x and f to test. If test is NULL, all
 #' elements are used. Otherwise test is a numeric vector containing the indices of
 #' the elements to use in the test.
-#' @param d An integer indicating the number of lag-1 differences to be used for
+#' @param d an integer indicating the number of lag-1 differences to be used for
 #' the denominator in MASE calculation. Default value is 1 for non-seasonal series
 #' and 0 for seasonal series.
-#' @param D An integer indicating the number of seasonal differences to be used
+#' @param D an integer indicating the number of seasonal differences to be used
 #' for the denominator in MASE calculation. Default value is 0 for non-seasonal
 #' series and 1 for seasonal series.
+#' @param ... other arguments (ignored)
+#' @export
 #' 
-accuracy.default <-  function(f, x, test = NULL, d = NULL, D = NULL){
+accuracy.default <-  function(f, x, test = NULL, d = NULL, D = NULL, ...){
    forecast::accuracy(f, x, test, d, D)
 }
 
 #' Generic method for accuracy
 #' 
-#' @param f The input object
-#' @param ... Other arguments (ignored).
-#' 
+#' @param f the input object.
+#' @param ... other arguments (ignored).
+#' @export
 accuracy <- function(f, ...){
   UseMethod("accuracy")
 }
@@ -350,22 +353,24 @@ accuracy <- function(f, ...){
 #' Accuracy measures for hybridModel objects
 #' 
 #' Return the in-sample accuracy measures for the component models of the hybridModel
-#' @export
+#' 
 #' @param f the input hybridModel.
 #' @param individual if \code{TRUE}, return the accuracy of the component models instead
 #' of the accuracy for the whole ensemble model.
+#' @param ... other arguments (ignored).
 #' @seealso \code{\link[forecast]{accuracy}}
 #' @return The accuracy of the ensemble or individual component models.
+#' @export
 #' 
-accuracy.hybridModel <- function(f, individual = FALSE){
+accuracy.hybridModel <- function(f, individual = FALSE, ...){
   if(individual){
     results <- list()
     for(i in f$models){
-      results[[i]] <- accuracy(f[[i]])
+      results[[i]] <- forecast::accuracy(f[[i]])
     }
     return(results)
   }
-  return(accuracy(f$fitted, getResponse(f)))
+  return(forecast::accuracy(f$fitted, getResponse(f)))
 }
 
 #' Print a summary of the hybridModel object
