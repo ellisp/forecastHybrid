@@ -1,7 +1,7 @@
 [![Travis-CI Build Status](https://travis-ci.org/ellisp/forecastHybrid.svg?branch=master)](https://travis-ci.org/ellisp/forecastHybrid)
 [![Coverage Status](https://coveralls.io/repos/github/ellisp/forecastHybrid/badge.svg?branch=master)](https://coveralls.io/github/ellisp/forecastHybrid?branch=master)
 [![CRAN version](http://www.r-pkg.org/badges/version/forecastHybrid)](http://www.r-pkg.org/pkg/forecastHybrid)
-
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/ggseas)](http://www.r-pkg.org/pkg/ggseas)
 
 # forecastHybrid
 Convenient functions for ensemble forecasts in R combining approaches from the [forecast](https://github.com/robjhyndman/forecast) package
@@ -59,16 +59,16 @@ fc$mean
 ```
 ##           Jan      Feb      Mar      Apr      May      Jun      Jul
 ## 1994                                                               
-## 1995 16885.40 20815.63 23583.39 24683.11 24382.37 24354.97 29469.07
-## 1996 16530.52 20746.57 24298.12 25200.00 24461.81 24566.54 29783.78
-## 1997 16481.95 20702.76 23764.88 25054.44 24219.16 24489.75 29801.07
-## 1998 16178.21 20559.47 24014.95 25172.79 24152.45 24491.63 29663.37
+## 1995 16349.33 20601.03 24108.68 24522.20 24193.04 24294.86 29400.42
+## 1996 16442.91 20872.89 24162.15 25466.90 24265.64 24776.05 29855.33
+## 1997 16263.38 20714.36 23762.96 25091.35 24121.42 24472.40 29730.75
+## 1998 15974.87 20744.47 23892.48 25382.29 24126.28 24723.62 29777.50
 ##           Aug      Sep      Oct      Nov      Dec
-## 1994          25527.24 26687.91 32099.84 36051.45
-## 1995 26985.83 25115.91 26389.49 31769.47 37127.95
-## 1996 26731.30 24914.23 26429.33 32151.08 36809.47
-## 1997 26568.82 25007.79 26525.61 32203.00 36901.60
-## 1998 26510.16
+## 1994          25475.55 26320.25 32082.95 36051.44
+## 1995 27107.22 25160.78 26544.60 32094.86 37132.48
+## 1996 26412.82 25310.13 26303.92 32540.15 36969.13
+## 1997 26965.06 25103.03 26592.32 32479.43 37165.79
+## 1998 26348.92
 ```
 
 ```r
