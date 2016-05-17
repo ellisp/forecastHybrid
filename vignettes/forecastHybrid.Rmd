@@ -27,19 +27,21 @@ First load the package.
 library(forecastHybrid)
 ```
 
-The workhorse function of the package is ```hybridModel```, a function that combines several component models from the "forecast" package. At a minimum, the user must input a ```ts``` or ```numeric``` vector for ```y```. In this case, the ensemble will include all of the component models: ```auto.arima```, ```ets```, ```nnetar```, ```stlm```, and ```tbats```. To instead use only a subset of these models, pass a character string to the ```models``` argument with the first letter of each model to include. For example, to build an ensemble model on the ```wineind``` dataset with ```auto.arima```, ```ets```, and ```tbats``` components, run
+The workhorse function of the package is ```hybridModel```, a function that combines several component models from the "forecast" package. At a minimum, the user must input a ```ts``` or ```numeric``` vector for ```y```. In this case, the ensemble will include all of the component models: ```auto.arima```, ```ets```, ```nnetar```, ```stlm```, and ```tbats```. To instead use only a subset of these models, pass a character string to the ```models``` argument with the first letter of each model to include. For example, to build an ensemble model on the ```gas``` dataset with ```auto.arima```, ```ets```, and ```tbats``` components, run
 
 ```{r basic_model, cache = TRUE}
 
-# Build a hybrid forecast on the wineind dataset using auto.arima, ets, and tbats models.
+# Build a hybrid forecast on the gas dataset using auto.arima, ets, and tbats models.
 # Each model is given equal weight
-hm1 <- hybridModel(y = wineind, models = "aet", weights = "equal")
+hm1 <- hybridModel(y = gas, models = "aet", weights = "equal")
 ```
 
 This produces an S3 object of class ```forecastHybrid```.
 ```{r object_class, cache = TRUE}
 class(hm1)
 ```
+
+By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles, but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass the value to the ```weights``` argument.
 
 This object can be manipulated with the same familiar interface from the "forecast" package, including S3 generic functions such as ```accuracy```, ```forecast```, ```fitted```, and ```residuals```. For example, we'll produce an S3 class ```forecast``` object for the next 48 periods from the ensemble model. 
 ```{r basic_forecast, cache = TRUE}
