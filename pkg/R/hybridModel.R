@@ -13,11 +13,11 @@
 #' @param models A character string of up to five characters indicating which contributing models to use: 
 #' a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), n (\code{\link[forecast]{nnetar}}),
 #' s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}})
-#' @param a.args an optional list of arguments to pass to \code{\link[forecast]{auto.arima}}.
-#' @param e.args an optional list of arguments to pass to \code{\link[forecast]{ets}}.
-#' @param n.args an optional list of arguments to pass to \code{\link[forecast]{nnetar}}.
-#' @param s.args an optional list of arguments to pass to \code{\link[forecast]{stlm}}.
-#' @param t.args an optional list of arguments to pass to \code{\link[forecast]{tbats}}.
+#' @param a.args an optional \code{list} of arguments to pass to \code{\link[forecast]{auto.arima}}. See details.
+#' @param e.args an optional \code{list} of arguments to pass to \code{\link[forecast]{ets}}. See details.
+#' @param n.args an optional \code{list} of arguments to pass to \code{\link[forecast]{nnetar}}. See details.
+#' @param s.args an optional \code{list} of arguments to pass to \code{\link[forecast]{stlm}}. See details.
+#' @param t.args an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}. See details.
 #' @param weights method for weighting the forecasts of the various contributing
 #' models.  Defaults to \code{equal}, which has shown to be robust and surprisingly better
 #' in many cases than giving more weight to models with better in-sample performance. Weights
@@ -35,7 +35,10 @@
 #' @details The \code{hybridModel} function fits multiple individual model specifications to allow easy creation
 #' of ensemble forecasts. While default settings for the individual component models work quite well
 #' in most cases, fine control can be exerted by passing detailed arguments to the component models in the
-#' \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
+#' \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists. Note that if \code{xreg}
+#' is passed to the \code{a.args} or \code{n.args} component models it must be passed as a dataframe instead of the matrix object
+#' that the "forecast" package functions usually accept. This is due to a limitation in how the component models are called.
+#' 
 #' \cr
 #' Characteristics of the input series can cause problems for certain types of models and paramesters.
 #' For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal; furthemore, the
@@ -46,6 +49,7 @@
 #' The \code{\link[forecast]{ets}} model does not handle 
 #' a series well with a seasonal period longer than 24 and will ignore the seasonality. In this case,
 #' \code{hybridModel()} will also drop the \code{ets} model from the ensemble.
+#' 
 #' @examples
 #' \dontrun{
 #' 
