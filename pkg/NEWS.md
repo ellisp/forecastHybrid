@@ -1,7 +1,8 @@
-# Version 0.1.6
+# Version 0.1.6 (unreleased)
+* Add vignette
 * Add NEWS
-* Add additional unit tests
-* Update unit tests away from deprecated `not()` function from "testthat" package
+* Add additional unit tests TODO
+* Update unit tests away from deprecated `not()` function from "testthat" package TODO
 * Fix accuracy methods
 * Fix warning for unimplemented parameter `weights = "cv.errors"`
 * Fix error with `nnetar` when `2 * frequency(y) > length(y)`
