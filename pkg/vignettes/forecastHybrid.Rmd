@@ -41,6 +41,13 @@ This produces an S3 object of class ```forecastHybrid```.
 class(hm1)
 ```
 
+Two types of plots can be created for the created ensemble model: either a plot showing the actual and fitted value of each component model on the data or individual plots of the component models as created by their regular plot methods. Note that not ```plot``` method exists in the "forecast" package for ```stlm``` objects, so this component model will be ignored when ```type = "models"```, but the other component models will be plotted.
+```{r plots, cache = TRUE}
+plot(hm1, type = "fit")
+plot(hm1, type = "models")
+
+```
+
 By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles, but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass this value to the ```errorMethod``` argument and pass either ```"insample.errors"``` or ```"cv.errors"``` (currently unimplemented) to the ```weights``` argument.
 
 This object can be manipulated with the same familiar interface from the "forecast" package, including S3 generic functions such as ```accuracy```, ```forecast```, ```fitted```, and ```residuals```.
@@ -67,7 +74,6 @@ The package aims to make fitting ensembles easy and quick, but it still allows a
 ```{r advanced_fit, cache = TRUE}
 hm2 <- hybridModel(y = gas, models = "aenst",
                    a.args = list(max.p = 12, max.q = 12, approximation = FALSE),
-                   e.args = list(allow.multiplicative.trend = TRUE),
                    n.args = list(repeats = 50),
                    s.args = list(robust = TRUE),
                    t.args = list(use.armga.errors = FALSE))
