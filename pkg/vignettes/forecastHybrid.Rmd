@@ -21,12 +21,12 @@ devtools::install_github("ellisp/forecastHybrid/pkg")
 
 Version updates to CRAN will be published frequently after new features are implemented, so the development version is not recommended unless you plan to modify the code.
 
-## Usage
+## Basic usage
 First load the package.
 ```{r load_library, message = FALSE, cache = TRUE}
 library(forecastHybrid)
 ```
-
+### Fitting a model
 The workhorse function of the package is ```hybridModel```, a function that combines several component models from the "forecast" package. At a minimum, the user must input a ```ts``` or ```numeric``` vector for ```y```. In this case, the ensemble will include all of the component models: ```auto.arima```, ```ets```, ```nnetar```, ```stlm```, and ```tbats```. To instead use only a subset of these models, pass a character string to the ```models``` argument with the first letter of each model to include. For example, to build an ensemble model on the ```gas``` dataset with ```auto.arima```, ```ets```, and ```tbats``` components, run
 
 ```{r basic_model, cache = TRUE}
@@ -41,14 +41,34 @@ This produces an S3 object of class ```forecastHybrid```.
 class(hm1)
 ```
 
-By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles, but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass the value to the ```weights``` argument.
+By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles, but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass this value to the ```errorMethod``` argument and pass either ```"insample.errors"``` or ```"cv.errors"``` (currently unimplemented) to the ```weights``` argument.
 
-This object can be manipulated with the same familiar interface from the "forecast" package, including S3 generic functions such as ```accuracy```, ```forecast```, ```fitted```, and ```residuals```. For example, we'll produce an S3 class ```forecast``` object for the next 48 periods from the ensemble model. 
+This object can be manipulated with the same familiar interface from the "forecast" package, including S3 generic functions such as ```accuracy```, ```forecast```, ```fitted```, and ```residuals```.
+```{r generics, cache = TRUE}
+# View the first 10 fitted values and residuals
+head(fitted(hm1))
+head(residuals(hm1))
+
+```
+
+### Forecasting
+Now's let's forecast future values. The ```forecast()``` function produce an S3 class ```forecast``` object for the next 48 periods from the ensemble model. 
 ```{r basic_forecast, cache = TRUE}
 hForecast <- forecast(hm1, h = 48)
 ```
 
 Now plot the forecast for the next 48 periods. The prediction intervals are preserved from the individual component models and currently use the most extreme value from an individual model, producing a conservative estimate for the ensemble's performance.
-```{r plot_forecast}
+```{r plot_forecast, cache = TRUE}
 plot(hForecast)
+```
+
+## Advanced usage
+The package aims to make fitting ensembles easy and quick, but it still allows advanced tuning of all the parameters available in the "forecast" package. This is possible through usage of the ```a.args```, ```e.args```, ```n.args```, ```s.args```, and ```t.args``` lists. These optional list arguments may be applied to one, none, all, or any combination of the included individual component models. Consult the documentation in the "forecast" package for acceptable arguments to pass in the ```auto.arima```, ```ets```, ```nnetar```, ```stlm```, and ```tbats``` functions.
+```{r advanced_fit, cache = TRUE}
+hm2 <- hybridModel(y = gas, models = "aenst",
+                   a.args = list(max.p = 12, max.q = 12, approximation = FALSE),
+                   e.args = list(allow.multiplicative.trend = TRUE),
+                   n.args = list(repeats = 50),
+                   s.args = list(robust = TRUE),
+                   t.args = list(use.armga.errors = FALSE))
 ```
