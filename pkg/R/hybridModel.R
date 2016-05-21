@@ -149,7 +149,7 @@ hybridModel <- function(y, models = "aenst",
   if(is.element("n", expandedModels)){
      if(frequency(y) * 2L >= length(y)){
         warning("The nnetar model requres a series more than twice as long as the seasonal period. The nnetar model will not be used.")
-        expandedModels <- expandedModels[expandedModels != "s"]
+        expandedModels <- expandedModels[expandedModels != "n"]
      }
   }
   
