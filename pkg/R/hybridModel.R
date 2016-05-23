@@ -6,7 +6,6 @@
 #' @import forecast
 #' @import stats
 #' @import graphics
-#' @import fpp
 #' @param y A numeric vector or time series.
 #' @param lambda
 #' Box-Cox transformation parameter.  Ignored if NULL.  Otherwise, data transformed before model is estimated.
@@ -401,7 +400,6 @@ print.hybridModel <- function(x, ...){
 #'
 #' @method plot hybridModel
 #' @import forecast
-#' @import fpp
 #' @param x an object of class hybridModel to plot.
 #' @param type if \code{type = "fit"}, plot the original series and the individual fitted models.
 #' If \code{type = "models"}, use the regular plot methods from the component models, i.e.
