@@ -1,5 +1,5 @@
 # Unit tests on the hybridModel function
-if(require(fpp) & require(forecast) & require(testthat)){
+if(require(forecast) & require(testthat)){
   context("Testing input for forecast.hybridModel()")
   test_that("Testing invalid inputs", {
     hModel <- hybridModel(woolyrnq)
