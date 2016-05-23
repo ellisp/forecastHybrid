@@ -1,5 +1,5 @@
 # Unit tests on the generic function
-if(require(fpp) & require(forecast) & require(testthat)){
+if(require(forecast) & require(testthat)){
   context("Testing generic functions")
   set.seed(2345)
   expect_warning(hm <- hybridModel(y = 10 + rnorm(100), models = "aenst"))
