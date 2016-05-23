@@ -1,5 +1,5 @@
 # Unit tests on the hybridModel function
-if(require(fpp) & require(forecast) & require(testthat)){
+if(require(forecast) & require(testthat)){
   context("Testing input for hybridModel()")
   test_that("Testing invalid inputs", {
     expect_error(hybridModel(y = 1:10, models = "jten"))
@@ -18,7 +18,7 @@ if(require(fpp) & require(forecast) & require(testthat)){
     expect_error(hybridModel(wineind, num.cores = "a"))
     expect_error(hybridModel(wineind, models = ""))
     expect_error(hybridModel(wineind, parallel = "a"))
-    
+
   })
   test_that("Testing for warnings", {
     expect_warning(hybridModel(wineind, models = "en", a.args = list()))
