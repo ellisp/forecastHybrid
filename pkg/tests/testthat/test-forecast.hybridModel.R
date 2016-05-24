@@ -17,7 +17,7 @@ if(require(forecast) & require(testthat)){
     aa <- hybridModel(wineind, models = "aenst", a.args = list(xreg = mm), n.args = list (xreg = mm))
     expect_warning(tmp <- forecast(aa, xreg = matrix(rnorm(20), nrow = 20)))
     expect_warning(forecast(aa, h = 10, xreg = matrix(rnorm(20), nrow = 20)))
-    expect_that(forecast(aa, xreg = matrix(rnorm(24), nrow = 24)), not(throws_error()))
+    expect_error(forecast(aa, xreg = matrix(rnorm(24), nrow = 24)), NA)
     expect_true(length(forecast(aa, xreg = matrix(rnorm(24), nrow = 24))$mean) == 24L)
     expect_true(class(forecast(aa, xreg = matrix(rnorm(24), nrow = 24))) == "forecast")
     expect_true(all(forecast(aa, xreg = mm,  h = nrow(mm), level = 0.9)$upper == forecast(aa, xreg = mm,  h = nrow(mm), level = 90)$upper))
