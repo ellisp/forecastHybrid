@@ -12,8 +12,7 @@ Description: Convenient functions for ensemble forecasts in R combining
     in-sample errors. Future methods such as cross validation are planned.
 Depends:
     R (>= 3.1.1),
-    forecast (>= 7.1),
-    fpp (>= 0.5)
+    forecast (>= 7.1)
 Suggests:
     knitr
 License: GPL-3
