@@ -35,6 +35,7 @@ The workhorse function of the package is ```hybridModel```, a function that comb
 # Each model is given equal weight
 hm1 <- hybridModel(y = gas, models = "aet", weights = "equal")
 ```
+#### Model diagnostics
 
 This produces an S3 object of class ```forecastHybrid```.
 ```{r object_class, cache = TRUE}
@@ -55,7 +56,15 @@ This object can be manipulated with the same familiar interface from the "foreca
 # View the first 10 fitted values and residuals
 head(fitted(hm1))
 head(residuals(hm1))
+```
 
+In-sample errors and various accuracy measure can be extracted with the ```accuracy``` method. The "forecastHybrid" package creates an S3 generic from the ```accuracy``` method in the "forecast" package, so ```accuracy``` will continue to function as normal with objects from the "forecast" package, but now special functionality is created for ```hybridModel``` objects. To view the in-sample accuracy for the entire ensemble, a simple call can be made.
+```{r accuracy_ensemble, cache = TRUE}
+accuracy(hm1)
+```
+Rather that retrieving the ensemble's accuracy, the individual component models' accuracies can be easily viewed by using the ```individual = TRUE``` argument.
+```{r accuracy_individual, cache = TRUE}
+accuracy(hm1, individual = TRUE)
 ```
 
 ### Forecasting
@@ -76,5 +85,5 @@ hm2 <- hybridModel(y = gas, models = "aenst",
                    a.args = list(max.p = 12, max.q = 12, approximation = FALSE),
                    n.args = list(repeats = 50),
                    s.args = list(robust = TRUE),
-                   t.args = list(use.armga.errors = FALSE))
+                   t.args = list(use.arma.errors = FALSE))
 ```
