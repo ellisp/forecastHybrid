@@ -5,11 +5,11 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-The "forecastHybrid" package provides functions to build models using multiple individual component models from the "forecast" package and then apply the ensemble model to forecast on 
+The "forecastHybrid" package provides functions to build composite models using multiple individual component models from the "forecast" package. These ```hybridModel``` objects can then be manipulated with many of the familiar functions from the "forecast"  and "stats" packages including ```forecast()```, ```plot()```, ```accuracy()```, ```residuals()```, and ```fitted()```.
 
 ## Installation
 
-The stable release of the package is hosted on [CRAN](https://cran.r-project.org/web/packages/forecastHybrid/index.html) and can be installed as usual:
+The stable release of the package is hosted on [CRAN](https://cran.r-project.org/web/packages/forecastHybrid/index.html) and can be installed as usual.
 ```{r cran_install, eval = FALSE, cache = TRUE}
 install.packages("forecastHybrid")
 ```
@@ -26,8 +26,17 @@ First load the package.
 ```{r load_library, message = FALSE, cache = TRUE}
 library(forecastHybrid)
 ```
+
+### Quick start
+If you don't have time to read the whole guide and want to get started immediatly with sane default settings to forecast the ```AirPassengers``` timeseries, run the following:
+```{r quickstart, cache = TRUE}
+quickModel <- hybridModel(AirPassengers)
+forecast(quickModel)
+plot(forecast(quickModel))
+```
+
 ### Fitting a model
-The workhorse function of the package is ```hybridModel```, a function that combines several component models from the "forecast" package. At a minimum, the user must input a ```ts``` or ```numeric``` vector for ```y```. In this case, the ensemble will include all of the component models: ```auto.arima```, ```ets```, ```nnetar```, ```stlm```, and ```tbats```. To instead use only a subset of these models, pass a character string to the ```models``` argument with the first letter of each model to include. For example, to build an ensemble model on the ```gas``` dataset with ```auto.arima```, ```ets```, and ```tbats``` components, run
+The workhorse function of the package is ```hybridModel()```, a function that combines several component models from the "forecast" package. At a minimum, the user must supply a ```ts``` or ```numeric``` vector for ```y```. In this case, the ensemble will include all of the component models: ```auto.arima()```, ```ets()```, ```nnetar()```, ```stlm()```, and ```tbats()```. To instead use only a subset of these models, pass a character string to the ```models``` argument with the first letter of each model to include. For example, to build an ensemble model on the ```gas``` dataset with ```auto.arima()```, ```ets()```, and ```tbats()``` components, run
 
 ```{r basic_model, cache = TRUE}
 
@@ -35,23 +44,55 @@ The workhorse function of the package is ```hybridModel```, a function that comb
 # Each model is given equal weight
 hm1 <- hybridModel(y = gas, models = "aet", weights = "equal")
 ```
-#### Model diagnostics
 
-This produces an S3 object of class ```forecastHybrid```.
-```{r object_class, cache = TRUE}
-class(hm1)
+The individual component models are stored inside the ```hybridModel``` objects and can viewed in their respective slots, and all the regular methods from the "forecast" package could be applied to these individual component models.
+```{r individualModels}
+# View the individual models
+hm1$auto.arima
+
+# See forecasts from the auto.arima model
+plot(forecast(hm1$auto.arima))
+
 ```
 
-Two types of plots can be created for the created ensemble model: either a plot showing the actual and fitted value of each component model on the data or individual plots of the component models as created by their regular plot methods. Note that not ```plot``` method exists in the "forecast" package for ```stlm``` objects, so this component model will be ignored when ```type = "models"```, but the other component models will be plotted.
+
+#### Model diagnostics
+The ```hybridModel()``` function produces an S3 object of class ```forecastHybrid```.
+```{r object_class, cache = TRUE}
+class(hm1)
+is.hybridModel(hm1)
+```
+The ```print()``` and ```summary()``` methods print information about the ensemble model including the weights assigned to each individual component model.
+```{r printSummary, cache = TRUE}
+print(hm1)
+summary(hm1)
+```
+
+Two types of plots can be created for the created ensemble model: either a plot showing the actual and fitted value of each component model on the data or individual plots of the component models as created by their regular S3 ```plot()``` methods. Note that a ```plot()``` method does not exist in the "forecast" package for objects generated with ```stlm()```, so this component model will be ignored when ```type = "models"```, but the other component models will be plotted regardless.
 ```{r plots, cache = TRUE}
 plot(hm1, type = "fit")
 plot(hm1, type = "models")
 
 ```
 
-By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles, but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass this value to the ```errorMethod``` argument and pass either ```"insample.errors"``` or ```"cv.errors"``` (currently unimplemented) to the ```weights``` argument.
+By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles [see @Armstrong2001], but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass this value to the ```errorMethod``` argument and pass either ```"insample.errors"``` or ```"cv.errors"``` (currently unimplemented) to the ```weights``` argument.
+```{r errorMethod, cache = TRUE}
+hm2 <- hybridModel(wineind, weights = "insample.errors", errorMethod = "MASE")
+hm2
+```
+After the model is fit, these weights are stored in the ```weights``` attribute of the model. The user can view and manipulated these weights after the fit is complete. Note that the ```hybridModel()``` function automatically scales weights to sum to one, so a user should similar scale the weights to ensure the forecasts remain unbiased. Furthermore, the vector that replaces ```weights``` must retain names specifying the component model it corresponds to since weights are not assigned by position but rather by component name. Similarly, indiviudal components may also be replaced
+```{r viewWeights, cache = TRUE}
+hm2$weights
+newWeights <- c(0.1, 0.2, 0.3, 0.1, 0.3)
+names(newWeights) <- c("auto.arima", "ets", "nnetar", "stlm", "tbats")
+hm2$weights <- newWeights
+hm2
+hm2$weights[1] <- 0.2
+hm2$weights[2] <- 0.1
+hm2
+```
 
-This object can be manipulated with the same familiar interface from the "forecast" package, including S3 generic functions such as ```accuracy```, ```forecast```, ```fitted```, and ```residuals```.
+This ```hybridModel``` S3 object can be manipulated with the same familiar interface from the "forecast" package, including S3 generic functions such as ```accuracy```, ```forecast```, ```fitted```, and ```residuals```.
 ```{r generics, cache = TRUE}
 # View the first 10 fitted values and residuals
 head(fitted(hm1))
@@ -87,3 +128,38 @@ hm2 <- hybridModel(y = gas, models = "aenst",
                    s.args = list(robust = TRUE),
                    t.args = list(use.arma.errors = FALSE))
 ```
+
+Since the ```lambda``` argument is shared between all the models in the "forecast" framework, it is included as a special paramemeter that can be used to set the Box-Cox transform in all models instead of settings this individually. For example,
+
+```{r lambda}
+hm3 <- hybridModel(y = wineind, models = "ae", lambda = 0.15)
+hm3$auto.arima$lambda
+hm3$ets$lambda
+```
+
+Users can still apply the ```lambda``` argument through the tuning lists, but in this case the list-supplied argument overwrites the default used across all models. Compare the following two results.
+```{r advancedLambda}
+hm4 <- hybridModel(y = wineind, models = "aens", lambda = 0.2,
+                   a.args = list(lambda = 0.5),
+                   n.args = list(lambda = 0.6))
+hm4$auto.arima$lambda
+hm4$ets$lambda
+hm4$nnetar$lambda
+hm4$stlm$lambda
+
+```
+
+---
+references:
+- id: Armstrong2001
+  title: Combining Forecasts
+  author:
+  - family: Armstrong
+    given J. Scott
+  container-title: Principles of Forecasting: A Handbook for Researchers and Practitioners
+  URL: http://principlesofforecasting.com/paperpdf/Combining.pdf
+  publisher: Kluwer Academic Publishers
+  type: book
+  issued:
+    year: 2001
+---
