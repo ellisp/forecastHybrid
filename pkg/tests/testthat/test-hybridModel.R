@@ -26,7 +26,9 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(wineind, models = "ae", n.args = list()))
     expect_warning(hybridModel(wineind, models = "an", s.args = list()))
     expect_warning(hybridModel(wineind, models = "an", t.args = list()))
+    # nnetar() with 2 * frequency(y) >= length(y)
     expect_warning(hybridModel(ts(rnorm(50), f = 24), models = "aen"))
+    # stlm() with 2 * frequency(y) >= length(y)
     expect_warning(hybridModel(ts(rnorm(20), f = 12), models = "aes"))
     # Currently unimplemented features
     expect_warning(hybridModel(wineind, models = "ae", parallel = TRUE))
