@@ -7,7 +7,7 @@ output: html_document
 
 The "forecastHybrid" package provides functions to build composite models using multiple individual component models from the "forecast" package. These ```hybridModel``` objects can then be manipulated with many of the familiar functions from the "forecast"  and "stats" packages including ```forecast()```, ```plot()```, ```accuracy()```, ```residuals()```, and ```fitted()```.
 
-## Installation
+# Installation
 
 The stable release of the package is hosted on [CRAN](https://cran.r-project.org/web/packages/forecastHybrid/index.html) and can be installed as usual.
 ```{r cran_install, eval = FALSE, cache = TRUE}
@@ -21,13 +21,13 @@ devtools::install_github("ellisp/forecastHybrid/pkg")
 
 Version updates to CRAN will be published frequently after new features are implemented, so the development version is not recommended unless you plan to modify the code.
 
-## Basic usage
+# Basic usage
 First load the package.
 ```{r load_library, message = FALSE, cache = TRUE}
 library(forecastHybrid)
 ```
 
-### Quick start
+## Quick start
 If you don't have time to read the whole guide and want to get started immediatly with sane default settings to forecast the ```AirPassengers``` timeseries, run the following:
 ```{r quickstart, cache = TRUE}
 quickModel <- hybridModel(AirPassengers)
@@ -35,7 +35,7 @@ forecast(quickModel)
 plot(forecast(quickModel))
 ```
 
-### Fitting a model
+## Fitting a model
 The workhorse function of the package is ```hybridModel()```, a function that combines several component models from the "forecast" package. At a minimum, the user must supply a ```ts``` or ```numeric``` vector for ```y```. In this case, the ensemble will include all of the component models: ```auto.arima()```, ```ets()```, ```nnetar()```, ```stlm()```, and ```tbats()```. To instead use only a subset of these models, pass a character string to the ```models``` argument with the first letter of each model to include. For example, to build an ensemble model on the ```gas``` dataset with ```auto.arima()```, ```ets()```, and ```tbats()``` components, run
 
 ```{r basic_model, cache = TRUE}
@@ -46,7 +46,7 @@ hm1 <- hybridModel(y = gas, models = "aet", weights = "equal")
 ```
 
 The individual component models are stored inside the ```hybridModel``` objects and can viewed in their respective slots, and all the regular methods from the "forecast" package could be applied to these individual component models.
-```{r individualModels}
+```{r individualModels, cache = TRUE}
 # View the individual models
 hm1$auto.arima
 
@@ -56,7 +56,7 @@ plot(forecast(hm1$auto.arima))
 ```
 
 
-#### Model diagnostics
+### Model diagnostics
 The ```hybridModel()``` function produces an S3 object of class ```forecastHybrid```.
 ```{r object_class, cache = TRUE}
 class(hm1)
@@ -108,7 +108,7 @@ Rather that retrieving the ensemble's accuracy, the individual component models'
 accuracy(hm1, individual = TRUE)
 ```
 
-### Forecasting
+## Forecasting
 Now's let's forecast future values. The ```forecast()``` function produce an S3 class ```forecast``` object for the next 48 periods from the ensemble model. 
 ```{r basic_forecast, cache = TRUE}
 hForecast <- forecast(hm1, h = 48)
@@ -119,7 +119,7 @@ Now plot the forecast for the next 48 periods. The prediction intervals are pres
 plot(hForecast)
 ```
 
-## Advanced usage
+# Advanced usage
 The package aims to make fitting ensembles easy and quick, but it still allows advanced tuning of all the parameters available in the "forecast" package. This is possible through usage of the ```a.args```, ```e.args```, ```n.args```, ```s.args```, and ```t.args``` lists. These optional list arguments may be applied to one, none, all, or any combination of the included individual component models. Consult the documentation in the "forecast" package for acceptable arguments to pass in the ```auto.arima```, ```ets```, ```nnetar```, ```stlm```, and ```tbats``` functions.
 ```{r advanced_fit, cache = TRUE}
 hm2 <- hybridModel(y = gas, models = "aenst",
@@ -131,14 +131,14 @@ hm2 <- hybridModel(y = gas, models = "aenst",
 
 Since the ```lambda``` argument is shared between all the models in the "forecast" framework, it is included as a special paramemeter that can be used to set the Box-Cox transform in all models instead of settings this individually. For example,
 
-```{r lambda}
+```{r lambda, cache = TRUE}
 hm3 <- hybridModel(y = wineind, models = "ae", lambda = 0.15)
 hm3$auto.arima$lambda
 hm3$ets$lambda
 ```
 
 Users can still apply the ```lambda``` argument through the tuning lists, but in this case the list-supplied argument overwrites the default used across all models. Compare the following two results.
-```{r advancedLambda}
+```{r advancedLambda, cache = TRUE}
 hm4 <- hybridModel(y = wineind, models = "aens", lambda = 0.2,
                    a.args = list(lambda = 0.5),
                    n.args = list(lambda = 0.6))
@@ -148,6 +148,28 @@ hm4$nnetar$lambda
 hm4$stlm$lambda
 
 ```
+
+Covariates can also be supplied to ```auto.arima``` and ```nnetar``` models as is done in the "forecast" package. To do this, utilize the ```a.args``` and ```n.args``` lists. Unlike the usage in the "forecast" package, the ```xreg``` argument should be passed as a dataframe, not a matrix. If a ```xreg``` is used in training, it must also be supplied to the ```forecast()``` fucntion in the ```xreg``` argument. Note that if the number of rows in the ```xreg``` to be used for the forecast does not match the supplied ```h``` forecast horizon, the function will overwrite ```h``` with the number of rows in ```xreg``` and issue a warning.
+```{r xreg, cache = TRUE}
+# Use the beaver1 dataset with the variable "activ" as a covariate and "temp" as the timeseries
+# Divice this into a train and test set
+trainSet <- beaver1[1:100, ]
+testSet <- beaver1[-(1:100), ]
+trainXreg <- data.frame(trainSet$activ)
+testXreg <- data.frame(testSet$activ)
+
+# Create the model
+beaverhm <- hybridModel(trainSet$temp,
+                        models = "aent",
+                        a.args = list(xreg = trainXreg),
+                        n.args = list(xreg = trainXreg))
+# Forecast future values
+beaverfc <- forecast(beaverhm, xreg = testXreg)
+
+# View the accuracy of the model
+accuracy(beaverfc, testSet$temp)
+```
+
 
 ---
 references:
