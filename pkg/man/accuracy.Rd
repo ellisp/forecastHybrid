@@ -7,11 +7,14 @@
 accuracy(f, ...)
 }
 \arguments{
-\item{f}{The input object}
+\item{f}{the input object.}
 
-\item{...}{Other arguments (ignored).}
+\item{...}{other arguments (ignored).}
 }
 \description{
 Generic method for accuracy
+}
+\seealso{
+\code{\link[forecast]{accuracy}}, \code{\link{accuracy.hybridModel}}
 }
 
