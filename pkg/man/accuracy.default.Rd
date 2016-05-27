@@ -4,29 +4,19 @@
 \alias{accuracy.default}
 \title{Generic method for accuracy}
 \usage{
-\method{accuracy}{default}(f, x, test = NULL, d = NULL, D = NULL)
+\method{accuracy}{default}(f, ...)
 }
 \arguments{
-\item{f}{An object of class forecast, or a numerical vector containing forecasts.
+\item{f}{an object of class forecast, or a numerical vector containing forecasts.
 It will also work with Arima, ets and lm objects if x is omitted - in which case
 in-sample accuracy measures are returned.}
 
-\item{x}{An optional numerical vector containing actual values of the same length
-as object, or a time series overlapping with the times of f.}
-
-\item{test}{Indicator of which elements of x and f to test. If test is NULL, all
-elements are used. Otherwise test is a numeric vector containing the indices of
-the elements to use in the test.}
-
-\item{d}{An integer indicating the number of lag-1 differences to be used for
-the denominator in MASE calculation. Default value is 1 for non-seasonal series
-and 0 for seasonal series.}
-
-\item{D}{An integer indicating the number of seasonal differences to be used
-for the denominator in MASE calculation. Default value is 0 for non-seasonal
-series and 1 for seasonal series.}
+\item{...}{other arguments (ignored)}
 }
 \description{
 Generic method for accuracy
+}
+\seealso{
+\code{\link[forecast]{accuracy}}, \code{\link{accuracy.hybridModel}}
 }
 
