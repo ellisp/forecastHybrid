@@ -10,7 +10,7 @@
 \arguments{
 \item{object}{a hybrid time series model fit with \link{hybridModel}.}
 
-\item{h}{number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast 
+\item{h}{number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast
 periods is set to the number of rows of \code{xreg}.}
 
 \item{xreg}{future values of regression variables (for use if one of the ensemble methods used
