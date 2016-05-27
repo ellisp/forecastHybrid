@@ -45,7 +45,7 @@ forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * ob
     if(!is.numeric(xreg)){
       stop("The supplied xreg must be numeric.")
     }
-    if(nrow(xreg) != h && !missing(h)){
+    if((nrow(xreg) != h) && (missing(h))){
       warning("The number of rows in xreg should match h. Setting h to nrow(xreg).")
       h <- nrow(xreg)
     }
