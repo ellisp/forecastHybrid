@@ -24,7 +24,7 @@ None. Function produces a plot.
 Plot a representation of the hybridModel.
 }
 \details{
-For \code{type = "fit"}, the original series is plotted in black. Fitted values for the 
+For \code{type = "fit"}, the original series is plotted in black. Fitted values for the
 individual component models are plotted in other colors.
 For \code{type = "models"}, each individual component model is plotted. Since
 there is not plot method for \code{stlm} or \code{nnetar} objects, these component
