@@ -4,9 +4,12 @@ if(require(forecast) & require(testthat)){
   test_that("Testing invalid inputs", {
     expect_error(hybridModel(y = 1:10, models = "jten"))
     expect_error(hybridModel(y = 1:10, models = 5))
-    expect_error(hybridModel(y = matrix(1:10, nrow = 5, ncol = 2), models = 5))
+    expect_error(hybridModel(y = matrix(1:10, nrow = 5, ncol = 2),
+                             models = 5))
     # Test for invalid mistmatch length of y and xreg in a.args/s.args later?
-    expect_error(hybridModel(y = wineind, a.args = list(xreg = rnorm(length(wineind) - 1))))
+    badxreg <- data.frame(rnorm(length(wineind) - 1))
+    expect_warning(expect_error(hybridModel(y = wineind,
+                                            a.args = list(xreg = badxreg))))
     expect_error(hybridModel(y = "hello world"))
     expect_error(hybridModel())
     expect_error(hybridModel(y = numeric()))
@@ -36,11 +39,15 @@ if(require(forecast) & require(testthat)){
   })
   test_that("Testing valid inputs", {
     set.seed(54321)
-    expect_error(hybridModel(y = rnorm(100), models = "ae", a.args = list(xreg = matrix(runif(100), nrow = 100))), NA)
-    expect_warning(hybridModel(y = rnorm(10), models = "en", a.args = list(lambda = 0.5)))
+    expect_error(hybridModel(y = rnorm(100), models = "ae",
+                             a.args = list(xreg = matrix(runif(100), nrow = 100))), NA)
+    expect_warning(hybridModel(y = rnorm(10), models = "en",
+                               a.args = list(lambda = 0.5)))
     expect_error(hybridModel(wineind, models = "atens"), NA)
-    expect_error(hybridModel(wineind, models = "aenst", weights = "insample.errors"), NA)
-    expect_error(hybridModel(wineind, models = "ae", e.args = list(lambda = 0.5)), NA)
+    expect_error(hybridModel(wineind, models = "aenst",
+                             weights = "insample.errors"), NA)
+    expect_error(hybridModel(wineind, models = "ae",
+                             e.args = list(lambda = 0.5)), NA)
   })
   test_that("Testing model matching", {
     set.seed(123456)
