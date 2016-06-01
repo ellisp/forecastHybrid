@@ -1,4 +1,4 @@
-# Version 0.1.6 [unreleased]
+# Version 0.1.6 [2016-05-31]
 * Fix broken S3 generic `accuracy()` and `hybridModel.accuracy()`
 * Add vignette
 * Add NEWS
