@@ -11,7 +11,8 @@
 
 \item{type}{if \code{type = "fit"}, plot the original series and the individual fitted models.
 If \code{type = "models"}, use the regular plot methods from the component models, i.e.
-\code{\link[forecast]{plot.Arima}}, \code{\link[forecast]{plot.ets}}, \code{\link[forecast]{plot.tbats}}. Note: no plot
+\code{\link[forecast]{plot.Arima}}, \code{\link[forecast]{plot.ets}},
+\code{\link[forecast]{plot.tbats}}. Note: no plot
 methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
 \code{type = "models"}}
 
@@ -24,8 +25,8 @@ None. Function produces a plot.
 Plot a representation of the hybridModel.
 }
 \details{
-For \code{type = "fit"}, the original series is plotted in black. Fitted values for the
-individual component models are plotted in other colors.
+For \code{type = "fit"}, the original series is plotted in black.
+Fitted values for the individual component models are plotted in other colors.
 For \code{type = "models"}, each individual component model is plotted. Since
 there is not plot method for \code{stlm} or \code{nnetar} objects, these component
 models are not plotted.
