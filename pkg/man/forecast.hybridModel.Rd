@@ -30,15 +30,18 @@ An object of class \link[forecast]{forecast}.
 Forecast method for hybrid models.
 }
 \details{
-if \code{xreg} was used in construcing the \code{hybridModel}, it must also be passed into \code{forecast.hybridModel}
+if \code{xreg} was used in construcing the \code{hybridModel},
+it must also be passed into \code{forecast.hybridModel}
 }
 \examples{
 \dontrun{
 mod <- hybridModel(AirPassengers)
-# View the point forecasts, upper prediction intervals, and lower prediction intervals
 fc <- forecast(mod)
+# View the point forecasts
 fc$mean
+# View the upper prediction interval
 fc$upper
+# View the lower prediction interval
 fc$lower
 # Plot the forecast
 plot(fc)
