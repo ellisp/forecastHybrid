@@ -17,7 +17,8 @@ hybridModel(y, models = "aenst", lambda = NULL, a.args = NULL,
 a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), n (\code{\link[forecast]{nnetar}}),
 s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}})}
 
-\item{lambda}{Box-Cox transformation parameter.  Ignored if NULL.  Otherwise, data transformed before model is estimated.}
+\item{lambda}{Box-Cox transformation parameter.
+Ignored if NULL. Otherwise, data transformed before model is estimated.}
 
 \item{a.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{auto.arima}}. See details.}
 
@@ -35,16 +36,20 @@ in many cases than giving more weight to models with better in-sample performanc
 utilizing in-sample errors are also available. Cross validated errors are currently unimplemented.}
 
 \item{errorMethod}{method of measuring accuracy to use if weights are not
-to be equal. Root mean square error (\code{RMSE}), mean absolute error (\code{MAE}) and mean absolute scaled error (\code{MASE})
+to be equal.
+Root mean square error (\code{RMSE}), mean absolute error (\code{MAE})
+and mean absolute scaled error (\code{MASE})
 are supported.}
 
-\item{parallel}{a boolean indicating if  parallel processing should be used between models. This is currently unimplemented.
+\item{parallel}{a boolean indicating if parallel processing should be used between models.
+This is currently unimplemented.
 Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.}
 
 \item{num.cores}{If \code{parallel=TRUE}, how many cores to use.}
 }
 \value{
-An object of class hybridModel. The individual component models are stored inside of the object
+An object of class hybridModel.
+The individual component models are stored inside of the object
 and can be accessed for all the regular manipulations available in the forecast package.
 }
 \description{
@@ -54,16 +59,19 @@ Create a hybrid time series model with two to five component models.
 The \code{hybridModel} function fits multiple individual model specifications to allow easy creation
 of ensemble forecasts. While default settings for the individual component models work quite well
 in most cases, fine control can be exerted by passing detailed arguments to the component models in the
-\code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists. Note that if \code{xreg}
-is passed to the \code{a.args} or \code{n.args} component models it must be passed as a dataframe instead of the matrix object
-that the "forecast" package functions usually accept. This is due to a limitation in how the component models are called.
-
+\code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
+Note that if \code{xreg} is passed to the \code{a.args} or \code{n.args} component models
+it must be passed as a dataframe instead of the matrix object
+that the "forecast" package functions usually accept.
+This is due to a limitation in how the component models are called.
 \cr
 Characteristics of the input series can cause problems for certain types of models and paramesters.
-For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal; furthemore, the
-data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)}) for the decomposition to succeed.
+For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal;
+furthemore, the data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)})
+for the decomposition to succeed.
 If this is not the case, \code{hybridModel()}
-will remove the \code{stlm} model so an error does not occur. Similarly, \code{nnetar} models require that
+will remove the \code{stlm} model so an error does not occur.
+Similarly, \code{nnetar} models require that
 \code{length(y) >= 2 * frequency(y)}, so these models will be removed if the condition is not satisfied
 The \code{\link[forecast]{ets}} model does not handle
 a series well with a seasonal period longer than 24 and will ignore the seasonality. In this case,
@@ -85,7 +93,8 @@ mod3$stlm
 
 }
 \seealso{
-\code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}}, \code{\link[forecast]{ets}}, \code{\link[forecast]{nnetar}},
+\code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}},
+\code{\link[forecast]{ets}}, \code{\link[forecast]{nnetar}},
 \code{\link[forecast]{stlm}}, \code{\link[forecast]{tbats}}
 }
 
