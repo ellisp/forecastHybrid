@@ -8,7 +8,8 @@
 #' @import graphics
 #' @param y A numeric vector or time series.
 #' @param lambda
-#' Box-Cox transformation parameter.  Ignored if NULL.  Otherwise, data transformed before model is estimated.
+#' Box-Cox transformation parameter.
+#' Ignored if NULL. Otherwise, data transformed before model is estimated.
 #' @param models A character string of up to five characters indicating which contributing models to use:
 #' a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), n (\code{\link[forecast]{nnetar}}),
 #' s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}})
@@ -22,28 +23,36 @@
 #' in many cases than giving more weight to models with better in-sample performance. Weights
 #' utilizing in-sample errors are also available. Cross validated errors are currently unimplemented.
 #' @param errorMethod  method of measuring accuracy to use if weights are not
-#' to be equal. Root mean square error (\code{RMSE}), mean absolute error (\code{MAE}) and mean absolute scaled error (\code{MASE})
+#' to be equal.
+#' Root mean square error (\code{RMSE}), mean absolute error (\code{MAE})
+#' and mean absolute scaled error (\code{MASE})
 #' are supported.
-#' @param parallel a boolean indicating if  parallel processing should be used between models. This is currently unimplemented.
+#' @param parallel a boolean indicating if parallel processing should be used between models.
+#' This is currently unimplemented.
 #' Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.
-#' @seealso \code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}}, \code{\link[forecast]{ets}}, \code{\link[forecast]{nnetar}},
+#' @seealso \code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}},
+#' \code{\link[forecast]{ets}}, \code{\link[forecast]{nnetar}},
 #' \code{\link[forecast]{stlm}}, \code{\link[forecast]{tbats}}
-#' @return An object of class hybridModel. The individual component models are stored inside of the object
+#' @return An object of class hybridModel.
+#' The individual component models are stored inside of the object
 #' and can be accessed for all the regular manipulations available in the forecast package.
 #' @details The \code{hybridModel} function fits multiple individual model specifications to allow easy creation
 #' of ensemble forecasts. While default settings for the individual component models work quite well
 #' in most cases, fine control can be exerted by passing detailed arguments to the component models in the
-#' \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists. Note that if \code{xreg}
-#' is passed to the \code{a.args} or \code{n.args} component models it must be passed as a dataframe instead of the matrix object
-#' that the "forecast" package functions usually accept. This is due to a limitation in how the component models are called.
-#'
+#' \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
+#' Note that if \code{xreg} is passed to the \code{a.args} or \code{n.args} component models
+#' it must be passed as a dataframe instead of the matrix object
+#' that the "forecast" package functions usually accept.
+#' This is due to a limitation in how the component models are called.
 #' \cr
 #' Characteristics of the input series can cause problems for certain types of models and paramesters.
-#' For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal; furthemore, the
-#' data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)}) for the decomposition to succeed.
+#' For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal;
+#' furthemore, the data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)})
+#' for the decomposition to succeed.
 #' If this is not the case, \code{hybridModel()}
-#' will remove the \code{stlm} model so an error does not occur. Similarly, \code{nnetar} models require that
+#' will remove the \code{stlm} model so an error does not occur.
+#' Similarly, \code{nnetar} models require that
 #' \code{length(y) >= 2 * frequency(y)}, so these models will be removed if the condition is not satisfied
 #' The \code{\link[forecast]{ets}} model does not handle
 #' a series well with a seasonal period longer than 24 and will ignore the seasonality. In this case,
@@ -65,14 +74,15 @@
 #'
 hybridModel <- function(y, models = "aenst",
                         lambda = NULL,
-                        a.args = NULL, e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL,
+                        a.args = NULL,
+                        e.args = NULL,
+                        n.args = NULL,
+                        s.args = NULL,
+                        t.args = NULL,
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("RMSE", "MAE", "MASE"),
                         parallel = FALSE, num.cores = 2L){
   # Weights could be set to equal (the default), based on in-sample errors, or based on cv errors
-  # In-sample errors are methodologically questionable but easy to implement. CV errors are probably
-  # methodologicaly sound, but more difficult and computationally expensive to implement.
-
   # errorMethod will determine which type of errors to use for weights. Some choices from accuracy()
   # are not appropriate. If weights = "equal", this would be ignored.
 
@@ -287,7 +297,9 @@ is.hybridModel <- function(x){
 #' @return The fitted values of the ensemble or individual component models.
 #' @export
 #'
-fitted.hybridModel <- function(object, individual = FALSE, ...){
+fitted.hybridModel <- function(object,
+                               individual = FALSE,
+                               ...){
   if(individual){
     results <- list()
     for(i in object$models){
@@ -309,7 +321,9 @@ fitted.hybridModel <- function(object, individual = FALSE, ...){
 #' @seealso \code{\link{accuracy}}
 #' @return The residuals of the ensemble or individual component models.
 #'
-residuals.hybridModel <- function(object, individual = FALSE, ...){
+residuals.hybridModel <- function(object,
+                                  individual = FALSE,
+                                  ...){
   if(individual){
     results <- list()
     for(i in object$models){
@@ -340,7 +354,7 @@ accuracy.default <-  function(f, ...){
 #' @param ... other arguments (ignored).
 #' @seealso \code{\link[forecast]{accuracy}}, \code{\link{accuracy.hybridModel}}
 #' @export
-accuracy <- function(f, ...){
+accuracy <- function(f,...){
   UseMethod("accuracy")
 }
 
@@ -356,7 +370,9 @@ accuracy <- function(f, ...){
 #' @return The accuracy of the ensemble or individual component models.
 #' @export
 #'
-accuracy.hybridModel <- function(f, individual = FALSE, ...){
+accuracy.hybridModel <- function(f,
+                                 individual = FALSE,
+                                 ...){
   if(individual){
     results <- list()
     for(i in f$models){
@@ -403,14 +419,15 @@ print.hybridModel <- function(x, ...){
 #' @param x an object of class hybridModel to plot.
 #' @param type if \code{type = "fit"}, plot the original series and the individual fitted models.
 #' If \code{type = "models"}, use the regular plot methods from the component models, i.e.
-#' \code{\link[forecast]{plot.Arima}}, \code{\link[forecast]{plot.ets}}, \code{\link[forecast]{plot.tbats}}. Note: no plot
+#' \code{\link[forecast]{plot.Arima}}, \code{\link[forecast]{plot.ets}},
+#' \code{\link[forecast]{plot.tbats}}. Note: no plot
 #' methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
 #' \code{type = "models"}
 #' @param ... other arguments (ignored).
 #' @seealso \code{\link{hybridModel}}
 #' @return None. Function produces a plot.
-#' @details For \code{type = "fit"}, the original series is plotted in black. Fitted values for the
-#' individual component models are plotted in other colors.
+#' @details For \code{type = "fit"}, the original series is plotted in black.
+#' Fitted values for the individual component models are plotted in other colors.
 #' For \code{type = "models"}, each individual component model is plotted. Since
 #' there is not plot method for \code{stlm} or \code{nnetar} objects, these component
 #' models are not plotted.
@@ -422,7 +439,9 @@ print.hybridModel <- function(x, ...){
 #' }
 #' @export
 #'
-plot.hybridModel <- function(x, type = c("fit", "models"), ...){
+plot.hybridModel <- function(x,
+                             type = c("fit", "models"),
+                             ...){
   type <- match.arg(type)
   plotModels <- x$models
   if(type == "fit"){
