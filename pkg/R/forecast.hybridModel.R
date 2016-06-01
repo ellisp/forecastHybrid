@@ -14,22 +14,28 @@
 #' @param fan if \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.
 #' @param ... other arguments; currently not used.
 #' @seealso \code{\link{hybridModel}}
-#' @details if \code{xreg} was used in construcing the \code{hybridModel}, it must also be passed into \code{forecast.hybridModel}
+#' @details if \code{xreg} was used in construcing the \code{hybridModel},
+#' it must also be passed into \code{forecast.hybridModel}
 #' @return An object of class \link[forecast]{forecast}.
 #' @examples
 #' \dontrun{
 #' mod <- hybridModel(AirPassengers)
-#' # View the point forecasts, upper prediction intervals, and lower prediction intervals
 #' fc <- forecast(mod)
+#' # View the point forecasts
 #' fc$mean
+#' # View the upper prediction interval
 #' fc$upper
+#' # View the lower prediction interval
 #' fc$lower
 #' # Plot the forecast
 #' plot(fc)
 #' }
 #'
-forecast.hybridModel <- function(object, h = ifelse(object$frequency > 1, 2 * object$frequency, 10), xreg = NULL,
-                                 level = c(80, 95), fan = FALSE, ...){
+forecast.hybridModel <- function(object,
+                                 h = ifelse(object$frequency > 1, 2 * object$frequency, 10),
+                                 xreg = NULL,
+                                 level = c(80, 95),
+                                 fan = FALSE, ...){
 
   # Check inputs
   if(!is.hybridModel(object)){
