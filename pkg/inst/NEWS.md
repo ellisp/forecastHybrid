@@ -1,3 +1,7 @@
+# Version 0.2.0 [Unreleased]
+* Add parallel processing between models TODO
+* Fix vignette TODO
+
 # Version 0.1.6 [2016-05-31]
 * Fix broken S3 generic `accuracy()` and `hybridModel.accuracy()`
 * Add vignette
