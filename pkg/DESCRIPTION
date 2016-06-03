@@ -16,11 +16,11 @@ Depends:
 Suggests:
     knitr,
     testthat
+VignetteBuilder: knitr
 License: GPL-3
 URL: https://github.com/ellisp/forecastHybrid
 BugReports: https://github.com/ellisp/forecastHybrid/issues
 LazyData: true
 RoxygenNote: 5.0.1
-Suggests: testthat
 ByteCompile: true
 NeedsCompilation: no
