@@ -1,6 +1,6 @@
 Package: forecastHybrid
 Title: Convenient Functions for Ensemble Time Series Forecasts
-Version: 0.1.6
+Version: 0.1.7
 Date: 2016-05-31
 Authors@R: c(
    person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
@@ -15,6 +15,7 @@ Depends:
     forecast (>= 7.1)
 Suggests:
     knitr,
+    rmarkdown,
     testthat
 VignetteBuilder: knitr
 License: GPL-3
