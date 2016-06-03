@@ -12,7 +12,7 @@ cache: packages
 install:
   - Rscript -e 'install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown")); devtools::install_deps("pkg")'
 script:
-  - Rscript -e 'devtools::check("pkg")'
+  - Rscript -e 'devtools::check("pkg", manual = TRUE)'
   
 notifications:
   email:
