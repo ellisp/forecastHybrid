@@ -176,19 +176,3 @@ beaverfc <- forecast(beaverhm, xreg = testXreg)
 # View the accuracy of the model
 accuracy(beaverfc, testSet$temp)
 ```
-
-
----
-references:
-- id: Armstrong2001
-  title: Combining Forecasts
-  author:
-  - family: Armstrong
-    given J. Scott
-  container-title: Principles of Forecasting: A Handbook for Researchers and Practitioners
-  URL: http://principlesofforecasting.com/paperpdf/Combining.pdf
-  publisher: Kluwer Academic Publishers
-  type: book
-  issued:
-    year: 2001
----
