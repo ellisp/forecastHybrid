@@ -3,6 +3,7 @@
 
 # Version 0.1.7 [Unreleased]
 * Build vignette with `knitr rmarkdown` engine
+* Build vignette with travis
 
 # Version 0.1.6 [2016-05-31]
 * Fix broken S3 generic `accuracy()` and `hybridModel.accuracy()`
