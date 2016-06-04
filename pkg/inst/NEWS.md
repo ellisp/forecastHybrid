@@ -1,7 +1,7 @@
 # Version 0.2.0 [Unreleased]
 * Add parallel processing between models TODO
 
-# Version 0.1.7 [Unreleased]
+# Version 0.1.7 [2016-06-04]
 * Build vignette with `knitr rmarkdown` engine
 * Build vignette with travis
 
