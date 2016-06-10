@@ -41,7 +41,7 @@
 #' of ensemble forecasts. While default settings for the individual component models work quite well
 #' in most cases, fine control can be exerted by passing detailed arguments to the component models in the
 #' \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
-#' Note that if \code{xreg} is passed to the \code{a.args} or \code{n.args} component models
+#' Note that if \code{xreg} is passed to the \code{a.args}, \code{n.args}, or \code{s.args} component models
 #' it must be passed as a dataframe instead of the matrix object
 #' that the "forecast" package functions usually accept.
 #' This is due to a limitation in how the component models are called.
