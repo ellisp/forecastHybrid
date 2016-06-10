@@ -8,7 +8,7 @@
 #' @param h number of periods for forecasting. If \code{xreg} is used, \code{h} is ignored and the number of forecast
 #' periods is set to the number of rows of \code{xreg}.
 #' @param xreg future values of regression variables (for use if one of the ensemble methods used
-#' in creating the hybrid forecast was \code{auto.arima} or \code{stlm} and a \code{xreg} was used in the fit)
+#' in creating the hybrid forecast was \code{auto.arima}, \code{nnetar}, or \code{stlm} and the model(s) used \code{xreg} in the fit)
 #' @param level confidence level for prediction intervals. This can be expressed as a decimal between 0.0 and 1.0 or numeric
 #' between 0 and 100.
 #' @param fan if \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.
