@@ -177,5 +177,5 @@ beaverhm <- hybridModel(ts(trainSet$temp, f = 6),
 #beaverfc <- forecast(beaverhm, xreg = testXreg)
 
 # View the accuracy of the model
-accuracy(beaverfc, testSet$temp)
+#accuracy(beaverfc, testSet$temp)
 ```
