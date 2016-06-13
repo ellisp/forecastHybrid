@@ -172,7 +172,9 @@ beaverhm <- hybridModel(ts(trainSet$temp, f = 6),
                         n.args = list(xreg = trainXreg),
                         s.args = list(xreg = trainXreg, method = "arima"))
 # Forecast future values
-beaverfc <- forecast(beaverhm, xreg = testXreg)
+#forecast won't run in current version, next release allows
+#forecast with stlm with xreg
+#beaverfc <- forecast(beaverhm, xreg = testXreg)
 
 # View the accuracy of the model
 accuracy(beaverfc, testSet$temp)
