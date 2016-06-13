@@ -156,7 +156,7 @@ hm4$stlm$lambda
 
 ```
 
-Covariates can also be supplied to ```auto.arima``` and ```nnetar``` models as is done in the "forecast" package. To do this, utilize the ```a.args``` and ```n.args``` lists. Unlike the usage in the "forecast" package, the ```xreg``` argument should be passed as a dataframe, not a matrix. If a ```xreg``` is used in training, it must also be supplied to the ```forecast()``` fucntion in the ```xreg``` argument. Note that if the number of rows in the ```xreg``` to be used for the forecast does not match the supplied ```h``` forecast horizon, the function will overwrite ```h``` with the number of rows in ```xreg``` and issue a warning.
+Covariates can also be supplied to ```auto.arima``` and ```nnetar``` models as is done in the "forecast" package. To do this, utilize the ```a.args``` and ```n.args``` lists. Note that the ```xreg``` may also be passed to a ```stlm``` model, but only when ```method = "arima"``` instead of the default ```method = "ets"```. Unlike the usage in the "forecast" package, the ```xreg``` argument should be passed as a dataframe, not a matrix. The ```stlm``` models require that the input series will be seasonal, so in the example below we will convert the input data to a ```ts``` object. If a ```xreg``` is used in training, it must also be supplied to the ```forecast()``` fucntion in the ```xreg``` argument. Note that if the number of rows in the ```xreg``` to be used for the forecast does not match the supplied ```h``` forecast horizon, the function will overwrite ```h``` with the number of rows in ```xreg``` and issue a warning.
 ```{r xreg}
 # Use the beaver1 dataset with the variable "activ" as a covariate and "temp" as the timeseries
 # Divice this into a train and test set
@@ -166,10 +166,11 @@ trainXreg <- data.frame(trainSet$activ)
 testXreg <- data.frame(testSet$activ)
 
 # Create the model
-beaverhm <- hybridModel(trainSet$temp,
-                        models = "aent",
+beaverhm <- hybridModel(ts(trainSet$temp, f = 6),
+                        models = "aenst",
                         a.args = list(xreg = trainXreg),
-                        n.args = list(xreg = trainXreg))
+                        n.args = list(xreg = trainXreg),
+                        s.args = list(xreg = trainXreg, method = "arima"))
 # Forecast future values
 beaverfc <- forecast(beaverhm, xreg = testXreg)
 
