@@ -66,7 +66,7 @@ forecast.hybridModel <- function(object,
   if(!is.numeric(h)){
     stop("The forecast horizon h must be a positive integer.")
   }
-  if(as.logical((h %% 1L == 0L)) || h <= 0L){
+  if(!as.logical((h %% 1L == 0L)) || h <= 0L){
     stop("The forecast horizon h must be a positive integer.")
   }
   
