@@ -1,5 +1,6 @@
 # Version 0.2.0 [Unreleased]
 * Add parallel processing between models TODO
+* Fixed erroneous warning message when `xreg` is included in `n.args` but a `nnetar` model is not included in the model list
 
 # Version 0.1.7 [2016-06-04]
 * Build vignette with `knitr rmarkdown` engine
