@@ -11,9 +11,24 @@
 #' @param horizon length of the forecast horizon to use for computing errors
 #' @param horizonAverage should the final errors be an average over all the horizons?
 #' 
-cvts <- function(x, FUN = NULL, FCFUN = NULL, rolling = TRUE, windowSize = 84, useHorizon = 5, maxHorizon = 5, horizonAverage = TRUE){
+cvts <- function(x, FUN = NULL, FCFUN = NULL,
+                 rolling = TRUE, windowSize = 84,
+                 useHorizon = 5, maxHorizon = 5,
+                 horizonAverage = TRUE){
    # try-catch this conversion
    x <- ts(x)
+   if(any(sapply(c(x, windowSize, useHorizon, maxHorizon), FUN = function(x) !is.numeric(x)))){
+     stop("The arguments x, windowSize, useHorizon, and maxHorizon must all be numeric.")
+   }
+   
+   
+   if(any(c(windowSize, userHorizon, maxHorizon) < 1L)){
+     stop("The arguments windowSize, useHorizon, and maxHorizon must be positive integers.")
+   }
+   
+   if(windowSize + maxHorizon > length(x)){
+     stop("The time series must be longer than windowSize + maxHorizon.")
+   }
    
    # Adapted from Rob Hyndman's approach
    # http://robjhyndman.com/hyndsight/tscvexample/
