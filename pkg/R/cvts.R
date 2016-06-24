@@ -22,12 +22,15 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
    }
    
    
-   if(any(c(windowSize, userHorizon, maxHorizon) < 1L)){
+   if(any(c(windowSize, useHorizon, maxHorizon) < 1L)){
      stop("The arguments windowSize, useHorizon, and maxHorizon must be positive integers.")
    }
    
-   if(windowSize + maxHorizon > length(x)){
-     stop("The time series must be longer than windowSize + maxHorizon.")
+   if(any(c(windowSize, useHorizon, maxHorizon) %% 1L != 0))
+   
+   # Ensure at least two periods are tested
+   if(windowSize + 2 * maxHorizon > length(x)){
+     stop("The time series must be longer than windowSize + 2 * maxHorizon.")
    }
    
    # Adapted from Rob Hyndman's approach
