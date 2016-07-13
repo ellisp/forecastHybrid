@@ -19,6 +19,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  verbose = TRUE){
    # try-catch this conversion
    x <- ts(x)
+   f <- frequency(x)
    if(any(sapply(c(x, windowSize, useHorizon, maxHorizon), FUN = function(x) !is.numeric(x)))){
      stop("The arguments x, windowSize, useHorizon, and maxHorizon must all be numeric.")
    }
@@ -45,10 +46,11 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                         ncol = maxHorizon)
       i <- 1
       while(windowSize + maxHorizon <= length(x)){
-         x <- x[1:windowSize]
-         mod <- auto.arima(x)
+         y <- ts(x[1:windowSize], f = f)
+         ynext <- x[(windowSize + 1):(windowSize + maxHorizon)]
+         mod <- auto.arima(y)
          fc <- forecast(mod, h = maxHorizon)$mean
-         results[i, ] <- fc
+         results[i, ] <- ynext - fc
          windowSize <- windowSize + maxHorizon
          i <- i + 1
       }
