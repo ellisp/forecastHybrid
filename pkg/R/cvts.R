@@ -38,6 +38,9 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
      stop("The time series must be longer than windowSize + 2 * maxHorizon.")
    }
    
+   # Rolling cv is easiest to test: larger windows are built until the windowSize + maxHorizon
+   # is longer than the timeseries
+   forecasts <- fits <- vector("list", 1)
    if(!rolling){
       # Number of rows will be determined by the series length, windowSize and maxHorizon
       # Number of columns is the maxHorizon
@@ -49,11 +52,15 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
          y <- ts(x[1:windowSize], f = f)
          ynext <- x[(windowSize + 1):(windowSize + maxHorizon)]
          mod <- auto.arima(y)
-         fc <- forecast(mod, h = maxHorizon)$mean
-         results[i, ] <- ynext - fc
+         fits[[i]] <- mod
+         fc <- forecast(mod, h = maxHorizon)
+         forecasts[[i]] <- fc
+         results[i, ] <- ynext - fc$mean
          windowSize <- windowSize + maxHorizon
          i <- i + 1
       }
+   } else{
+      # Nothing for now
    }
    
    
@@ -84,7 +91,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 #    # this will be replaced with the fitted values
 # #    forecasted <- data
 # #    return(accuracy(f = forecasted, x = data))
-#    result <- list(forecasts, fits = fits)
-#    class(result) <- "cv"
-   return(results)
+   result <- list(forecasts = forecasts, models = fits, residuals = results)
+   class(result) <- "cv"
+   return(result)
 }
