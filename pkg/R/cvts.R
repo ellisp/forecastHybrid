@@ -6,14 +6,16 @@
 #' @param x the input time series
 #' @param FUN the model function.
 #' @param FCFUN a function that proces point forecasts for the model function.
-#' @param rolling should a rolling procedure be used?
+#' @param rolling should a rolling procedure be used? If TRUE, nonoverlapping windows of size maxHorizon
+#' will be used for fitting each model. If FALSE, the size of the dataset used for training will grow
+#' by one each iteration.
 #' @param window llength of the window to build each model
 #' @param horizon length of the forecast horizon to use for computing errors
 #' @param horizonAverage should the final errors be an average over all the horizons?
 #' @param verbose should the current fold number and the total number of folders be printed to the console?
 #' 
 cvts <- function(x, FUN = NULL, FCFUN = NULL,
-                 rolling = TRUE, windowSize = 84,
+                 rolling = FALSE, windowSize = 84,
                  useHorizon = 5, maxHorizon = 5,
                  horizonAverage = TRUE,
                  verbose = TRUE){
@@ -53,6 +55,9 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                         ncol = maxHorizon)
       #i <- 1
       for(i in 1:nrow(results)){
+         if(verbose){
+            print(paste("Fitting fold", i, "of", nrow(results)))
+            }
         y <- ts(x[1:windowSize], f = f)
         nextHorizon <- windowSize + maxHorizon
         ynext <- x[(windowSize + 1):nextHorizon]
@@ -83,20 +88,23 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
    } else{
       # Nothing for now
      results <- matrix(NA,
-                       nrow = as.integer((length(x) - maxHorizon) / windowSize),
+                       nrow = as.integer((length(x) - windowSize) / maxHorizon),
                        ncol = maxHorizon)
      startWindow <- 1
      endWindow <- windowSize
      for(i in 1:nrow(results)){
+        if(verbose){
+           print(paste("Fitting fold", i, "of", nrow(results)))
+           }
         y <- ts(x[startWindow:endWindow], f = f)
-        print(y)
         ynext <- x[(endWindow + 1):(endWindow + maxHorizon)]
         mod <- do.call(FUN, list(y))
         fits[[i]] <- mod
         fc <- do.call(FCFUN, list(mod, h = maxHorizon))
         forecasts[[i]] <- fc
         results[i, ] <- ynext - fc$mean
-        startWindow <- startWindow + windowSize
+        startWindow <- startWindow + maxHorizon
+        endWindow <- endWindow + maxHorizon
      }
    }
    
