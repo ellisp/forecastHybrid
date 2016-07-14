@@ -17,6 +17,10 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  useHorizon = 5, maxHorizon = 5,
                  horizonAverage = TRUE,
                  verbose = TRUE){
+   # Default forecast function
+   if(is.null(FCFUN)){
+      FCFUN <- forecast
+   }
    # try-catch this conversion
    x <- ts(x)
    f <- frequency(x)
@@ -49,11 +53,15 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                         ncol = maxHorizon)
       i <- 1
       while(windowSize + maxHorizon <= length(x)){
+         # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
+         # This should ultimately be cleaned up to preserve all ts attributes
          y <- ts(x[1:windowSize], f = f)
          ynext <- x[(windowSize + 1):(windowSize + maxHorizon)]
-         mod <- auto.arima(y)
+         # This will be replaced with do.call on FUN
+         mod <- do.call(FUN, list(y)) #auto.arima(y)
          fits[[i]] <- mod
-         fc <- forecast(mod, h = maxHorizon)
+         # This will be replaced with do.call on FCFUN
+         fc <- do.call(FCFUN, list(mod, h = maxHorizon)) #forecast(mod, h = maxHorizon)
          forecasts[[i]] <- fc
          results[i, ] <- ynext - fc$mean
          windowSize <- windowSize + maxHorizon
