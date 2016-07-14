@@ -51,22 +51,35 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
       results <- matrix(NA,
                         nrow = as.integer((length(x) - windowSize) / maxHorizon),
                         ncol = maxHorizon)
-      i <- 1
-      while(windowSize + maxHorizon <= length(x)){
-         # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
-         # This should ultimately be cleaned up to preserve all ts attributes
-         y <- ts(x[1:windowSize], f = f)
-         ynext <- x[(windowSize + 1):(windowSize + maxHorizon)]
-         # This will be replaced with do.call on FUN
-         mod <- do.call(FUN, list(y)) #auto.arima(y)
-         fits[[i]] <- mod
-         # This will be replaced with do.call on FCFUN
-         fc <- do.call(FCFUN, list(mod, h = maxHorizon)) #forecast(mod, h = maxHorizon)
-         forecasts[[i]] <- fc
-         results[i, ] <- ynext - fc$mean
-         windowSize <- windowSize + maxHorizon
-         i <- i + 1
+      #i <- 1
+      for(i in 1:nrow(results)){
+        y <- ts(x[1:windowSize], f = f)
+        nextHorizon <- windowSize + maxHorizon
+        ynext <- x[(windowSize + 1):nextHorizon]
+        # This will be replaced with do.call on FUN
+        mod <- do.call(FUN, list(y)) #auto.arima(y)
+        fits[[i]] <- mod
+        # This will be replaced with do.call on FCFUN
+        fc <- do.call(FCFUN, list(mod, h = maxHorizon)) #forecast(mod, h = maxHorizon)
+        forecasts[[i]] <- fc
+        results[i, ] <- ynext - fc$mean
+        windowSize <- nextHorizon
       }
+#       while(windowSize + maxHorizon <= length(x)){
+#          # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
+#          # This should ultimately be cleaned up to preserve all ts attributes
+#          y <- ts(x[1:windowSize], f = f)
+#          ynext <- x[(windowSize + 1):(windowSize + maxHorizon)]
+#          # This will be replaced with do.call on FUN
+#          mod <- do.call(FUN, list(y)) #auto.arima(y)
+#          fits[[i]] <- mod
+#          # This will be replaced with do.call on FCFUN
+#          fc <- do.call(FCFUN, list(mod, h = maxHorizon)) #forecast(mod, h = maxHorizon)
+#          forecasts[[i]] <- fc
+#          results[i, ] <- ynext - fc$mean
+#          windowSize <- windowSize + maxHorizon
+#          i <- i + 1
+#       }
    } else{
       # Nothing for now
    }
