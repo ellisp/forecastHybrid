@@ -1,4 +1,4 @@
-#' Cross validatoin for time series
+#' Cross validation for time series
 #'
 #' Perform cross validation on time series 
 #'
@@ -82,6 +82,22 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 #       }
    } else{
       # Nothing for now
+     results <- matrix(NA,
+                       nrow = as.integer((length(x) - maxHorizon) / windowSize),
+                       ncol = maxHorizon)
+     startWindow <- 1
+     endWindow <- windowSize
+     for(i in 1:nrow(results)){
+        y <- ts(x[startWindow:endWindow], f = f)
+        print(y)
+        ynext <- x[(endWindow + 1):(endWindow + maxHorizon)]
+        mod <- do.call(FUN, list(y))
+        fits[[i]] <- mod
+        fc <- do.call(FCFUN, list(mod, h = maxHorizon))
+        forecasts[[i]] <- fc
+        results[i, ] <- ynext - fc$mean
+        startWindow <- startWindow + windowSize
+     }
    }
    
    
