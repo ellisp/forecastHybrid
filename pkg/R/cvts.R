@@ -65,8 +65,11 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
       for(i in 1:nrow(results)){
          if(verbose){
             print(paste("Fitting fold", i, "of", nrow(results)))
-            }
-        y <- ts(x[1:windowSize], f = f)
+         }
+        stsp <- tsp(x)[1]
+        etsp <- stsp + (i + maxHorizon - 2) / frequency(x)
+        y <- window(x, start = stsp, end = etsp)
+        # y <- ts(x[1:windowSize], f = f)
         nextHorizon <- windowSize + maxHorizon
         ynext <- x[(windowSize + 1):nextHorizon]
         # This will be replaced with do.call on FUN
