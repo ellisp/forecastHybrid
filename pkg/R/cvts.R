@@ -16,12 +16,12 @@
 #' @param maxHorizon maximum length of the forecast horizon to use for computing errors
 #' @param horizonAverage should the final errors be an average over all the horizons instead of producing
 #' metrics for each individual horizon?
-#' @param verbose should the current fold number and the total number of folders be printed to the console?
+#' @param verbose should the current fold number and the total number of folds be printed to the console?
 #' 
 #' @examples
 #' 
-#' cvmod <- cvts(AirPassengers, FUN = ets, FCFUN = forecast, rolling = TRUE, windowSize = 48, maxHorizon = 12)
-#' cvmod <- cvts(AirPassengers, FUN = hybridModel, FCFUN = forecast, rolling = TRUE, windowSize = 48, maxHorizon = 12)
+#' cvmod1 <- cvts(AirPassengers, FUN = ets, FCFUN = forecast, rolling = TRUE, windowSize = 48, maxHorizon = 12)
+#' cvmod2 <- cvts(AirPassengers, FUN = hybridModel, FCFUN = forecast, rolling = TRUE, windowSize = 48, maxHorizon = 12)
 cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
                  useHorizon = 5, maxHorizon = 5,
@@ -55,7 +55,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
    # Rolling cv is easiest to test: larger windows are built until the windowSize + maxHorizon
    # is longer than the timeseries
    forecasts <- fits <- vector("list", 1)
-   if(!rolling){
+   if(rolling){
       # Number of rows will be determined by the series length, windowSize and maxHorizon
       # Number of columns is the maxHorizon
       results <- matrix(NA,
@@ -94,7 +94,6 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 #          i <- i + 1
 #       }
    } else{
-      # Nothing for now
      results <- matrix(NA,
                        nrow = as.integer((length(x) - windowSize) / maxHorizon),
                        ncol = maxHorizon)
@@ -103,8 +102,12 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
      for(i in 1:nrow(results)){
         if(verbose){
            print(paste("Fitting fold", i, "of", nrow(results)))
-           }
-        y <- ts(x[startWindow:endWindow], f = f)
+        }
+       # tsp properties should be preserved, "forecast" might adopt this in subset()
+       stsp <- tsp(x)[1] + (i - 1) / frequency(x)
+       etsp <- stsp + (maxHorizon - 1) / frequency(x)
+       y <- window(x, start = stsp, end = etsp) 
+       #y <- ts(x[startWindow:endWindow], f = f)
         ynext <- x[(endWindow + 1):(endWindow + maxHorizon)]
         mod <- do.call(FUN, list(y))
         fits[[i]] <- mod
