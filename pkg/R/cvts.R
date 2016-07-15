@@ -4,20 +4,28 @@
 #'
 #' @export
 #' @param x the input time series
-#' @param FUN the model function.
-#' @param FCFUN a function that proces point forecasts for the model function.
+#' @param FUN the model function used. See details.
+#' @param FCFUN a function that proces point forecasts for the model function. This defaults to forecast().
+#' See details.
 #' @param rolling should a rolling procedure be used? If TRUE, nonoverlapping windows of size maxHorizon
 #' will be used for fitting each model. If FALSE, the size of the dataset used for training will grow
 #' by one each iteration.
-#' @param window llength of the window to build each model
-#' @param horizon length of the forecast horizon to use for computing errors
-#' @param horizonAverage should the final errors be an average over all the horizons?
+#' @param windoSize length of the window to build each model. When rolling == TRUE, the each model will be
+#' fit to a time series of this length, and when rolling == FALSE the first model will be fit to a series
+#' of this length and grow by one each iteration
+#' @param maxHorizon maximum length of the forecast horizon to use for computing errors
+#' @param horizonAverage should the final errors be an average over all the horizons instead of producing
+#' metrics for each individual horizon?
 #' @param verbose should the current fold number and the total number of folders be printed to the console?
 #' 
+#' @examples
+#' 
+#' cvmod <- cvts(AirPassengers, FUN = ets, FCFUN = forecast, rolling = TRUE, windowSize = 48, maxHorizon = 12)
+#' cvmod <- cvts(AirPassengers, FUN = hybridModel, FCFUN = forecast, rolling = TRUE, windowSize = 48, maxHorizon = 12)
 cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
                  useHorizon = 5, maxHorizon = 5,
-                 horizonAverage = TRUE,
+                 horizonAverage = FALSE,
                  verbose = TRUE){
    # Default forecast function
    if(is.null(FCFUN)){
@@ -51,7 +59,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
       # Number of rows will be determined by the series length, windowSize and maxHorizon
       # Number of columns is the maxHorizon
       results <- matrix(NA,
-                        nrow = as.integer((length(x) - windowSize) / maxHorizon),
+                        nrow = length(x) - windowSize - maxHorizon,
                         ncol = maxHorizon)
       #i <- 1
       for(i in 1:nrow(results)){
@@ -68,7 +76,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
         fc <- do.call(FCFUN, list(mod, h = maxHorizon)) #forecast(mod, h = maxHorizon)
         forecasts[[i]] <- fc
         results[i, ] <- ynext - fc$mean
-        windowSize <- nextHorizon
+        windowSize <- windowSize + 1
       }
 #       while(windowSize + maxHorizon <= length(x)){
 #          # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
