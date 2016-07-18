@@ -66,6 +66,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
          if(verbose){
             print(paste("Fitting fold", i, "of", nrow(results)))
          }
+        # tsp properties should be preserved, "forecast" might adopt this in subset()
+        # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
         stsp <- tsp(x)[1]
         etsp <- stsp + (i + maxHorizon - 2) / frequency(x)
         y <- window(x, start = stsp, end = etsp)
@@ -81,22 +83,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
         results[i, ] <- ynext - fc$mean
         windowSize <- windowSize + 1
       }
-#       while(windowSize + maxHorizon <= length(x)){
-#          # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
-#          # This should ultimately be cleaned up to preserve all ts attributes
-#          y <- ts(x[1:windowSize], f = f)
-#          ynext <- x[(windowSize + 1):(windowSize + maxHorizon)]
-#          # This will be replaced with do.call on FUN
-#          mod <- do.call(FUN, list(y)) #auto.arima(y)
-#          fits[[i]] <- mod
-#          # This will be replaced with do.call on FCFUN
-#          fc <- do.call(FCFUN, list(mod, h = maxHorizon)) #forecast(mod, h = maxHorizon)
-#          forecasts[[i]] <- fc
-#          results[i, ] <- ynext - fc$mean
-#          windowSize <- windowSize + maxHorizon
-#          i <- i + 1
-#       }
-   } else{
+   }
+   else{
      results <- matrix(NA,
                        nrow = as.integer((length(x) - windowSize) / maxHorizon),
                        ncol = maxHorizon)
@@ -107,6 +95,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
            print(paste("Fitting fold", i, "of", nrow(results)))
         }
        # tsp properties should be preserved, "forecast" might adopt this in subset()
+       # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
        stsp <- tsp(x)[1] + (i - 1) / frequency(x)
        etsp <- stsp + (maxHorizon - 1) / frequency(x)
        y <- window(x, start = stsp, end = etsp) 
