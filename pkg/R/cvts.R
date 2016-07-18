@@ -54,62 +54,111 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
    
    # Rolling cv is easiest to test: larger windows are built until the windowSize + maxHorizon
    # is longer than the timeseries
-   forecasts <- fits <- vector("list", 1)
+   
+   
+   # Combined code for rolling/nonrolling CV
    if(rolling){
-      # Number of rows will be determined by the series length, windowSize and maxHorizon
-      # Number of columns is the maxHorizon
-      results <- matrix(NA,
-                        nrow = length(x) - windowSize - maxHorizon,
-                        ncol = maxHorizon)
-      #i <- 1
-      for(i in 1:nrow(results)){
-         if(verbose){
-            print(paste("Fitting fold", i, "of", nrow(results)))
-         }
-        # tsp properties should be preserved, "forecast" might adopt this in subset()
-        # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
-        stsp <- tsp(x)[1]
-        etsp <- stsp + (i + maxHorizon - 2) / frequency(x)
-        y <- window(x, start = stsp, end = etsp)
-        # y <- ts(x[1:windowSize], f = f)
-        nextHorizon <- windowSize + maxHorizon
-        ynext <- x[(windowSize + 1):nextHorizon]
-        # This will be replaced with do.call on FUN
-        mod <- do.call(FUN, list(y)) #auto.arima(y)
-        fits[[i]] <- mod
-        # This will be replaced with do.call on FCFUN
-        fc <- do.call(FCFUN, list(mod, h = maxHorizon)) #forecast(mod, h = maxHorizon)
-        forecasts[[i]] <- fc
-        results[i, ] <- ynext - fc$mean
-        windowSize <- windowSize + 1
-      }
+     results <- matrix(NA,
+                       nrow = length(x) - windowSize - maxHorizon,
+                       ncol = maxHorizon)
+     
    }
    else{
      results <- matrix(NA,
                        nrow = as.integer((length(x) - windowSize) / maxHorizon),
                        ncol = maxHorizon)
-     startWindow <- 1
-     endWindow <- windowSize
-     for(i in 1:nrow(results)){
-        if(verbose){
-           print(paste("Fitting fold", i, "of", nrow(results)))
-        }
-       # tsp properties should be preserved, "forecast" might adopt this in subset()
-       # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
+   }
+   forecasts <- fits <- vector("list", nrow(results))
+   
+   # Needed for nonrolling
+   startWindow <- 1
+   endWindow <- windowSize
+   # Perform the cv fits
+   for(i in 1:nrow(results)){
+     # Sample the correct slice for rolling
+     if(verbose){
+       print(paste("Fitting fold", i, "of", nrow(results)))
+     }
+     if(rolling){
+       stsp <- tsp(x)[1]
+       etsp <- stsp + (i + maxHorizon - 2) / frequency(x)
+       y <- window(x, start = stsp, end = etsp)
+       # y <- ts(x[1:windowSize], f = f)
+       nextHorizon <- windowSize + maxHorizon
+       ynext <- x[(windowSize + 1):nextHorizon]
+       windowSize <- windowSize + 1
+     }
+     # Sample the correct slice for nonrolling
+     else{
        stsp <- tsp(x)[1] + (i - 1) / frequency(x)
        etsp <- stsp + (maxHorizon - 1) / frequency(x)
        y <- window(x, start = stsp, end = etsp) 
-       #y <- ts(x[startWindow:endWindow], f = f)
-        ynext <- x[(endWindow + 1):(endWindow + maxHorizon)]
-        mod <- do.call(FUN, list(y))
-        fits[[i]] <- mod
-        fc <- do.call(FCFUN, list(mod, h = maxHorizon))
-        forecasts[[i]] <- fc
-        results[i, ] <- ynext - fc$mean
-        startWindow <- startWindow + maxHorizon
-        endWindow <- endWindow + maxHorizon
+       ynext <- x[(endWindow + 1):(endWindow + maxHorizon)]
+       startWindow <- startWindow + maxHorizon
+       endWindow <- endWindow + maxHorizon
      }
+     # Perfom the simulation
+     mod <- do.call(FUN, list(y))
+     fits[[i]] <- mod
+     fc <- do.call(FCFUN, list(mod, h = maxHorizon))
+     forecasts[[i]] <- fc
+     results[i, ] <- ynext - fc$mean
    }
+   
+   
+#    if(rolling){
+#       # Number of rows will be determined by the series length, windowSize and maxHorizon
+#       # Number of columns is the maxHorizon
+#       results <- matrix(NA,
+#                         nrow = length(x) - windowSize - maxHorizon,
+#                         ncol = maxHorizon)
+#       #i <- 1
+#       for(i in 1:nrow(results)){
+#          if(verbose){
+#             print(paste("Fitting fold", i, "of", nrow(results)))
+#          }
+#         # tsp properties should be preserved, "forecast" might adopt this in subset()
+#         # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
+#         stsp <- tsp(x)[1]
+#         etsp <- stsp + (i + maxHorizon - 2) / frequency(x)
+#         y <- window(x, start = stsp, end = etsp)
+#         # y <- ts(x[1:windowSize], f = f)
+#         nextHorizon <- windowSize + maxHorizon
+#         ynext <- x[(windowSize + 1):nextHorizon]
+#         # This will be replaced with do.call on FUN
+#         mod <- do.call(FUN, list(y))
+#         fits[[i]] <- mod
+#         fc <- do.call(FCFUN, list(mod, h = maxHorizon))
+#         forecasts[[i]] <- fc
+#         results[i, ] <- ynext - fc$mean
+#         windowSize <- windowSize + 1
+#       }
+#    }
+#    else{
+#      results <- matrix(NA,
+#                        nrow = as.integer((length(x) - windowSize) / maxHorizon),
+#                        ncol = maxHorizon)
+#      startWindow <- 1
+#      endWindow <- windowSize
+#      for(i in 1:nrow(results)){
+#         if(verbose){
+#            print(paste("Fitting fold", i, "of", nrow(results)))
+#         }
+#        # tsp properties should be preserved, "forecast" might adopt this in subset()
+#        # If issue 343 is accepted in the "forecast" package, this can be replaced with subset.ts
+#        stsp <- tsp(x)[1] + (i - 1) / frequency(x)
+#        etsp <- stsp + (maxHorizon - 1) / frequency(x)
+#        y <- window(x, start = stsp, end = etsp) 
+#        ynext <- x[(endWindow + 1):(endWindow + maxHorizon)]
+#        mod <- do.call(FUN, list(y))
+#         fits[[i]] <- mod
+#         fc <- do.call(FCFUN, list(mod, h = maxHorizon))
+#         forecasts[[i]] <- fc
+#         results[i, ] <- ynext - fc$mean
+#         startWindow <- startWindow + maxHorizon
+#         endWindow <- endWindow + maxHorizon
+#      }
+#    }
    
    
 #    # Adapted from Rob Hyndman's approach
