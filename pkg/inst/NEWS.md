@@ -1,6 +1,6 @@
 # Version 0.2.0 [Unreleased]
 * Add parallel processing between models TODO
-* Add timeseries cross validation wtih `cv.ts()` TODO
+* Add timeseries cross validation wtih `cvts()`
 * Fix model weights when `weights = "insample.errors"` and one or more component models perfectly fit the time series TODO
 * Fixed erroneous warning message when `xreg` is included in `n.args` but a `nnetar` model is not included in the model list
 
