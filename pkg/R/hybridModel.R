@@ -251,6 +251,12 @@ hybridModel <- function(y, models = "aenst",
     modelResults$weights <- (1 / modelResults$weights) / sum(1 / modelResults$weights)
 
   }
+  
+  # Check for valid weights when weights = "insample.errors" and submodels produce perfect fits
+  if(is.element(NaN, modelResults$weights) & weights == "insample.errors"){
+     warning('At least one model perfectly fit the series, so accuracy measures cannot be used for weights. Reverting to weights = "equal".')
+     modelResults$weights <- rep(1/ length(includedModels), length(includedModels))
+  }
   names(modelResults$weights) <- includedModels
 
   # Apply the weights to construct the fitted values
