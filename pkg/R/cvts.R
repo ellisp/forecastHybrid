@@ -19,7 +19,7 @@
 #' @param verbose should the current progress be printed to the console?
 #' 
 #' @details Cross validation of time series is more complicated than regular k-folds of leave one out cross validation of datasets
-#' without serial correlation since observations \eqn{x_t} and \eqn(x_t+n) are not independent. The \code{cvts()} function overcomes
+#' without serial correlation since observations \eqn{x_t}{x[t]} and \eqn{x_{t+n}}{x[t+n]} are not independent. The \code{cvts()} function overcomes
 #' this obstacle using two methods: rolling cross validation where an initial training window is used along with a forecast horizon
 #' and the initial window used for training grows by one each round until the training window and the forecast horizon capture the
 #' entire series or a nonrolling approach where a fixed training horizon is used that is shifted forward by the forecast horizon
