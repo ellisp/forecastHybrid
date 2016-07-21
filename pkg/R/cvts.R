@@ -5,18 +5,33 @@
 #' @export
 #' @param x the input time series
 #' @param FUN the model function used. See details.
-#' @param FCFUN a function that proces point forecasts for the model function. This defaults to forecast().
+#' @param FCFUN a function that proces point forecasts for the model function. This defaults to \code{\link{forecast()}}.
 #' See details.
-#' @param rolling should a rolling procedure be used? If TRUE, nonoverlapping windows of size maxHorizon
+#' @param rolling should a rolling procedure be used? If TRUE, nonoverlapping windows of size \code{maxHorizon}
 #' will be used for fitting each model. If FALSE, the size of the dataset used for training will grow
 #' by one each iteration.
-#' @param windoSize length of the window to build each model. When rolling == TRUE, the each model will be
-#' fit to a time series of this length, and when rolling == FALSE the first model will be fit to a series
+#' @param windoSize length of the window to build each model. When \code{rolling == TRUE}, the each model will be
+#' fit to a time series of this length, and when \code{rolling == FALSE} the first model will be fit to a series
 #' of this length and grow by one each iteration
 #' @param maxHorizon maximum length of the forecast horizon to use for computing errors
-#' @param horizonAverage should the final errors be an average over all the horizons instead of producing
+#' @param horizonAverage should the final errors be an average over all forecast horizons up to \code{maxHorizon} instead of producing
 #' metrics for each individual horizon?
-#' @param verbose should the current fold number and the total number of folds be printed to the console?
+#' @param verbose should the current progress be printed to the console?
+#' 
+#' @details Cross validation of time series is more complicated than regular k-folds of leave one out cross validation of datasets
+#' without serial correlation since observations \eqn{x_t} and \eqn(x_t+n) are not independent. The \code{cvts()} function overcomes
+#' this obstacle using two methods: rolling cross validation where an initial training window is used along with a forecast horizon
+#' and the initial window used for training grows by one each round until the training window and the forecast horizon capture the
+#' entire series or a nonrolling approach where a fixed training horizon is used that is shifted forward by the forecast horizon
+#' after each iteration.
+#' \br
+#' For the rolling approach, training points are heavily recycled, both in terms of used for fitting
+#' and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}. In constrast, the models fit with
+#' the nonrolling approach share less overlap, and the predicted forecast values are also only compared to the actual values once.
+#' former approach is similar to leave one out cross validatoin whlie the latter resembles k-fold cross validation. As a result,
+#' rolling cross validation can use far more iterations and computationally take longer to complete, but a disadvantage of the
+#' nonrolling approach is the greater variance and general instability of cross validated errors.
+#' 
 #' 
 #' @examples
 #' 
@@ -96,6 +111,10 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
      fc <- do.call(FCFUN, list(mod, h = maxHorizon))
      forecasts[[i]] <- fc
      results[i, ] <- ynext - fc$mean
+   }
+   # Average the results from all forecast horizons up to maxHorizon
+   if(horizonAverage){
+      results <- rowMeans(results)
    }
    
    result <- list(forecasts = forecasts, models = fits, residuals = results)
