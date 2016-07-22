@@ -21,6 +21,8 @@ if(require(forecast) & require(testthat)){
     expect_error(hybridModel(wineind, num.cores = "a"))
     expect_error(hybridModel(wineind, models = ""))
     expect_error(hybridModel(wineind, parallel = "a"))
+    # warning when component model fits perfectly and weights = "insample.error"
+    expect_warning(hybridModel(ts(1:100, f = 4), weights = "insample.errors"))
 
   })
   test_that("Testing for warnings", {
