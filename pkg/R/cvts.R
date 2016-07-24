@@ -25,6 +25,7 @@
 #' entire series or a nonrolling approach where a fixed training horizon is used that is shifted forward by the forecast horizon
 #' after each iteration.
 #' \cr
+#' \cr
 #' For the rolling approach, training points are heavily recycled, both in terms of used for fitting
 #' and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}. In constrast, the models fit with
 #' the nonrolling approach share less overlap, and the predicted forecast values are also only compared to the actual values once.
