@@ -10,7 +10,7 @@
 #' @param rolling should a rolling procedure be used? If TRUE, nonoverlapping windows of size \code{maxHorizon}
 #' will be used for fitting each model. If FALSE, the size of the dataset used for training will grow
 #' by one each iteration.
-#' @param windoSize length of the window to build each model. When \code{rolling == TRUE}, the each model will be
+#' @param windowSize length of the window to build each model. When \code{rolling == TRUE}, the each model will be
 #' fit to a time series of this length, and when \code{rolling == FALSE} the first model will be fit to a series
 #' of this length and grow by one each iteration
 #' @param maxHorizon maximum length of the forecast horizon to use for computing errors
@@ -36,8 +36,10 @@
 #' 
 #' @examples
 #' 
-#' cvmod1 <- cvts(AirPassengers, FUN = ets, FCFUN = forecast, rolling = TRUE, windowSize = 48, maxHorizon = 12)
-#' cvmod2 <- cvts(AirPassengers, FUN = hybridModel, FCFUN = forecast, rolling = TRUE, windowSize = 48, maxHorizon = 12)
+#' cvmod1 <- cvts(AirPassengers, FUN = ets, FCFUN = forecast,
+#' rolling = TRUE, windowSize = 48, maxHorizon = 12)
+#' cvmod2 <- cvts(AirPassengers, FUN = hybridModel, FCFUN = forecast,
+#' rolling = TRUE, windowSize = 48, maxHorizon = 12)
 cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
                  useHorizon = 5, maxHorizon = 5,
