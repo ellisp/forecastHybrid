@@ -4,8 +4,8 @@
 #'
 #' @export
 #' @param x the input time series
-#' @param FUN the model function used. See details.
-#' @param FCFUN a function that proces point forecasts for the model function. This defaults to \code{\link{forecast()}}.
+#' @param FUN the model function used. Custom functions are allowed. See details and examples.
+#' @param FCFUN a function that proces point forecasts for the model function. This defaults to \code{\link{forecast}}. Custom functions are allowed. See details and examples.
 #' See details.
 #' @param rolling should a rolling procedure be used? If TRUE, nonoverlapping windows of size \code{maxHorizon}
 #' will be used for fitting each model. If FALSE, the size of the dataset used for training will grow
@@ -32,17 +32,48 @@
 #' former approach is similar to leave one out cross validatoin whlie the latter resembles k-fold cross validation. As a result,
 #' rolling cross validation can use far more iterations and computationally take longer to complete, but a disadvantage of the
 #' nonrolling approach is the greater variance and general instability of cross validated errors.
-#' 
+#' \cr
+#' \cr
+#' The \code{FUN} and \code{FCFUN} arguments specify which function to use
+#' for generating a model and forecasting, respectively. While the functions
+#' from the "forecast" package can be used, user-defined functions can also
+#' be tested, but the objected returned by \code{FCFUN} must critically
+#' accept the argument \code{h} and contain the point forecasts out to
+#' this horizon \code{h} in slot \code{$mean}. An example is given with
+#' a custom model and forecast.
 #' 
 #' @examples
 #' 
 #' cvmod1 <- cvts(AirPassengers, FUN = ets, FCFUN = forecast,
 #' rolling = TRUE, windowSize = 48, maxHorizon = 12)
+#' \dontrun{
 #' cvmod2 <- cvts(AirPassengers, FUN = hybridModel, FCFUN = forecast,
 #' rolling = TRUE, windowSize = 48, maxHorizon = 12)
+#' )
+#' 
+#' # Example with custom model function and forecast function
+#' 
+#' customMod <- function(x){
+#' result <- list()
+#' result$series <- x
+#' result$last <- tail(x, n = 1)
+#' class(result) <- "customMod"
+#' return(result)
+#' }
+#' 
+#' forecast.customMod <- function(x, h = 12){
+#' result <- list()
+#' result$model <- x
+#' result$mean <- rep(x$last, h)
+#' class(result) <- "forecast"
+#' return(result)
+#' }
+#' 
+#' cvobj <- cvts(AirPassengers, FUN = customMod, FCFUN = forecast.customMod)
+#' 
 cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
-                 useHorizon = 5, maxHorizon = 5,
+                 maxHorizon = 5,
                  horizonAverage = FALSE,
                  verbose = TRUE){
    # Default forecast function
@@ -51,17 +82,17 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
    }
    x <- ts(x)
    f <- frequency(x)
-   if(any(sapply(c(x, windowSize, useHorizon, maxHorizon), FUN = function(x) !is.numeric(x)))){
-     stop("The arguments x, windowSize, useHorizon, and maxHorizon must all be numeric.")
+   if(any(sapply(c(x, windowSize, maxHorizon), FUN = function(x) !is.numeric(x)))){
+     stop("The arguments x, windowSize, and maxHorizon must all be numeric.")
    }
    
    
-   if(any(c(windowSize, useHorizon, maxHorizon) < 1L)){
-     stop("The arguments windowSize, useHorizon, and maxHorizon must be positive integers.")
+   if(any(c(windowSize, maxHorizon) < 1L)){
+     stop("The arguments windowSize, and maxHorizon must be positive integers.")
    }
    
-   if(any(c(windowSize, useHorizon, maxHorizon) %% 1L != 0)){
-     stop("The arguments windowSize, useHorizon, and maxHorizon must be positive integers.")
+   if(any(c(windowSize, maxHorizon) %% 1L != 0)){
+     stop("The arguments windowSize, and maxHorizon must be positive integers.")
    }
    
    # Ensure at least two periods are tested
