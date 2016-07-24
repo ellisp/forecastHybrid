@@ -46,6 +46,7 @@
 #' that the "forecast" package functions usually accept.
 #' This is due to a limitation in how the component models are called.
 #' \cr
+#' \cr
 #' Characteristics of the input series can cause problems for certain types of models and paramesters.
 #' For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal;
 #' furthemore, the data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)})
