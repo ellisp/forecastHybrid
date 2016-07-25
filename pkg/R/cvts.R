@@ -49,7 +49,7 @@
 #' \dontrun{
 #' cvmod2 <- cvts(AirPassengers, FUN = hybridModel, FCFUN = forecast,
 #' rolling = TRUE, windowSize = 48, maxHorizon = 12)
-#' )
+#' }
 #' 
 #' # Example with custom model function and forecast function
 #' 
