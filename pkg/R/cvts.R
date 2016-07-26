@@ -72,6 +72,8 @@
 #' 
 #' cvobj <- cvts(AirPassengers, FUN = customMod, FCFUN = forecast.customMod)
 #' 
+#' @author David Shaub
+#' 
 cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
                  maxHorizon = 5,
