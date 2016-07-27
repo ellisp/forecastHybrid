@@ -72,6 +72,8 @@
 #' mod3$auto.arima
 #' mod3$stlm
 #' }
+#' 
+#' @author David Shaub
 #'
 hybridModel <- function(y, models = "aenst",
                         lambda = NULL,
@@ -376,6 +378,8 @@ accuracy <- function(f,...){
 #' @seealso \code{\link[forecast]{accuracy}}
 #' @return The accuracy of the ensemble or individual component models.
 #' @export
+#' 
+#' @author David Shaub
 #'
 accuracy.hybridModel <- function(f,
                                  individual = FALSE,
@@ -445,6 +449,8 @@ print.hybridModel <- function(x, ...){
 #' plot(hm, type = "models")
 #' }
 #' @export
+#' 
+#' @author David Shaub
 #'
 plot.hybridModel <- function(x,
                              type = c("fit", "models"),
