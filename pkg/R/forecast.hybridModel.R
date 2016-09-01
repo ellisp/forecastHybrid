@@ -15,7 +15,14 @@
 #' @param ... other arguments; currently not used.
 #' @seealso \code{\link{hybridModel}}
 #' @details if \code{xreg} was used in construcing the \code{hybridModel},
-#' it must also be passed into \code{forecast.hybridModel}
+#' it must also be passed into \code{forecast.hybridModel}.
+#' \cr
+#' \cr
+#' While prediction intervals are produced for the
+#' final ensemble forecast model, these should be viewed conservatively as insights to the forecast's uncertainty.
+#' Currently these are constructed using the most extreme interval from each component model for each horizon, so
+#' the composite prediction intervals do not have statistical guarantees of asymptotic efficiency. More sophisticated
+#' and rigorous techniques are planned, however, particularly when cross validation approaches are used.
 #' @return An object of class \link[forecast]{forecast}.
 #' @examples
 #' \dontrun{
