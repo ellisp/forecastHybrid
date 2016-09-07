@@ -309,6 +309,7 @@ is.hybridModel <- function(x){
 fitted.hybridModel <- function(object,
                                individual = FALSE,
                                ...){
+  chkDots(...)
   if(individual){
     results <- list()
     for(i in object$models){
@@ -333,6 +334,7 @@ fitted.hybridModel <- function(object,
 residuals.hybridModel <- function(object,
                                   individual = FALSE,
                                   ...){
+  chkDots(...)
   if(individual){
     results <- list()
     for(i in object$models){
@@ -384,6 +386,7 @@ accuracy <- function(f,...){
 accuracy.hybridModel <- function(f,
                                  individual = FALSE,
                                  ...){
+  chkDots(...)
   if(individual){
     results <- list()
     for(i in f$models){
@@ -411,6 +414,7 @@ summary.hybridModel <- function(x){
 #' @details Print the names of the individual component models and their weights.
 #'
 print.hybridModel <- function(x, ...){
+  chkDots(...)
   cat("Hybrid forecast model comprised of the following models: ")
   cat(x$models, sep = ", ")
   cat("\n")
@@ -456,6 +460,7 @@ plot.hybridModel <- function(x,
                              type = c("fit", "models"),
                              ...){
   type <- match.arg(type)
+  chkDots(...)
   plotModels <- x$models
   if(type == "fit"){
     # Set the highest and lowest axis scale
