@@ -16,6 +16,8 @@
 #' @param maxHorizon maximum length of the forecast horizon to use for computing errors
 #' @param horizonAverage should the final errors be an average over all forecast horizons up to \code{maxHorizon} instead of producing
 #' metrics for each individual horizon?
+#' @param saveModels should the individual models be saved? Set this to \code{FALSE} on long time series to save memory.
+#' @param saveForecasts should the individual forecast from each model be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param verbose should the current progress be printed to the console?
 #' 
 #' @details Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
@@ -78,83 +80,92 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
                  maxHorizon = 5,
                  horizonAverage = FALSE,
+                 saveModels = ifelse(length(x) > 500, FALSE, TRUE),
+                 saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
                  verbose = TRUE){
-   # Default forecast function
-   if(is.null(FCFUN)){
-      FCFUN <- forecast
-   }
-   x <- ts(x)
-   f <- frequency(x)
-   if(any(sapply(c(x, windowSize, maxHorizon), FUN = function(x) !is.numeric(x)))){
-     stop("The arguments x, windowSize, and maxHorizon must all be numeric.")
-   }
-   
-   
-   if(any(c(windowSize, maxHorizon) < 1L)){
-     stop("The arguments windowSize, and maxHorizon must be positive integers.")
-   }
-   
-   if(any(c(windowSize, maxHorizon) %% 1L != 0)){
-     stop("The arguments windowSize, and maxHorizon must be positive integers.")
-   }
-   
-   # Ensure at least two periods are tested
-   if(windowSize + 2 * maxHorizon > length(x)){
-     stop("The time series must be longer than windowSize + 2 * maxHorizon.")
-   }
-   
-   # Combined code for rolling/nonrolling CV
-   if(rolling){
-     results <- matrix(NA,
-                       nrow = length(x) - windowSize - maxHorizon,
-                       ncol = maxHorizon)
-   }
-   else{
-     results <- matrix(NA,
-                       nrow = as.integer((length(x) - windowSize) / maxHorizon),
-                       ncol = maxHorizon)
-   }
-   forecasts <- fits <- vector("list", nrow(results))
-   
-   # Needed for nonrolling
-   startWindow <- 1
-   endWindow <- windowSize
-   # Perform the cv fits
-   for(i in 1:nrow(results)){
-     if(verbose){
-       print(paste("Fitting fold", i, "of", nrow(results)))
-     }
-     # Sample the correct slice for rolling
-     if(rolling){
-       stsp <- tsp(x)[1]
-       etsp <- stsp + (i + maxHorizon - 2) / frequency(x)
-       y <- window(x, start = stsp, end = etsp)
-       nextHorizon <- windowSize + maxHorizon
-       ynext <- x[(windowSize + 1):nextHorizon]
-       windowSize <- windowSize + 1
-     }
-     # Sample the correct slice for nonrolling
-     else{
-       stsp <- tsp(x)[1] + (i - 1) / frequency(x)
-       etsp <- stsp + (maxHorizon - 1) / frequency(x)
-       y <- window(x, start = stsp, end = etsp) 
-       ynext <- x[(endWindow + 1):(endWindow + maxHorizon)]
-       startWindow <- startWindow + maxHorizon
-       endWindow <- endWindow + maxHorizon
-     }
-     # Perfom the simulation
-     mod <- do.call(FUN, list(y))
-     fits[[i]] <- mod
-     fc <- do.call(FCFUN, list(mod, h = maxHorizon))
-     forecasts[[i]] <- fc
-     results[i, ] <- ynext - fc$mean
-   }
-   # Average the results from all forecast horizons up to maxHorizon
-   if(horizonAverage){
-      results <- rowMeans(results)
-   }
-   
-   result <- list(forecasts = forecasts, models = fits, residuals = results)
-   class(result) <- "cv"
-   return(result)
+  # Default forecast function
+  if(is.null(FCFUN)){
+    FCFUN <- forecast
+  }
+  x <- ts(x)
+  f <- frequency(x)
+  if(any(sapply(c(x, windowSize, maxHorizon), FUN = function(x) !is.numeric(x)))){
+    stop("The arguments x, windowSize, and maxHorizon must all be numeric.")
+  }
+  
+  
+  if(any(c(windowSize, maxHorizon) < 1L)){
+    stop("The arguments windowSize, and maxHorizon must be positive integers.")
+  }
+  
+  if(any(c(windowSize, maxHorizon) %% 1L != 0)){
+    stop("The arguments windowSize, and maxHorizon must be positive integers.")
+  }
+  
+  # Ensure at least two periods are tested
+  if(windowSize + 2 * maxHorizon > length(x)){
+    stop("The time series must be longer than windowSize + 2 * maxHorizon.")
+  }
+  
+  # Combined code for rolling/nonrolling CV
+  if(rolling){
+    results <- matrix(NA,
+                      nrow = length(x) - windowSize - maxHorizon,
+                      ncol = maxHorizon)
+  }
+  else{
+    results <- matrix(NA,
+                      nrow = as.integer((length(x) - windowSize) / maxHorizon),
+                      ncol = maxHorizon)
+  }
+  forecasts <- fits <- vector("list", nrow(results))
+  
+  # Needed for nonrolling
+  startWindow <- 1
+  endWindow <- windowSize
+  # Perform the cv fits
+  for(i in 1:nrow(results)){
+    if(verbose){
+      print(paste("Fitting fold", i, "of", nrow(results)))
+    }
+    # Sample the correct slice for rolling
+    if(rolling){
+      stsp <- tsp(x)[1]
+      etsp <- stsp + (i + maxHorizon - 2) / frequency(x)
+      y <- window(x, start = stsp, end = etsp)
+      nextHorizon <- windowSize + maxHorizon
+      ynext <- x[(windowSize + 1):nextHorizon]
+      windowSize <- windowSize + 1
+    }
+    # Sample the correct slice for nonrolling
+    else{
+      stsp <- tsp(x)[1] + (i - 1) / frequency(x)
+      etsp <- stsp + (maxHorizon - 1) / frequency(x)
+      y <- window(x, start = stsp, end = etsp) 
+      ynext <- x[(endWindow + 1):(endWindow + maxHorizon)]
+      startWindow <- startWindow + maxHorizon
+      endWindow <- endWindow + maxHorizon
+    }
+    # Perfom the simulation
+    mod <- do.call(FUN, list(y))
+    fits[[i]] <- mod
+    fc <- do.call(FCFUN, list(mod, h = maxHorizon))
+    forecasts[[i]] <- fc
+    results[i, ] <- ynext - fc$mean
+  }
+  # Average the results from all forecast horizons up to maxHorizon
+  if(horizonAverage){
+    results <- rowMeans(results)
+  }
+  
+  
+  if(!saveModels){
+    fits <- NULL
+  }
+  if(!saveForecasts){
+    forecasts <- NULL
+  }
+  result <- list(forecasts = forecasts, models = fits, residuals = results)
+  class(result) <- "cv"
+  return(result)
 }
