@@ -37,6 +37,7 @@
 #' # Plot the forecast
 #' plot(fc)
 #' }
+#'@author David Shaub
 #'
 forecast.hybridModel <- function(object,
                                  h = ifelse(object$frequency > 1, 2 * object$frequency, 10),
