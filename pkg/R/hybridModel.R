@@ -469,9 +469,7 @@ plot.hybridModel <- function(x,
     range <- ymax - ymin
     plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range),
          ylab = "y", xlab = "time")
-    title(main = "Plot of original series (black) and fitted component models",
-          cex.main = ifelse(length(plotModels) > 3, 3 / length(plotModels), 1),
-          outer = TRUE)
+    title(main = "Plot of original series (black) and fitted component models", outer = TRUE)
     for(i in seq_along(plotModels)){
       lines(fitted(x[[plotModels[i]]]), col = i + 1)
     }
