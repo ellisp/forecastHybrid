@@ -39,7 +39,7 @@ If you don't have time to read the whole guide and want to get started immediatl
 ```{r quickstart}
 quickModel <- hybridModel(AirPassengers)
 forecast(quickModel)
-plot(forecast(quickModel))
+plot(forecast(quickModel), main = "Forecast from auto.arima, ets, nnetar, stlm, and tbats model")
 ```
 
 ## Fitting a model
