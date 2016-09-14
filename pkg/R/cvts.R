@@ -167,7 +167,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   }
   # Average the results from all forecast horizons up to maxHorizon
   if(horizonAverage){
-    results <- rowMeans(results)
+    results <- as.matrix(rowMeans(results), ncol = 1)
   }
   
   
@@ -187,6 +187,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 #'
 #'Returns range of summary measures of the cross-validated forecast accuracy for \code{cvts} objects.
 #'
+#'@param f a \code{cvts} objected created by \code{\link{cvts}}
+#'@param ... 
 #'@details
 #'Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy measures
 #'\code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy is calculated for each
