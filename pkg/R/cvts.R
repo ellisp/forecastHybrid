@@ -44,6 +44,14 @@
 #' this horizon \code{h} in slot \code{$mean} of the returned object. An example is given with
 #' a custom model and forecast.
 #' 
+#' \cr
+#' \cr
+#' For small time series (default \code{length <= 500}), all of the individual fit models are included in the final
+#' \code{cvts} object that is returned. This can grow quite large since functions such as \code{auto.arima} will
+#' save fitted values, residual values, summary statistics, coefficient matrices, etc. Setting \code{saveModels = FALSE}
+#' can be safely done if there is no need to examine individual models fit at every stage of cross validation since the
+#' forecasts from each fold and the associated residuals are always saved.
+#' 
 #' @examples
 #' 
 #' cvmod1 <- cvts(AirPassengers, FUN = ets, FCFUN = forecast,
@@ -175,6 +183,15 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 }
 
 
+#'Accuracy measures for cross-validated time series
+#'
+#'Returns range of summary measures of the cross-validated forecast accuracy for \code{cvts} objects.
+#'
+#'@details
+#'Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy measures
+#'\code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy is calculated for each
+#'forecast horizon up to \code{maxHorizon}
+#'
 accuracy.cvts <- function(f, ...){
   ME <- colMeans(f$residuals)
   RMSE <- apply(f$residuals, MARGIN = 2, FUN = function(x){sqrt(sum(x ^ 2)/ length(x))})
