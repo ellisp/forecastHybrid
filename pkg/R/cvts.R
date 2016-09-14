@@ -148,9 +148,13 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     }
     # Perfom the simulation
     mod <- do.call(FUN, list(y))
-    fits[[i]] <- mod
     fc <- do.call(FCFUN, list(mod, h = maxHorizon))
-    forecasts[[i]] <- fc
+    if(saveModels){
+      fits[[i]] <- mod
+    }
+    if(saveForecasts){
+      forecasts[[i]] <- fc
+    }
     results[i, ] <- ynext - fc$mean
   }
   # Average the results from all forecast horizons up to maxHorizon
@@ -166,6 +170,17 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     forecasts <- NULL
   }
   result <- list(forecasts = forecasts, models = fits, residuals = results)
-  class(result) <- "cv"
+  class(result) <- "cvts"
   return(result)
+}
+
+
+accuracy.cvts <- function(f, ...){
+  ME <- colMeans(f$residuals)
+  RMSE <- apply(f$residuals, MARGIN = 2, FUN = function(x){sqrt(sum(x ^ 2)/ length(x))})
+  MAE <- colMeans(abs(f$residuals))
+  results <- data.frame(ME, RMSE, MAE)
+  rownames(results) <- paste("Forecast Horizon ", rownames(results))
+  return(results)
+  # MASE TODO
 }
