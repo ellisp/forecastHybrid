@@ -91,6 +91,16 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  saveModels = ifelse(length(x) > 500, FALSE, TRUE),
                  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
                  verbose = TRUE){
+  # Default model function
+  # This can be useful for methods that estimate the model and forecasts in one step
+  # e.g. GMDH() from the "GMDH" package or thetaf()/meanf()/rwf() from "forecast". In this case,
+  # no model function is entered but the forecast function is entered for
+  # FCFUN
+  if(is.null(FUN)){
+    FUN <- function(x){
+      return(x)
+    }
+  }
   # Default forecast function
   if(is.null(FCFUN)){
     FCFUN <- forecast
