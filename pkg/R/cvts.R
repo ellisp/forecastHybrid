@@ -105,8 +105,14 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   if(is.null(FCFUN)){
     FCFUN <- forecast
   }
-  x <- ts(x)
-  f <- frequency(x)
+  #f <- frequency(x)
+  f = frequency(x)
+  tspx <- tsp(x)
+  if(is.null(tspx)){
+    x <- ts(x, f = f)
+  }
+  
+  
   if(any(sapply(c(x, windowSize, maxHorizon), FUN = function(x) !is.numeric(x)))){
     stop("The arguments x, windowSize, and maxHorizon must all be numeric.")
   }
@@ -149,7 +155,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     # Sample the correct slice for rolling
     if(rolling){
       stsp <- tsp(x)[1]
-      etsp <- stsp + (i + maxHorizon - 2) / frequency(x)
+      etsp <- stsp + (i + windowSize - 2) / frequency(x)
       y <- window(x, start = stsp, end = etsp)
       nextHorizon <- windowSize + maxHorizon
       ynext <- x[(windowSize + 1):nextHorizon]
@@ -158,7 +164,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     # Sample the correct slice for nonrolling
     else{
       stsp <- tsp(x)[1] + (i - 1) / frequency(x)
-      etsp <- stsp + (maxHorizon - 1) / frequency(x)
+      etsp <- stsp + (windowSize - 1) / frequency(x)
       y <- window(x, start = stsp, end = etsp) 
       ynext <- x[(endWindow + 1):(endWindow + maxHorizon)]
       startWindow <- startWindow + maxHorizon
