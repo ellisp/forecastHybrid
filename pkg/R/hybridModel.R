@@ -19,9 +19,12 @@
 #' @param s.args an optional \code{list} of arguments to pass to \code{\link[forecast]{stlm}}. See details.
 #' @param t.args an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}. See details.
 #' @param weights method for weighting the forecasts of the various contributing
-#' models.  Defaults to \code{equal}, which has shown to be robust and surprisingly better
-#' in many cases than giving more weight to models with better in-sample performance. Weights
-#' utilizing in-sample errors are also available. Cross validated errors are currently unimplemented.
+#' models.  Defaults to \code{equal}, which has shown to be robust and better
+#' in many cases than giving more weight to models with better in-sample performance. Cross validated errors--implemented with \code{link{cvts}}
+#' should produce the best forecast, but the model estimation is also the slowest. Note that extra arguments
+#' passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} are not used
+#' during cross validation. See further explanation in \code{\link{cvts}}.
+#' Weights utilizing in-sample errors are also available but not recommended.
 #' @param errorMethod  method of measuring accuracy to use if weights are not
 #' to be equal.
 #' Root mean square error (\code{RMSE}), mean absolute error (\code{MAE})
@@ -31,6 +34,13 @@
 #' This is currently unimplemented.
 #' Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.
+#' @param cvHorizon If \code{weights = "cv.errors"}, this controls which forecast to horizon to use
+#' for the error calculations.
+#' @param windowSize length of the window to build each model, only used when \code{weights = "cv.errors"}
+#' @param horizonAverage If \code{weights = "cv.errors"}, setting this to \code{TRUE} will average
+#' all forecast horizons up to \code{cvHorizon} for calculating the errors instead of using
+#' the single horizon given in \code{cvHorizon}
+#' @param verbose Should the status of which model is being fit/cross validated be printed to the terminal?
 #' @seealso \code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}},
 #' \code{\link[forecast]{ets}}, \code{\link[forecast]{nnetar}},
 #' \code{\link[forecast]{stlm}}, \code{\link[forecast]{tbats}}
@@ -84,11 +94,15 @@ hybridModel <- function(y, models = "aenst",
                         t.args = NULL,
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("RMSE", "MAE", "MASE"),
-                        parallel = FALSE, num.cores = 2L){
+                        cvHorizon = 1,
+                        windowSize = 84,
+                        horizonAverage = FALSE,
+                        parallel = FALSE, num.cores = 2L,
+                        verbose = TRUE){
   # Weights could be set to equal (the default), based on in-sample errors, or based on cv errors
   # errorMethod will determine which type of errors to use for weights. Some choices from accuracy()
   # are not appropriate. If weights = "equal", this would be ignored.
-
+  
   # The dependent variable must be numeric and not a matrix/dataframe
   if(!is.numeric(y) || !is.null(dim(y))){
     stop("The time series must be numeric and may not be a matrix or dataframe object.")
@@ -97,11 +111,11 @@ hybridModel <- function(y, models = "aenst",
     stop("The time series must have obserations")
   }
   y <- as.ts(y)
-
+  
   # Match arguments to ensure validity
   weights <- match.arg(weights)
   errorMethod <- match.arg(errorMethod)
-
+  
   # Match the specified models
   expandedModels <- unique(tolower(unlist(strsplit(models, split = ""))))
   if(length(expandedModels) > 5L){
@@ -114,7 +128,7 @@ hybridModel <- function(y, models = "aenst",
   if(!length(expandedModels)){
     stop("At least one component model type must be specified.")
   }
-
+  
   # Validate cores and parallel arguments
   if(!is.logical(parallel)){
     stop("The parallel argument must be TRUE/FALSE.")
@@ -125,7 +139,7 @@ hybridModel <- function(y, models = "aenst",
   if(as.logical((num.cores %% 1L)) || num.cores <= 0L){
     stop("The number of cores specified must be an integer greater than zero.")
   }
-
+  
   # Check a.args/t.args/e.args/n.args/s.args
   if(!is.null(a.args) && !is.element("a", expandedModels)){
     warning("auto.arima was not selected in the models argument, but a.args was passed. Ignoring a.args")
@@ -142,7 +156,7 @@ hybridModel <- function(y, models = "aenst",
   if(!is.null(t.args) && !is.element("t", expandedModels)){
     warning("tbats was not selected in the models argument, but t.args was passed. Ignoring a.args")
   }
-
+  
   # Check for problems for specific models (e.g. long seasonality for ets and non-seasonal for stlm or nnetar)
   if(is.element("e", expandedModels) && frequency(y) >=24){
     warning("frequency(y) >= 24. The ets model will not be used.")
@@ -154,39 +168,46 @@ hybridModel <- function(y, models = "aenst",
       expandedModels <- expandedModels[expandedModels != "s"]
     }
     if(frequency(y) * 2L >= length(y)){
-       warning("The stlm model requres a series more than twice as long as the seasonal period. The stlm model will not be used.")
-       expandedModels <- expandedModels[expandedModels != "s"]
+      warning("The stlm model requres a series more than twice as long as the seasonal period. The stlm model will not be used.")
+      expandedModels <- expandedModels[expandedModels != "s"]
     }
   }
   if(is.element("n", expandedModels)){
-     if(frequency(y) * 2L >= length(y)){
-        warning("The nnetar model requres a series more than twice as long as the seasonal period. The nnetar model will not be used.")
-        expandedModels <- expandedModels[expandedModels != "n"]
-     }
+    if(frequency(y) * 2L >= length(y)){
+      warning("The nnetar model requres a series more than twice as long as the seasonal period. The nnetar model will not be used.")
+      expandedModels <- expandedModels[expandedModels != "n"]
+    }
   }
-
-
+  
+  
   # A model run should include at least two component models
   if(length(expandedModels) < 2L){
     stop("A hybridModel must contain at least two component models.")
   }
-
+  
   # Check for currently unimplemented features
   if(parallel){
     warning("The 'parallel' argument is currently unimplemented. Ignoring for now.")
   }
-  if(weights == "cv.errors"){
-    warning("Cross validated error weights are currently unimplemented. Ignoring for now.")
-     weights <- "equal"
+  # if(weights == "cv.errors"){
+  #   warning("Cross validated error weights are currently unimplemented. Ignoring for now.")
+  #   weights <- "equal"
+  # }
+  if(weights == "cv.errors" && errorMethod == "MASE"){
+    warning("cv errors currently do not support MASE. Reverting to RMSE.")
+    errorMethod <- "RMSE"
   }
-
+  
   modelResults <- list()
-
+  
   # We would allow for these models to run in parallel at the model level rather than within the model
   # since this has better performance. As an enhancement, users with >4 cores could benefit by running
   # parallelism both within and between models, based on the number of available cores.
   # auto.arima()
   if(is.element("a", expandedModels)){
+    if(verbose){
+      cat("Fitting the auto.arima model.\n")
+    }
     if(is.null(a.args)){
       a.args <- list(lambda = lambda)
     } else if(is.null(a.args$lambda)){
@@ -196,6 +217,9 @@ hybridModel <- function(y, models = "aenst",
   }
   # ets()
   if(is.element("e", expandedModels)){
+    if(verbose){
+      cat("Fitting the ets model.\n")
+    }
     if(is.null(e.args)){
       e.args <- list(lambda = lambda)
     } else if(is.null(e.args$lambda)){
@@ -205,6 +229,9 @@ hybridModel <- function(y, models = "aenst",
   }
   # nnetar()
   if(is.element("n", expandedModels)){
+    if(verbose){
+      cat("Fitting the nnetar model.\n")
+    }
     if(is.null(n.args)){
       n.args <- list(lambda = lambda)
     } else if(is.null(n.args$lambda)){
@@ -214,6 +241,9 @@ hybridModel <- function(y, models = "aenst",
   }
   # stlm()
   if(is.element("s", expandedModels)){
+    if(verbose){
+      cat("Fitting the stlm model.\n")
+    }
     if(is.null(s.args)){
       s.args <- list(lambda = lambda)
     } else if(is.null(s.args$lambda)){
@@ -223,45 +253,86 @@ hybridModel <- function(y, models = "aenst",
   }
   # tbats()
   if(is.element("t", expandedModels)){
+    if(verbose){
+      cat("Fitting the tbats model.\n")
+    }
     modelResults$tbats <- do.call(tbats, c(list(y), e.args))
   }
-
+  
   # Set the model weights
   includedModels <- names(modelResults)
   # Weighting methods would go here, equal weighting for now
   if(weights == "equal"){
     modelResults$weights <- rep(1 / length(expandedModels), length(expandedModels))
-  } else if(weights == "insample.errors"){
+  } else if(weights %in% c("insample.errors", "cv.errors")){
+    
     # There is probably a better way of accomplishing this
     # But this ugly approach will work for now
+    # These loops and if statements can be replace
+    # with do.call and/or map
     modelResults$weights <- rep(0, length(expandedModels))
     index <- 1
+    modResults <- modelResults
+    
+    if(weights == "cv.errors"){
+      #modResults <- 
+      for(i in expandedModels){
+        if(i == "a"){
+          if(verbose){
+            cat("Cross validating the auto.arima model.\n")
+          }
+          modResults$auto.arima <- cvts(y, FUN = auto.arima, maxHorizon = cvHorizon, horizonAverage = horizonAverage, verbose = FALSE)
+        } else if(i == "e"){
+          if(verbose){
+            cat("Cross validating the ets model.\n")
+          }
+          modResults$ets <- cvts(y, FUN = ets, maxHorizon = cvHorizon, horizonAverage = horizonAverage, verbose = FALSE)
+        } else if(i == "n"){
+          if(verbose){
+            cat("Cross validating the nnetar model.\n")
+          }
+          modResults$nnetar <- cvts(y, FUN = nnetar, maxHorizon = cvHorizon, horizonAverage = horizonAverage, verbose = FALSE)
+        } else if(i == "s"){
+          if(verbose){
+            cat("Cross validating the stlm model.\n")
+          }
+          modResults$stlm <- cvts(y, FUN = stlm, maxHorizon = cvHorizon, horizonAverage = horizonAverage, verbose = FALSE)
+        } else if(i == "t"){
+          if(verbose){
+            cat("Cross validating the tbats model.\n")
+          }
+          modResults$tbats <- cvts(y, FUN = tbats, maxHorizon = cvHorizon, horizonAverage = horizonAverage, verbose = FALSE)
+        }
+      }
+    }
+    # If horizonAverage == TRUE, the resulting accuracy object will have only one row
+    cvHorizon <- ifelse(horizonAverage, 1, cvHorizon)
     for(i in expandedModels){
       if(i == "a"){
-        modelResults$weights[index] <- accuracy(modelResults$auto.arima)[1, errorMethod]
+        modelResults$weights[index] <- accuracy(modResults$auto.arima)[cvHorizon, errorMethod]
       }else if(i == "e"){
-        modelResults$weights[index] <- accuracy(modelResults$ets)[1, errorMethod]
+        modelResults$weights[index] <- accuracy(modResults$ets)[cvHorizon, errorMethod]
       } else if(i == "n"){
-        modelResults$weights[index] <- accuracy(modelResults$nnetar)[1, errorMethod]
+        modelResults$weights[index] <- accuracy(modResults$nnetar)[cvHorizon, errorMethod]
       } else if(i == "s"){
-        modelResults$weights[index] <- accuracy(modelResults$stlm)[1, errorMethod]
+        modelResults$weights[index] <- accuracy(modResults$stlm)[cvHorizon, errorMethod]
       } else if(i == "t"){
-        modelResults$weights[index] <- accuracy(modelResults$tbats)[1, errorMethod]
+        modelResults$weights[index] <- accuracy(modResults$tbats)[cvHorizon, errorMethod]
       }
       index <- index + 1
     }
     # Scale the weights
     modelResults$weights <- (1 / modelResults$weights) / sum(1 / modelResults$weights)
-
+    
   }
   
   # Check for valid weights when weights = "insample.errors" and submodels produce perfect fits
-  if(is.element(NaN, modelResults$weights) & weights == "insample.errors"){
-     warning('At least one model perfectly fit the series, so accuracy measures cannot be used for weights. Reverting to weights = "equal".')
-     modelResults$weights <- rep(1/ length(includedModels), length(includedModels))
+  if(is.element(NaN, modelResults$weights) & weights %in% c("insample.errors", "cv.errors")){
+    warning('At least one model perfectly fit the series, so accuracy measures cannot be used for weights. Reverting to weights = "equal".')
+    modelResults$weights <- rep(1/ length(includedModels), length(includedModels))
   }
   names(modelResults$weights) <- includedModels
-
+  
   # Apply the weights to construct the fitted values
   fits <- sapply(includedModels, FUN = function(x) fitted(modelResults[[x]]))
   fitsWeightsMatrix <- matrix(rep(modelResults$weights[includedModels], times = nrow(fits)),
@@ -273,7 +344,7 @@ hybridModel <- function(y, models = "aenst",
     resid <- ts(fits)
     tsp(fits) <- tsp(resid) <- tsp(y)
   }
-
+  
   # Prepare the hybridModel object
   class(modelResults) <- "hybridModel"
   modelResults$frequency <- frequency(y)
@@ -356,7 +427,7 @@ residuals.hybridModel <- function(object,
 #' @export
 #'
 accuracy.default <-  function(f, ...){
-   forecast::accuracy(f, ...)
+  forecast::accuracy(f, ...)
 }
 
 #' Generic method for accuracy
