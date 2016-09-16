@@ -10,8 +10,8 @@
 #' @param rolling should a rolling procedure be used? If TRUE, nonoverlapping windows of size \code{maxHorizon}
 #' will be used for fitting each model. If FALSE, the size of the dataset used for training will grow
 #' by one each iteration.
-#' @param windowSize length of the window to build each model. When \code{rolling == TRUE}, the each model will be
-#' fit to a time series of this length, and when \code{rolling == FALSE} the first model will be fit to a series
+#' @param windowSize length of the window to build each model. When \code{rolling == FALSE}, the each model will be
+#' fit to a time series of this length, and when \code{rolling == TRUE} the first model will be fit to a series
 #' of this length and grow by one each iteration
 #' @param maxHorizon maximum length of the forecast horizon to use for computing errors
 #' @param horizonAverage should the final errors be an average over all forecast horizons up to \code{maxHorizon} instead of producing
@@ -83,6 +83,23 @@
 #' cvobj <- cvts(AirPassengers, FUN = customMod, FCFUN = forecast.customMod)
 #' 
 #' @author David Shaub
+#' @examples 
+#' # Use the stlm() function from the "forecast" pacakge
+#' stlmcv <- cvts(AirPassengers, FUN = stlm)
+#' 
+#' # Use the rwf() function from the "forecast" package.
+#' # This function does not have a modeling function and
+#' # instead calculates a forecast on the time series directly
+#' rwcv <- cvts(AirPassengers, FCFUN = rwf)
+#' 
+#' # We can also use custom functions, for example fcast()
+#' from the "GMDH" package
+#' \dontrun{
+#' library(GMDH)
+#' GMDHForecast <- function(x, h){fcast(x, f.number = h)}
+#' gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
+#' gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
+#' }
 #' 
 cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
@@ -132,44 +149,40 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   }
   
   # Combined code for rolling/nonrolling CV
-  if(rolling){
-    results <- matrix(NA,
-                      nrow = length(x) - windowSize - maxHorizon,
-                      ncol = maxHorizon)
-  }
-  else{
-    results <- matrix(NA,
-                      nrow = as.integer((length(x) - windowSize) / maxHorizon),
-                      ncol = maxHorizon)
-  }
+
+  results <- matrix(NA,
+                    nrow = ifelse(rolling, length(x) - windowSize - maxHorizon, as.integer((length(x) - windowSize) / maxHorizon)),
+                    ncol = maxHorizon)
+
   forecasts <- fits <- vector("list", nrow(results))
   
   # Needed for nonrolling
   startWindow <- 1
   endWindow <- windowSize
   # Perform the cv fits
+  # adapted from code from Rob Hyndman at http://robjhyndman.com/hyndsight/tscvexample/
+  # licensend under >= GPL2 from the author
+  stsp <- tsp(x)[1]
   for(i in 1:nrow(results)){
     if(verbose){
-      print(paste("Fitting fold", i, "of", nrow(results)))
+      cat("Fitting fold", i, "of", nrow(results), "\n")
     }
     # Sample the correct slice for rolling
     if(rolling){
-      stsp <- tsp(x)[1]
       etsp <- stsp + (i + windowSize - 2) / frequency(x)
       y <- window(x, start = stsp, end = etsp)
-      nextHorizon <- windowSize + maxHorizon
-      ynext <- x[(windowSize + 1):nextHorizon]
-      windowSize <- windowSize + 1
+      fstsp <- stsp + (i + windowSize - 1) / frequency(x)
+      fetsp <- fstsp + (maxHorizon - 1) / frequency(x)
     }
     # Sample the correct slice for nonrolling
     else{
-      stsp <- tsp(x)[1] + (i - 1) / frequency(x)
-      etsp <- stsp + (windowSize - 1) / frequency(x)
-      y <- window(x, start = stsp, end = etsp) 
-      ynext <- x[(endWindow + 1):(endWindow + maxHorizon)]
-      startWindow <- startWindow + maxHorizon
-      endWindow <- endWindow + maxHorizon
+      etsp <- stsp + (windowSize - 1) / frequency(x) + maxHorizon * (i - 1) / frequency(x)
+      y <- window(x, end = etsp)
+      fstsp <- tsp(y)[2] + 1 / frequency(x)
+      fetsp <- stsp + (windowSize - 1) / frequency(x) + maxHorizon * i / frequency(x)
     }
+    ynext <- window(x, start = fstsp, end = fetsp)
+    
     # Perfom the simulation
     mod <- do.call(FUN, list(y))
     fc <- do.call(FCFUN, list(mod, h = maxHorizon))
