@@ -94,7 +94,7 @@ hybridModel <- function(y, models = "aenst",
                         t.args = NULL,
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("RMSE", "MAE", "MASE"),
-                        cvHorizon = 1,
+                        cvHorizon = frequency(y),
                         windowSize = 84,
                         horizonAverage = FALSE,
                         parallel = FALSE, num.cores = 2L,
@@ -206,7 +206,7 @@ hybridModel <- function(y, models = "aenst",
   # auto.arima()
   if(is.element("a", expandedModels)){
     if(verbose){
-      cat("Fitting the auto.arima model.\n")
+      cat("Fitting the auto.arima model\n")
     }
     if(is.null(a.args)){
       a.args <- list(lambda = lambda)
@@ -218,7 +218,7 @@ hybridModel <- function(y, models = "aenst",
   # ets()
   if(is.element("e", expandedModels)){
     if(verbose){
-      cat("Fitting the ets model.\n")
+      cat("Fitting the ets model\n")
     }
     if(is.null(e.args)){
       e.args <- list(lambda = lambda)
@@ -230,7 +230,7 @@ hybridModel <- function(y, models = "aenst",
   # nnetar()
   if(is.element("n", expandedModels)){
     if(verbose){
-      cat("Fitting the nnetar model.\n")
+      cat("Fitting the nnetar model\n")
     }
     if(is.null(n.args)){
       n.args <- list(lambda = lambda)
@@ -242,7 +242,7 @@ hybridModel <- function(y, models = "aenst",
   # stlm()
   if(is.element("s", expandedModels)){
     if(verbose){
-      cat("Fitting the stlm model.\n")
+      cat("Fitting the stlm model\n")
     }
     if(is.null(s.args)){
       s.args <- list(lambda = lambda)
@@ -254,7 +254,7 @@ hybridModel <- function(y, models = "aenst",
   # tbats()
   if(is.element("t", expandedModels)){
     if(verbose){
-      cat("Fitting the tbats model.\n")
+      cat("Fitting the tbats model\n")
     }
     modelResults$tbats <- do.call(tbats, c(list(y), e.args))
   }
@@ -279,29 +279,49 @@ hybridModel <- function(y, models = "aenst",
       for(i in expandedModels){
         if(i == "a"){
           if(verbose){
-            cat("Cross validating the auto.arima model.\n")
+            cat("Cross validating the auto.arima model\n")
           }
-          modResults$auto.arima <- cvts(y, FUN = auto.arima, maxHorizon = cvHorizon, horizonAverage = horizonAverage, verbose = FALSE)
+          modResults$auto.arima <- cvts(y, FUN = auto.arima,
+                                        maxHorizon = cvHorizon,
+                                        horizonAverage = horizonAverage,
+                                        verbose = FALSE,
+                                        windowSize = windowSize)
         } else if(i == "e"){
           if(verbose){
-            cat("Cross validating the ets model.\n")
+            cat("Cross validating the ets model\n")
           }
-          modResults$ets <- cvts(y, FUN = ets, maxHorizon = cvHorizon, horizonAverage = horizonAverage, verbose = FALSE)
+          modResults$ets <- cvts(y, FUN = ets,
+                                 maxHorizon = cvHorizon,
+                                 horizonAverage = horizonAverage,
+                                 verbose = FALSE,
+                                 windowSize = windowSize)
         } else if(i == "n"){
           if(verbose){
-            cat("Cross validating the nnetar model.\n")
+            cat("Cross validating the nnetar model\n")
           }
-          modResults$nnetar <- cvts(y, FUN = nnetar, maxHorizon = cvHorizon, horizonAverage = horizonAverage, verbose = FALSE)
+          modResults$nnetar <- cvts(y, FUN = nnetar,
+                                    maxHorizon = cvHorizon,
+                                    horizonAverage = horizonAverage,
+                                    verbose = FALSE,
+                                    windowSize = windowSize)
         } else if(i == "s"){
           if(verbose){
-            cat("Cross validating the stlm model.\n")
+            cat("Cross validating the stlm model\n")
           }
-          modResults$stlm <- cvts(y, FUN = stlm, maxHorizon = cvHorizon, horizonAverage = horizonAverage, verbose = FALSE)
+          modResults$stlm <- cvts(y, FUN = stlm,
+                                  maxHorizon = cvHorizon,
+                                  horizonAverage = horizonAverage,
+                                  verbose = FALSE,
+                                  windowSize = windowSize)
         } else if(i == "t"){
           if(verbose){
-            cat("Cross validating the tbats model.\n")
+            cat("Cross validating the tbats model\n")
           }
-          modResults$tbats <- cvts(y, FUN = tbats, maxHorizon = cvHorizon, horizonAverage = horizonAverage, verbose = FALSE)
+          modResults$tbats <- cvts(y, FUN = tbats,
+                                   maxHorizon = cvHorizon,
+                                   horizonAverage = horizonAverage,
+                                   verbose = FALSE,
+                                   windowSize = windowSize)
         }
       }
     }
@@ -509,7 +529,7 @@ print.hybridModel <- function(x, ...){
 #' \code{\link[forecast]{plot.tbats}}. Note: no plot
 #' methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
 #' \code{type = "models"}
-#' @param ... other arguments (ignored).
+#' @param ... other arguments passed to \link{plot}.
 #' @seealso \code{\link{hybridModel}}
 #' @return None. Function produces a plot.
 #' @details For \code{type = "fit"}, the original series is plotted in black.
@@ -538,9 +558,8 @@ plot.hybridModel <- function(x,
     ymax <- max(sapply(plotModels, FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
     ymin <- min(sapply(plotModels, FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
     range <- ymax - ymin
-    plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range),
-         ylab = "y", xlab = "time")
-    title(main = "Plot of original series (black) and fitted component models", outer = TRUE)
+    plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range), ...)
+    #title(main = "Plot of original series (black) and fitted component models", outer = TRUE)
     for(i in seq_along(plotModels)){
       lines(fitted(x[[plotModels[i]]]), col = i + 1)
     }
