@@ -327,6 +327,7 @@ hybridModel <- function(y, models = "aenst",
     }
     # If horizonAverage == TRUE, the resulting accuracy object will have only one row
     cvHorizon <- ifelse(horizonAverage, 1, cvHorizon)
+    cvHorizon <- ifelse(weights != "cv.errors", 1, cvHorizon)
     for(i in expandedModels){
       if(i == "a"){
         modelResults$weights[index] <- accuracy(modResults$auto.arima)[cvHorizon, errorMethod]
