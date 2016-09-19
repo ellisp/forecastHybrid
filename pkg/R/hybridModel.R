@@ -12,7 +12,7 @@
 #' Ignored if NULL. Otherwise, data transformed before model is estimated.
 #' @param models A character string of up to five characters indicating which contributing models to use:
 #' a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), n (\code{\link[forecast]{nnetar}}),
-#' s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}})
+#' s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}}).
 #' @param a.args an optional \code{list} of arguments to pass to \code{\link[forecast]{auto.arima}}. See details.
 #' @param e.args an optional \code{list} of arguments to pass to \code{\link[forecast]{ets}}. See details.
 #' @param n.args an optional \code{list} of arguments to pass to \code{\link[forecast]{nnetar}}. See details.
@@ -36,10 +36,10 @@
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.
 #' @param cvHorizon If \code{weights = "cv.errors"}, this controls which forecast to horizon to use
 #' for the error calculations.
-#' @param windowSize length of the window to build each model, only used when \code{weights = "cv.errors"}
+#' @param windowSize length of the window to build each model, only used when \code{weights = "cv.errors"}.
 #' @param horizonAverage If \code{weights = "cv.errors"}, setting this to \code{TRUE} will average
 #' all forecast horizons up to \code{cvHorizon} for calculating the errors instead of using
-#' the single horizon given in \code{cvHorizon}
+#' the single horizon given in \code{cvHorizon}.
 #' @param verbose Should the status of which model is being fit/cross validated be printed to the terminal?
 #' @seealso \code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}},
 #' \code{\link[forecast]{ets}}, \code{\link[forecast]{nnetar}},
@@ -72,17 +72,25 @@
 #' @examples
 #' \dontrun{
 #'
+#' # Fit an auto.arima, ets, nnetar, stlm, and tbats model
+#' # on the time series with equal weights
 #' mod1 <- hybridModel(AirPassengers)
 #' plot(forecast(mod1))
+#'
+#' # Use an auto.arima, ets, and tbats model with weights
+#' # set by the MASE in-sample errors
 #' mod2 <- hybridModel(AirPassengers, models = "aet",
 #' weights = "insample.errors", errorMethod = "MASE")
+#'
+#' # Pass additional arguments to auto.arima() to control its fit
 #' mod3 <- hybridModel(AirPassengers, models = "aens",
 #' a.args = list(max.p = 7, max.q = 7, approximation = FALSE))
+#'
 #' # View the component auto.arima() and stlm() models
 #' mod3$auto.arima
 #' mod3$stlm
 #' }
-#' 
+#'
 #' @author David Shaub
 #'
 hybridModel <- function(y, models = "aenst",
@@ -102,7 +110,7 @@ hybridModel <- function(y, models = "aenst",
   # Weights could be set to equal (the default), based on in-sample errors, or based on cv errors
   # errorMethod will determine which type of errors to use for weights. Some choices from accuracy()
   # are not appropriate. If weights = "equal", this would be ignored.
-  
+
   # The dependent variable must be numeric and not a matrix/dataframe
   if(!is.numeric(y) || !is.null(dim(y))){
     stop("The time series must be numeric and may not be a matrix or dataframe object.")
@@ -111,11 +119,11 @@ hybridModel <- function(y, models = "aenst",
     stop("The time series must have obserations")
   }
   y <- as.ts(y)
-  
+
   # Match arguments to ensure validity
   weights <- match.arg(weights)
   errorMethod <- match.arg(errorMethod)
-  
+
   # Match the specified models
   expandedModels <- unique(tolower(unlist(strsplit(models, split = ""))))
   if(length(expandedModels) > 5L){
@@ -128,7 +136,7 @@ hybridModel <- function(y, models = "aenst",
   if(!length(expandedModels)){
     stop("At least one component model type must be specified.")
   }
-  
+
   # Validate cores and parallel arguments
   if(!is.logical(parallel)){
     stop("The parallel argument must be TRUE/FALSE.")
@@ -139,7 +147,7 @@ hybridModel <- function(y, models = "aenst",
   if(as.logical((num.cores %% 1L)) || num.cores <= 0L){
     stop("The number of cores specified must be an integer greater than zero.")
   }
-  
+
   # Check a.args/t.args/e.args/n.args/s.args
   if(!is.null(a.args) && !is.element("a", expandedModels)){
     warning("auto.arima was not selected in the models argument, but a.args was passed. Ignoring a.args")
@@ -156,7 +164,7 @@ hybridModel <- function(y, models = "aenst",
   if(!is.null(t.args) && !is.element("t", expandedModels)){
     warning("tbats was not selected in the models argument, but t.args was passed. Ignoring a.args")
   }
-  
+
   # Check for problems for specific models (e.g. long seasonality for ets and non-seasonal for stlm or nnetar)
   if(is.element("e", expandedModels) && frequency(y) >=24){
     warning("frequency(y) >= 24. The ets model will not be used.")
@@ -178,13 +186,13 @@ hybridModel <- function(y, models = "aenst",
       expandedModels <- expandedModels[expandedModels != "n"]
     }
   }
-  
-  
+
+
   # A model run should include at least two component models
   if(length(expandedModels) < 2L){
     stop("A hybridModel must contain at least two component models.")
   }
-  
+
   # Check for currently unimplemented features
   if(parallel){
     warning("The 'parallel' argument is currently unimplemented. Ignoring for now.")
@@ -197,9 +205,9 @@ hybridModel <- function(y, models = "aenst",
     warning("cv errors currently do not support MASE. Reverting to RMSE.")
     errorMethod <- "RMSE"
   }
-  
+
   modelResults <- list()
-  
+
   # We would allow for these models to run in parallel at the model level rather than within the model
   # since this has better performance. As an enhancement, users with >4 cores could benefit by running
   # parallelism both within and between models, based on the number of available cores.
@@ -258,14 +266,14 @@ hybridModel <- function(y, models = "aenst",
     }
     modelResults$tbats <- do.call(tbats, c(list(y), e.args))
   }
-  
+
   # Set the model weights
   includedModels <- names(modelResults)
   # Weighting methods would go here, equal weighting for now
   if(weights == "equal"){
     modelResults$weights <- rep(1 / length(expandedModels), length(expandedModels))
   } else if(weights %in% c("insample.errors", "cv.errors")){
-    
+
     # There is probably a better way of accomplishing this
     # But this ugly approach will work for now
     # These loops and if statements can be replace
@@ -273,9 +281,9 @@ hybridModel <- function(y, models = "aenst",
     modelResults$weights <- rep(0, length(expandedModels))
     index <- 1
     modResults <- modelResults
-    
+
     if(weights == "cv.errors"){
-      #modResults <- 
+      #modResults <-
       for(i in expandedModels){
         if(i == "a"){
           if(verbose){
@@ -344,16 +352,16 @@ hybridModel <- function(y, models = "aenst",
     }
     # Scale the weights
     modelResults$weights <- (1 / modelResults$weights) / sum(1 / modelResults$weights)
-    
+
   }
-  
+
   # Check for valid weights when weights = "insample.errors" and submodels produce perfect fits
   if(is.element(NaN, modelResults$weights) & weights %in% c("insample.errors", "cv.errors")){
     warning('At least one model perfectly fit the series, so accuracy measures cannot be used for weights. Reverting to weights = "equal".')
     modelResults$weights <- rep(1/ length(includedModels), length(includedModels))
   }
   names(modelResults$weights) <- includedModels
-  
+
   # Apply the weights to construct the fitted values
   fits <- sapply(includedModels, FUN = function(x) fitted(modelResults[[x]]))
   fitsWeightsMatrix <- matrix(rep(modelResults$weights[includedModels], times = nrow(fits)),
@@ -365,7 +373,7 @@ hybridModel <- function(y, models = "aenst",
     resid <- ts(fits)
     tsp(fits) <- tsp(resid) <- tsp(y)
   }
-  
+
   # Prepare the hybridModel object
   class(modelResults) <- "hybridModel"
   modelResults$frequency <- frequency(y)
@@ -377,6 +385,8 @@ hybridModel <- function(y, models = "aenst",
 }
 
 #' Test if the object is a hybridModel object
+#'
+#' Test if the object is a \code{hybridModel} object.
 #'
 #' @export
 #' @param x the input object.
@@ -416,7 +426,7 @@ fitted.hybridModel <- function(object,
 #'
 #' Extract the model residuals from the \code{hybridModel} object.
 #' @export
-#' @param object The input hybridModel
+#' @param object The input hybridModel.
 #' @param individual If \code{TRUE}, return the residuals of the component models instead
 #' of the residuals for the whole ensemble model.
 #' @param ... Other arguments (ignored).
@@ -440,10 +450,12 @@ residuals.hybridModel <- function(object,
 
 #' Generic method for accuracy
 #'
+#' Generic method for accuracy.
+#'
 #' @param f an object of class forecast, or a numerical vector containing forecasts.
 #' It will also work with Arima, ets and lm objects if x is omitted - in which case
 #' in-sample accuracy measures are returned.
-#' @param ... other arguments (ignored)
+#' @param ... other arguments (ignored).
 #' @seealso \code{\link[forecast]{accuracy}}, \code{\link{accuracy.hybridModel}}
 #' @export
 #'
@@ -452,6 +464,8 @@ accuracy.default <-  function(f, ...){
 }
 
 #' Generic method for accuracy
+#'
+#' Generic method for accuracy.
 #'
 #' @param f the input object.
 #' @param ... other arguments (ignored).
@@ -463,6 +477,9 @@ accuracy <- function(f,...){
 
 #' Accuracy measures for hybridModel objects
 #'
+#' Accuracy measures for hybridModel
+#' objects.
+#'
 #' Return the in-sample accuracy measures for the component models of the hybridModel
 #'
 #' @param f the input hybridModel.
@@ -472,7 +489,7 @@ accuracy <- function(f,...){
 #' @seealso \code{\link[forecast]{accuracy}}
 #' @return The accuracy of the ensemble or individual component models.
 #' @export
-#' 
+#'
 #' @author David Shaub
 #'
 accuracy.hybridModel <- function(f,
@@ -489,16 +506,44 @@ accuracy.hybridModel <- function(f,
   return(forecast::accuracy(f$fitted, getResponse(f)))
 }
 
+#'Accuracy measures for cross-validated time series
+#'
+#'Returns range of summary measures of the cross-validated forecast accuracy
+#'for \code{cvts} objects.
+#'
+#'@param f a \code{cvts} objected created by \code{\link{cvts}}.
+#'@param ... other arguments (ignored).
+#'
+#'@details
+#'Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy measures
+#'\code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy is calculated for each
+#'forecast horizon up to \code{maxHorizon}
+#'
+accuracy.cvts <- function(f, ...){
+  ME <- colMeans(f$residuals)
+  RMSE <- apply(f$residuals, MARGIN = 2, FUN = function(x){sqrt(sum(x ^ 2)/ length(x))})
+  MAE <- colMeans(abs(f$residuals))
+  results <- data.frame(ME, RMSE, MAE)
+  rownames(results) <- paste("Forecast Horizon ", rownames(results))
+  return(results)
+  # MASE TODO
+  # Will require actual/fitted/residuals
+}
+
+
 #' Print a summary of the hybridModel object
 #'
 #' @param x the input \code{hybridModel} object.
 #' @details Print the names of the individual component models and their weights.
+#'
 #'
 summary.hybridModel <- function(x){
   print(x)
 }
 
 #' Print information about the hybridModel object
+#'
+#' Print information about the \code{hybridModel} object.
 #'
 #' @param x the input \code{hybridModel} object.
 #' @param ... other arguments (ignored).
@@ -529,10 +574,11 @@ print.hybridModel <- function(x, ...){
 #' \code{\link[forecast]{plot.Arima}}, \code{\link[forecast]{plot.ets}},
 #' \code{\link[forecast]{plot.tbats}}. Note: no plot
 #' methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
-#' \code{type = "models"}
+#' \code{type = "models"}.
 #' @param ... other arguments passed to \link{plot}.
 #' @seealso \code{\link{hybridModel}}
 #' @return None. Function produces a plot.
+#'
 #' @details For \code{type = "fit"}, the original series is plotted in black.
 #' Fitted values for the individual component models are plotted in other colors.
 #' For \code{type = "models"}, each individual component model is plotted. Since
@@ -545,7 +591,7 @@ print.hybridModel <- function(x, ...){
 #' plot(hm, type = "models")
 #' }
 #' @export
-#' 
+#'
 #' @author David Shaub
 #'
 plot.hybridModel <- function(x,
