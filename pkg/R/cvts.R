@@ -1,9 +1,9 @@
 #' Cross validation for time series
 #'
-#' Perform cross validation on time series 
+#' Perform cross validation on a time series.
 #'
 #' @export
-#' @param x the input time series
+#' @param x the input time series.
 #' @param FUN the model function used. Custom functions are allowed. See details and examples.
 #' @param FCFUN a function that proces point forecasts for the model function. This defaults to \code{\link{forecast}}. Custom functions are allowed. See details and examples.
 #' See details.
@@ -12,14 +12,14 @@
 #' by one each iteration.
 #' @param windowSize length of the window to build each model. When \code{rolling == FALSE}, the each model will be
 #' fit to a time series of this length, and when \code{rolling == TRUE} the first model will be fit to a series
-#' of this length and grow by one each iteration
-#' @param maxHorizon maximum length of the forecast horizon to use for computing errors
+#' of this length and grow by one each iteration.
+#' @param maxHorizon maximum length of the forecast horizon to use for computing errors.
 #' @param horizonAverage should the final errors be an average over all forecast horizons up to \code{maxHorizon} instead of producing
 #' metrics for each individual horizon?
 #' @param saveModels should the individual models be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param saveForecasts should the individual forecast from each model be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param verbose should the current progress be printed to the console?
-#' 
+#'
 #' @details Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
 #' without serial correlation since observations \eqn{x_t}{x[t]} and \eqn{x_{t+n}}{x[t+n]} are not independent. The \code{cvts()} function overcomes
 #' this obstacle using two methods: 1) rolling cross validation where an initial training window is used along with a forecast horizon
@@ -43,7 +43,6 @@
 #' accept the argument \code{h} and contain the point forecasts out to
 #' this horizon \code{h} in slot \code{$mean} of the returned object. An example is given with
 #' a custom model and forecast.
-#' 
 #' \cr
 #' \cr
 #' For small time series (default \code{length <= 500}), all of the individual fit models are included in the final
@@ -51,56 +50,51 @@
 #' save fitted values, residual values, summary statistics, coefficient matrices, etc. Setting \code{saveModels = FALSE}
 #' can be safely done if there is no need to examine individual models fit at every stage of cross validation since the
 #' forecasts from each fold and the associated residuals are always saved.
-#' 
+#'
 #' @examples
-#' 
-#' cvmod1 <- cvts(AirPassengers, FUN = ets, FCFUN = forecast,
-#' rolling = TRUE, windowSize = 48, maxHorizon = 12)
-#' cvmod2 <- cvts(wineind, FUN = auto.arima)
+#' cvmod1 <- cvts(AirPassengers, FUN = stlm,
+#'                windowSize = 48, maxHorizon = 12)
+#'
 #' \dontrun{
-#' cvmod3 <- cvts(AirPassengers, FUN = hybridModel, FCFUN = forecast,
-#' rolling = TRUE, windowSize = 48, maxHorizon = 12)
-#' }
-#' 
-#' # Example with custom model function and forecast function
-#' 
-#' customMod <- function(x){
-#' result <- list()
-#' result$series <- x
-#' result$last <- tail(x, n = 1)
-#' class(result) <- "customMod"
-#' return(result)
-#' }
-#' 
-#' forecast.customMod <- function(x, h = 12){
-#' result <- list()
-#' result$model <- x
-#' result$mean <- rep(x$last, h)
-#' class(result) <- "forecast"
-#' return(result)
-#' }
-#' 
-#' cvobj <- cvts(AirPassengers, FUN = customMod, FCFUN = forecast.customMod)
-#' 
-#' @author David Shaub
-#' @examples 
-#' # Use the stlm() function from the "forecast" pacakge
-#' stlmcv <- cvts(AirPassengers, FUN = stlm)
-#' 
-#' # Use the rwf() function from the "forecast" package.
-#' # This function does not have a modeling function and
-#' # instead calculates a forecast on the time series directly
-#' rwcv <- cvts(AirPassengers, FCFUN = rwf)
-#' 
+#' cvmod2 <- cvts(USAccDeaths, FUN = ets,
+#'                saveModels = FALSE, saveForecasts = FALSE,
+#'                windowSize = 36, maxHorizon = 12)
+#'
+#' cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
+#'                FCFUN = forecast, rolling = TRUE, windowSize = 48,
+#'                maxHorizon = 12)
+#'
 #' # We can also use custom functions, for example fcast()
 #' from the "GMDH" package
-#' \dontrun{
 #' library(GMDH)
 #' GMDHForecast <- function(x, h){fcast(x, f.number = h)}
 #' gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
 #' gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
+#'
+#' # Example with custom model function and forecast function
+#' customMod <- function(x){
+#'  result <- list()
+#'  result$series <- x
+#'  result$last <- tail(x, n = 1)
+#'  class(result) <- "customMod"
+#'  return(result)
 #' }
-#' 
+#' forecast.customMod <- function(x, h = 12){
+#'  result <- list()
+#'  result$model <- x
+#'  result$mean <- rep(x$last, h)
+#'  class(result) <- "forecast"
+#'  return(result)
+#' }
+#' cvobj <- cvts(AirPassengers, FUN = customMod, FCFUN = forecast.customMod)
+#'
+#' # Use the rwf() function from the "forecast" package.
+#' # This function does not have a modeling function and
+#' # instead calculates a forecast on the time series directly
+#' rwcv <- cvts(AirPassengers, FCFUN = rwf)
+#' }
+#'
+#' @author David Shaub
 cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
                  maxHorizon = 5,
@@ -126,28 +120,28 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   f = frequency(x)
   tspx <- tsp(x)
   if(is.null(tspx)){
-    x <- ts(x, f = f)
+    x <- ts(x, frequency = f)
   }
-  
-  
+
+
   if(any(sapply(c(x, windowSize, maxHorizon), FUN = function(x) !is.numeric(x)))){
     stop("The arguments x, windowSize, and maxHorizon must all be numeric.")
   }
-  
-  
+
+
   if(any(c(windowSize, maxHorizon) < 1L)){
     stop("The arguments windowSize, and maxHorizon must be positive integers.")
   }
-  
+
   if(any(c(windowSize, maxHorizon) %% 1L != 0)){
     stop("The arguments windowSize, and maxHorizon must be positive integers.")
   }
-  
+
   # Ensure at least two periods are tested
   if(windowSize + 2 * maxHorizon > length(x)){
     stop("The time series must be longer than windowSize + 2 * maxHorizon.")
   }
-  
+
   # Combined code for rolling/nonrolling CV
 
   results <- matrix(NA,
@@ -155,7 +149,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                     ncol = maxHorizon)
 
   forecasts <- fits <- vector("list", nrow(results))
-  
+
   # Needed for nonrolling
   startWindow <- 1
   endWindow <- windowSize
@@ -182,7 +176,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
       fetsp <- stsp + (windowSize - 1) / frequency(x) + maxHorizon * i / frequency(x)
     }
     ynext <- window(x, start = fstsp, end = fetsp)
-    
+
     # Perfom the simulation
     mod <- do.call(FUN, list(y))
     fc <- do.call(FCFUN, list(mod, h = maxHorizon))
@@ -198,8 +192,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   if(horizonAverage){
     results <- as.matrix(rowMeans(results), ncol = 1)
   }
-  
-  
+
+
   if(!saveModels){
     fits <- NULL
   }
@@ -212,23 +206,4 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 }
 
 
-#'Accuracy measures for cross-validated time series
-#'
-#'Returns range of summary measures of the cross-validated forecast accuracy for \code{cvts} objects.
-#'
-#'@param f a \code{cvts} objected created by \code{\link{cvts}}
-#'@param ... 
-#'@details
-#'Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy measures
-#'\code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy is calculated for each
-#'forecast horizon up to \code{maxHorizon}
-#'
-accuracy.cvts <- function(f, ...){
-  ME <- colMeans(f$residuals)
-  RMSE <- apply(f$residuals, MARGIN = 2, FUN = function(x){sqrt(sum(x ^ 2)/ length(x))})
-  MAE <- colMeans(abs(f$residuals))
-  results <- data.frame(ME, RMSE, MAE)
-  rownames(results) <- paste("Forecast Horizon ", rownames(results))
-  return(results)
-  # MASE TODO
-}
+
