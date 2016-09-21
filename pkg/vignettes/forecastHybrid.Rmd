@@ -21,7 +21,7 @@ The stable release of the package is hosted on [CRAN](https://cran.r-project.org
 install.packages("forecastHybrid")
 ```
 
-The latest development version can be installed using the "devtools"" package.
+The latest development version can be installed using the "devtools" package.
 ```{r github_install, eval = FALSE}
 devtools::install_github("ellisp/forecastHybrid/pkg")
 ```
@@ -82,7 +82,7 @@ plot(hm1, type = "models")
 
 ```
 
-By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles [see @Armstrong2001], but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass this value to the ```errorMethod``` argument and pass either ```"insample.errors"``` or ```"cv.errors"``` (currently unimplemented) to the ```weights``` argument.
+By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles [see @Armstrong2001], but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass this value to the ```errorMethod``` argument and pass either ```"insample.errors"``` or ```"cv.errors"``` to the ```weights``` argument.
 ```{r errorMethod}
 hm2 <- hybridModel(wineind, weights = "insample.errors", errorMethod = "MASE")
 hm2
