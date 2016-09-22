@@ -68,4 +68,9 @@ if(require(forecast) & require(testthat)){
     expect_error(plot(exampleModel, type = "fit"), NA)
     expect_error(plot(exampleModel, type = "models"), NA)
   })
+  context("Testing cv.errors")
+    test_that("Testing hybridModel(weights = \"cv.errors\")", {
+      expect_error(cvMod <- hybridModel(woolyrnq, weights = "cv.errors"), NA)
+      expect_false(all.equal(cvMod$weights))
+    })
 }
