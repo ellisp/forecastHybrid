@@ -71,6 +71,6 @@ if(require(forecast) & require(testthat)){
   context("Testing cv.errors")
     test_that("Testing hybridModel(weights = \"cv.errors\")", {
       expect_error(cvMod <- hybridModel(woolyrnq, weights = "cv.errors"), NA)
-      expect_false(all.equal(cvMod$weights))
+      expect_true(length(cvMod$weights) == length(unique(cvMod$weights)))
     })
 }
