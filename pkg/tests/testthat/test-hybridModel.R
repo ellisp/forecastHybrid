@@ -6,7 +6,7 @@ if(require(forecast) & require(testthat)){
     expect_error(hybridModel(y = 1:10, models = 5))
     expect_error(hybridModel(y = matrix(1:10, nrow = 5, ncol = 2),
                              models = 5))
-    # Test for invalid mistmatch length of y and xreg in a.args/s.args later?
+    # Test for invalid mismatch length of y and xreg in a.args/s.args later?
     badxreg <- data.frame(rnorm(length(wineind) - 1))
     expect_warning(expect_error(hybridModel(y = wineind,
                                             a.args = list(xreg = badxreg))))
@@ -37,7 +37,7 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(ts(rnorm(20), f = 12), models = "aes"))
     # Currently unimplemented features
     expect_warning(hybridModel(wineind, models = "ae", parallel = TRUE))
-    expect_warning(hybridModel(wineind, models = "ae", weights = "cv.errors"))
+    #expect_warning(hybridModel(wineind, models = "ae", weights = "cv.errors"))
   })
   test_that("Testing valid inputs", {
     set.seed(54321)
