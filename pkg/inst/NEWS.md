@@ -1,9 +1,12 @@
-# Version 0.2.0 [Unreleased]
-* Add parallel processing between models TODO
-* Add timeseries cross validation wtih `cvts()`
+# Version 0.2.0 [2016-09-23]
+* Add timeseries cross validation with `cvts()`
 * Add support for `weights = "cv.errors"` in `hybridModel()`
 * Fix model weights when `weights = "insample.errors"` and one or more component models perfectly fit the time series
 * Fixed erroneous warning message when `xreg` is included in `n.args` but a `nnetar` model is not included in the model list
+* Clean up titles in `plot.hybridModel()`
+* Enable passing `...` arguments to `plot()` from `plot.hybridModel()`
+* Round weights in `print.hybridModel()` to three digits for cleaner display
+* Add `verbose` argument and enable by default in `hybridModel()` to display fitting/cross validation progress
 
 # Version 0.1.7 [2016-06-04]
 * Build vignette with `knitr rmarkdown` engine
