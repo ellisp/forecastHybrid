@@ -185,7 +185,7 @@ forecast.hybridModel <- function(object,
 
   # Build a forecast object
   forecasts$x <- forecasts[[object$models[1]]]$x
-  forecasts$method <- paste0(object$models, " with weight ", object$weights)
+  forecasts$method <- paste0(object$models, " with weight ", round(object$weights, 3))
   forecasts$level <- level
   class(forecasts) <- "forecast"
   return(forecasts)
