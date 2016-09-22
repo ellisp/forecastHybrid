@@ -557,7 +557,7 @@ print.hybridModel <- function(x, ...){
   cat("\n")
   for(i in x$models){
     cat("############\n")
-    cat(i, "with weight", x$weights[i], "\n")
+    cat(i, "with weight", round(x$weights[i], 3), "\n")
     #cat("############\n")
   }
 }
