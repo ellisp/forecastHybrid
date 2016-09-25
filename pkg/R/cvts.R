@@ -123,11 +123,9 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     x <- ts(x, frequency = f)
   }
 
-
   if(any(sapply(c(x, windowSize, maxHorizon), FUN = function(x) !is.numeric(x)))){
     stop("The arguments x, windowSize, and maxHorizon must all be numeric.")
   }
-
 
   if(any(c(windowSize, maxHorizon) < 1L)){
     stop("The arguments windowSize, and maxHorizon must be positive integers.")
@@ -192,7 +190,6 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   if(horizonAverage){
     results <- as.matrix(rowMeans(results), ncol = 1)
   }
-
 
   if(!saveModels){
     fits <- NULL
