@@ -31,7 +31,7 @@
 #' For the rolling approach, training points are heavily recycled, both in terms of used for fitting
 #' and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}. In constrast, the models fit with
 #' the non-rolling approach share less overlap, and the predicted forecast values are also only compared to the actual values once.
-#' The former approach is similar to leave-one-out cross validatoin whlie the latter resembles k-fold cross validation. As a result,
+#' The former approach is similar to leave-one-out cross validatoin while the latter resembles k-fold cross validation. As a result,
 #' rolling cross validation requires far more iterations and computationally takes longer to complete, but a disadvantage of the
 #' non-rolling approach is the greater variance and general instability of cross-validated errors.
 #' \cr
