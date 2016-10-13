@@ -21,10 +21,10 @@ if(require(forecast) &  require(testthat)){
     # If xreg is used and no h is provided, overwrite h
     expect_error(tmp <- forecast(aa, xreg = matrix(rnorm(20), nrow = 20)), NA)
     # If nrow(xreg) != h, issue a warning but set h <- nrow(xreg)
-    expect_warning(forecast(aa, h = 10, xreg = matrix(rnorm(20), nrow = 20)))
-    expect_error(forecast(aa, xreg = matrix(rnorm(24), nrow = 24)), NA)
-    expect_true(length(forecast(aa, xreg = matrix(rnorm(24), nrow = 24))$mean) == 24L)
-    expect_true(class(forecast(aa, xreg = matrix(rnorm(24), nrow = 24))) == "forecast")
+    expect_warning(forecast(aa, h = 10, xreg = matrix(rnorm(20), nrow = 20), PI = FALSE))
+    expect_error(forecast(aa, xreg = matrix(rnorm(24), nrow = 24), PI = FALSE), NA)
+    expect_true(length(forecast(aa, xreg = matrix(rnorm(24), nrow = 24), PI = FALSE)$mean) == 24L)
+    expect_true(class(forecast(aa, xreg = matrix(rnorm(24), nrow = 24), PI = FALSE)) == "forecast")
     # Prediction intervals for nnetar are nondeterministic, so this will fail
     #expect_true(all(forecast(aa, xreg = mm,  h = nrow(mm), level = 0.9)$upper == forecast(aa, xreg = mm,  h = nrow(mm), level = 90)$upper))
     expect_error(forecast(aa, xreg = mm, level = 110))
