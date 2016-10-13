@@ -1,6 +1,6 @@
 Package: forecastHybrid
 Title: Convenient Functions for Ensemble Time Series Forecasts
-Version: 0.2.0
+Version: 0.3.0
 Date: 2016-09-23
 Authors@R: c(
    person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
@@ -12,7 +12,7 @@ Description: Convenient functions for ensemble forecasts in R combining
     in-sample errors. Future methods such as cross validation are planned.
 Depends:
     R (>= 3.1.1),
-    forecast (>= 7.1)
+    forecast (>= 7.3)
 Suggests:
     knitr,
     rmarkdown,
