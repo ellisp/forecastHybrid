@@ -142,31 +142,34 @@ forecast.hybridModel <- function(object,
   resid <- object$x - fits
 
   # Construct the prediction intervals
-  nint <- length(level)
-  upper <- lower <- matrix(NA, ncol = nint, nrow = length(finalForecast))
-  # Prediction intervals for nnetar do not currently work, so exclude these
-  piModels <- object$models#[object$models != "nnetar"]
-  # Produce each upper/lower limit
-  for(i in 1:nint){
-    # Produce the upper/lower limit for each model for a given level
-    tmpUpper <- tmpLower <- matrix(NA, nrow = h, ncol = length(piModels))
-    j2 <- 1
-    for(j in piModels){
-      tmpUpper[, j2] <- as.numeric(forecasts[[j]]$upper[, i])
-      tmpLower[, j2] <- as.numeric(forecasts[[j]]$lower[, i])
-      j2 <- j2 + 1
-    }
-    # upper/lower prediction intervals are the extreme values for now
-    # We can modify it for other approaches by changing the FUN here
-    upper[, i] <- apply(tmpUpper, 1, FUN = max)
-    lower[, i] <- apply(tmpLower, 1, FUN = min)
+  if(PI){
+     nint <- length(level)
+     upper <- lower <- matrix(NA, ncol = nint, nrow = length(finalForecast))
+     # Prediction intervals for nnetar do not currently work, so exclude these
+     piModels <- object$models#[object$models != "nnetar"]
+     # Produce each upper/lower limit
+     for(i in 1:nint){
+        # Produce the upper/lower limit for each model for a given level
+        tmpUpper <- tmpLower <- matrix(NA, nrow = h, ncol = length(piModels))
+        j2 <- 1
+        for(j in piModels){
+           tmpUpper[, j2] <- as.numeric(forecasts[[j]]$upper[, i])
+           tmpLower[, j2] <- as.numeric(forecasts[[j]]$lower[, i])
+           j2 <- j2 + 1
+        }
+        # upper/lower prediction intervals are the extreme values for now
+        # We can modify it for other approaches by changing the FUN here
+        upper[, i] <- apply(tmpUpper, 1, FUN = max)
+        lower[, i] <- apply(tmpLower, 1, FUN = min)
+     }
+     if(!is.finite(max(upper)) || !is.finite(min(lower))){
+        warning("Prediction intervals are not finite.")
+     }
+     colnames(lower) <- colnames(upper) <- paste0(level, "%")
+     forecasts$lower <- lower
+     forecasts$upper <- upper
   }
-  if(!is.finite(max(upper)) || !is.finite(min(lower))){
-    warning("Prediction intervals are not finite.")
-  }
-  colnames(lower) <- colnames(upper) <- paste0(level, "%")
-  forecasts$lower <- lower
-  forecasts$upper <- upper
+
 
   # Build the mean forecast as a ts object
   tsp.x <- tsp(object$x)
