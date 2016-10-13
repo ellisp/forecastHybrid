@@ -114,7 +114,7 @@ forecast.hybridModel <- function(object,
     forecasts$pointForecasts[, "ets"] <- forecasts$ets$mean
   }
   if("nnetar" %in% includedModels){
-    forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xreg)
+    forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xreg, PI = PI)
     forecasts$pointForecasts[, "nnetar"] <- forecasts$nnetar$mean
   }
   if("stlm" %in% includedModels){
@@ -145,7 +145,7 @@ forecast.hybridModel <- function(object,
   nint <- length(level)
   upper <- lower <- matrix(NA, ncol = nint, nrow = length(finalForecast))
   # Prediction intervals for nnetar do not currently work, so exclude these
-  piModels <- object$models[object$models != "nnetar"]
+  piModels <- object$models#[object$models != "nnetar"]
   # Produce each upper/lower limit
   for(i in 1:nint){
     # Produce the upper/lower limit for each model for a given level
