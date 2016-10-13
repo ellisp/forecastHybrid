@@ -12,6 +12,9 @@
 #' @param level confidence level for prediction intervals. This can be expressed as a decimal between 0.0 and 1.0 or numeric
 #' between 0 and 100.
 #' @param fan if \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.
+#' @param PI should prediction intervals be produced? If a \code{nnetar} model is in the ensemble, this can be quite slow,
+#' so disabling prediction intervals will speed up the forecast generation. If \code{FALSE}, the arguments \code{level}
+#' and \code{fan} are ignored.
 #' @param ... other arguments; currently not used.
 #' @seealso \code{\link{hybridModel}}
 #' @details if \code{xreg} was used in construcing the \code{hybridModel},
@@ -47,6 +50,7 @@ forecast.hybridModel <- function(object,
                                  h = ifelse(object$frequency > 1, 2 * object$frequency, 10),
                                  xreg = NULL,
                                  level = c(80, 95),
+                                 PI = TRUE,
                                  fan = FALSE, ...){
 
   # Check inputs
