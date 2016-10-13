@@ -1,3 +1,6 @@
+# Version 0.3.0 [Unreleased]
+* Prediction intervals are now created for `nnetar` objects in the ensemble. This should address one aspect of incorrect prediction intervals (e.g. issue #37).
+
 # Version 0.2.0 [2016-09-23]
 * Add timeseries cross validation with `cvts()`
 * Add support for `weights = "cv.errors"` in `hybridModel()`
