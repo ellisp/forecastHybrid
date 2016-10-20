@@ -10,5 +10,6 @@ if(require(forecast) &  require(testthat)){
   test_that("Testing valid inputs", {
      expect_error(cvts(AirPassengers, FUN = ets, FCFUN = forecast, rolling = FALSE, windowSize = 60, maxHorizon = 12), NA)
      expect_error(cvts(AirPassengers, FUN = ets, FCFUN = forecast, rolling = TRUE, windowSize = 60, maxHorizon = 12, verbose = FALSE), NA)
+     expect_error(cvts(rnorm(100), saveModels = FALSE, saveForecasts = FALSE), NA)
   })
 }
