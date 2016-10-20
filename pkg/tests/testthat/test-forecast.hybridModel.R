@@ -3,15 +3,15 @@ if(require(forecast) &  require(testthat)){
   context("Testing input for forecast.hybridModel()")
   test_that("Testing invalid inputs", {
     hModel <- hybridModel(woolyrnq)
-    expect_error(forecast.hybridModl(object = 1))
-    expect_error(forecast.hybridModl(object = hModel, h = -1L))
-    expect_error(forecast.hybridModl(object = hModel, h = "a"))
-    expect_error(forecast.hybridModl(object = hModel, h = 3.2))
-    expect_error(forecast.hybridModl(object = hModel, h = 5,
+    expect_error(forecast(object = 1))
+    expect_error(forecast(object = hModel, h = -1L))
+    expect_error(forecast(object = hModel, h = "a"))
+    expect_error(forecast(object = hModel, h = 3.2))
+    expect_error(forecast(object = hModel, h = 5,
                                      xreg = matrix(1:5, nrow = 5, ncol = 2)))
-    expect_error(forecast.hybridModl(object = hModel, h = 5,
+    expect_error(forecast(object = hModel, h = 5,
                                      xreg = matrix("a", nrow = 5, ncol = 2)))
-    expect_error(forecast.hybridModl(object = hModel, h = 5,
+    expect_error(forecast(object = hModel, h = 5,
                                      xreg = 1:12))
   })
   test_that("Testing forecasts with xreg", {
