@@ -363,7 +363,7 @@ hybridModel <- function(y, models = "aenst",
         modelResults$weights[index] <- accuracy(modResults$auto.arima)[cvHorizon, errorMethod]
       } else if(i == "e"){
         modelResults$weights[index] <- accuracy(modResults$ets)[cvHorizon, errorMethod]
-      } else if(i == "F"){
+      } else if(i == "f"){
          modelResults$weights[index] <- accuracy(modResults$thetam)[cvHorizon, errorMethod]
       } else if(i == "n"){
         modelResults$weights[index] <- accuracy(modResults$nnetar)[cvHorizon, errorMethod]
