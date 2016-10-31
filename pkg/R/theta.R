@@ -57,18 +57,17 @@ thetam <- function(y){
 #' @param fan If TRUE, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.
 forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10), 
                             level = c(80, 95), fan = FALSE, ...){
-   if (fan){ 
+   if (fan) {
       level <- seq(51, 99, by = 3)
-   }
-   else {
+   } else {
       if (min(level) > 0 & max(level) < 1) 
          level <- 100 * level
       else if (min(level) < 0 | max(level) > 99.99) 
          stop("Confidence limit out of range")
    }
-   fcast <- forecast::forecast.ets(object, h = h, level = level)
+   fcast <- forecast.ets(object, h = h, level = level, fan = fan)
    alpha <- fcast$model$par["alpha"]
-   fcast$mean <- fcast$mean + object$drift * (0:(h - 1) + (1 - (1 - alpha) ^ length(object$y)) / alpha)
+   fcast$mean <- fcast$mean + object$drift * (0:(h - 1) + (1 - (1 - alpha) ^ length(object$x)) / alpha)
    if(object$seasonal){
       fcast$mean <- fcast$mean * rep(object$seasadj, trunc(1 + h / object$m))[1:h]
    }
@@ -82,6 +81,5 @@ forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10),
    }
    return(fcast)
 }
-
 
 
