@@ -51,12 +51,15 @@ thetam <- function(y){
 #' Returns forecasts and other information for univariate Theta "models"
 #' 
 #' @export
-#' @param object An object of class "\code{thetam}.  Usuall the result of a call to \code{link{thetam}}.
+#' @param object An object of class "\code{thetam}.  Usually the result of a call to \code{link{thetam}}.
 #' @param h Number of periods for forecasting
 #' @param level Confidence level for prediction intervals
 #' @param fan If TRUE, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.
+#' @return An object of class \code{forecast}
+#' @author Peter Ellis
+#' @seealso \code{\link{thetam}}
 forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10), 
-                            level = c(80, 95), fan = FALSE, ...){
+                            level = c(80, 95), fan = FALSE){
    if (fan) {
       level <- seq(51, 99, by = 3)
    } else {

@@ -18,7 +18,7 @@ Create a model object as an interim step to a theta method forecast.
 \details{
 This fits an exponential smoothing state space model with \code{model = 'ANN'} to \code{y}, 
 having first performed classic multiplicative seasonal adjustment.  A drift value is also calculated
-by \code{lsfit(0:(length(y) - 1), y)$coef[2] / 2}.  In combination with \code{forecast.thetam}, this provides
+by \code{lsfit(0:(length(y) - 1), y)$coef[2] / 2}.  In combination with \code{forecast.thetam()}, this provides
 identical results to \code{forecast::thetaf(...)}.  The  purpose of splitting it into a `model` and 
 `forecast` functions is to make the approach consistent with other modelling / forecasting approaches
 used in \code{hybridModel()}.
