@@ -23,6 +23,10 @@ identical results to \code{forecast::thetaf(...)}.  The  purpose of splitting it
 `forecast` functions is to make the approach consistent with other modelling / forecasting approaches
 used in \code{hybridModel()}.
 }
+\examples{
+mod1 <- thetam(Nile)
+plot(mod1)
+}
 \author{
 Peter Ellis
 }

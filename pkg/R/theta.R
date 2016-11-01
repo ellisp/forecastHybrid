@@ -12,6 +12,9 @@
 #' used in \code{hybridModel()}.
 #' @return An object of class \code{thetam}
 #' @author Peter Ellis
+#' @examples 
+#' mod1 <- thetam(Nile)
+#' plot(mod1)
 #' @seealso \code{\link{forecast.thetam}}
 thetam <- function(y){
    n <- length(y)
@@ -41,7 +44,7 @@ thetam <- function(y){
    object$x <- origy
    object$drift <- stats::lsfit(0:(n - 1), y)$coef[2] / 2
    object$method <- "Theta"
-   class(object) <- "thetam"
+   class(object) <- c("thetam")
    
    return(object)
 }
@@ -56,6 +59,10 @@ thetam <- function(y){
 #' @param level Confidence level for prediction intervals
 #' @param fan If TRUE, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.
 #' @return An object of class \code{forecast}
+#' @examples
+#' mod1 <- thetam(Nile)
+#' fc1 <- forecast(mod1)
+#' plot(fc1)
 #' @author Peter Ellis
 #' @seealso \code{\link{thetam}}
 forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10), 
@@ -85,4 +92,17 @@ forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10),
    return(fcast)
 }
 
+#' Plot components from Theta model
+#' 
+#' Produces a plot of the level components from the ETS model underlying a Theta model
+#' @export
+#' @param x Object of class "thetam".
+#' @author Peter Ellis
+plot.thetam <- function(x, ...){
+   y <- x$x
+   plot(cbind(observed = y, level = x$states[, 1]), 
+        main = paste("Decomposition by", x$method, "method"), ...)
+   #TODO - add the slope
+}
 
+# TODO - autoplot.thetam

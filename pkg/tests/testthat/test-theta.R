@@ -32,3 +32,14 @@ fan2 <- thetaf(AirPassengers, level = c(75, 90))
 expect_equal(sum(fan1$upper - fan2$upper), 0)
 expect_equal(sum(fan1$lower - fan2$lower), 0)
 
+# another example
+fc1 <- thetaf(Nile)
+fc2 <- forecast(thetam(Nile))
+expect_equal(sum(fc2$mean - fc1$mean), 0)
+expect_equal(sum(fc2$upper - fc1$upper), 0)
+expect_equal(sum(fc2$lower - fc1$lower), 0)
+
+fc3 <- forecast(thetam(Nile), level = c(0.7, 0.9))
+expect_equal(sum(fc3$mean - fc1$mean), 0)
+expect_lt(sum(fc3$upper - fc1$upper), 0)
+expect_gt(sum(fc3$lower - fc1$lower), 0)
