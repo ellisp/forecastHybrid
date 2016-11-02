@@ -13,6 +13,6 @@ is.hybridModel(x)
 A boolean indicating if the object is a \code{hybridModel} is returned.
 }
 \description{
-Test if the object is a hybridModel object
+Test if the object is a \code{hybridModel} object.
 }
 

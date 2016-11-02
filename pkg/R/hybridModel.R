@@ -119,6 +119,11 @@ hybridModel <- function(y, models = "aenst",
   if(!length(y)){
     stop("The time series must have obserations")
   }
+    
+   if(length(y) < 4){
+      stop("The time series must have at least four observations")
+   }
+   
   y <- as.ts(y)
 
   # Match arguments to ensure validity

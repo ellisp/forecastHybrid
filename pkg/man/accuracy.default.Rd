@@ -11,10 +11,10 @@
 It will also work with Arima, ets and lm objects if x is omitted - in which case
 in-sample accuracy measures are returned.}
 
-\item{...}{other arguments (ignored)}
+\item{...}{other arguments (ignored).}
 }
 \description{
-Generic method for accuracy
+Generic method for accuracy.
 }
 \seealso{
 \code{\link[forecast]{accuracy}}, \code{\link{accuracy.hybridModel}}

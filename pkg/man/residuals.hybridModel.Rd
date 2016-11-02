@@ -7,7 +7,7 @@
 \method{residuals}{hybridModel}(object, individual = FALSE, ...)
 }
 \arguments{
-\item{object}{The input hybridModel}
+\item{object}{The input hybridModel.}
 
 \item{individual}{If \code{TRUE}, return the residuals of the component models instead
 of the residuals for the whole ensemble model.}
