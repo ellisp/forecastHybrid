@@ -12,7 +12,7 @@ accuracy(f, ...)
 \item{...}{other arguments (ignored).}
 }
 \description{
-Generic method for accuracy
+Generic method for accuracy.
 }
 \seealso{
 \code{\link[forecast]{accuracy}}, \code{\link{accuracy.hybridModel}}

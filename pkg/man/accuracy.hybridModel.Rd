@@ -18,7 +18,14 @@ of the accuracy for the whole ensemble model.}
 The accuracy of the ensemble or individual component models.
 }
 \description{
+Accuracy measures for hybridModel
+objects.
+}
+\details{
 Return the in-sample accuracy measures for the component models of the hybridModel
+}
+\author{
+David Shaub
 }
 \seealso{
 \code{\link[forecast]{accuracy}}

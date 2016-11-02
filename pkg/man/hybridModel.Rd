@@ -7,15 +7,16 @@
 hybridModel(y, models = "aenst", lambda = NULL, a.args = NULL,
   e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL,
   weights = c("equal", "insample.errors", "cv.errors"),
-  errorMethod = c("RMSE", "MAE", "MASE"), parallel = FALSE,
-  num.cores = 2L)
+  errorMethod = c("RMSE", "MAE", "MASE"), cvHorizon = frequency(y),
+  windowSize = 84, horizonAverage = FALSE, parallel = FALSE,
+  num.cores = 2L, verbose = TRUE)
 }
 \arguments{
 \item{y}{A numeric vector or time series.}
 
 \item{models}{A character string of up to five characters indicating which contributing models to use:
 a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), n (\code{\link[forecast]{nnetar}}),
-s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}})}
+s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}}).}
 
 \item{lambda}{Box-Cox transformation parameter.
 Ignored if NULL. Otherwise, data transformed before model is estimated.}
@@ -31,9 +32,12 @@ Ignored if NULL. Otherwise, data transformed before model is estimated.}
 \item{t.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}. See details.}
 
 \item{weights}{method for weighting the forecasts of the various contributing
-models.  Defaults to \code{equal}, which has shown to be robust and surprisingly better
-in many cases than giving more weight to models with better in-sample performance. Weights
-utilizing in-sample errors are also available. Cross validated errors are currently unimplemented.}
+models.  Defaults to \code{equal}, which has shown to be robust and better
+in many cases than giving more weight to models with better in-sample performance. Cross validated errors--implemented with \code{link{cvts}}
+should produce the best forecast, but the model estimation is also the slowest. Note that extra arguments
+passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} are not used
+during cross validation. See further explanation in \code{\link{cvts}}.
+Weights utilizing in-sample errors are also available but not recommended.}
 
 \item{errorMethod}{method of measuring accuracy to use if weights are not
 to be equal.
@@ -41,11 +45,22 @@ Root mean square error (\code{RMSE}), mean absolute error (\code{MAE})
 and mean absolute scaled error (\code{MASE})
 are supported.}
 
+\item{cvHorizon}{If \code{weights = "cv.errors"}, this controls which forecast to horizon to use
+for the error calculations.}
+
+\item{windowSize}{length of the window to build each model, only used when \code{weights = "cv.errors"}.}
+
+\item{horizonAverage}{If \code{weights = "cv.errors"}, setting this to \code{TRUE} will average
+all forecast horizons up to \code{cvHorizon} for calculating the errors instead of using
+the single horizon given in \code{cvHorizon}.}
+
 \item{parallel}{a boolean indicating if parallel processing should be used between models.
 This is currently unimplemented.
 Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.}
 
 \item{num.cores}{If \code{parallel=TRUE}, how many cores to use.}
+
+\item{verbose}{Should the status of which model is being fit/cross validated be printed to the terminal?}
 }
 \value{
 An object of class hybridModel.
@@ -60,10 +75,11 @@ The \code{hybridModel} function fits multiple individual model specifications to
 of ensemble forecasts. While default settings for the individual component models work quite well
 in most cases, fine control can be exerted by passing detailed arguments to the component models in the
 \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
-Note that if \code{xreg} is passed to the \code{a.args} or \code{n.args} component models
+Note that if \code{xreg} is passed to the \code{a.args}, \code{n.args}, or \code{s.args} component models
 it must be passed as a dataframe instead of the matrix object
 that the "forecast" package functions usually accept.
 This is due to a limitation in how the component models are called.
+\cr
 \cr
 Characteristics of the input series can cause problems for certain types of models and paramesters.
 For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal;
@@ -80,17 +96,28 @@ a series well with a seasonal period longer than 24 and will ignore the seasonal
 \examples{
 \dontrun{
 
+# Fit an auto.arima, ets, nnetar, stlm, and tbats model
+# on the time series with equal weights
 mod1 <- hybridModel(AirPassengers)
 plot(forecast(mod1))
+
+# Use an auto.arima, ets, and tbats model with weights
+# set by the MASE in-sample errors
 mod2 <- hybridModel(AirPassengers, models = "aet",
 weights = "insample.errors", errorMethod = "MASE")
+
+# Pass additional arguments to auto.arima() to control its fit
 mod3 <- hybridModel(AirPassengers, models = "aens",
 a.args = list(max.p = 7, max.q = 7, approximation = FALSE))
+
 # View the component auto.arima() and stlm() models
 mod3$auto.arima
 mod3$stlm
 }
 
+}
+\author{
+David Shaub
 }
 \seealso{
 \code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}},

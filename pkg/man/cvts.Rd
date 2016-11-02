@@ -5,55 +5,117 @@
 \title{Cross validation for time series}
 \usage{
 cvts(x, FUN = NULL, FCFUN = NULL, rolling = FALSE, windowSize = 84,
-  useHorizon = 5, maxHorizon = 5, horizonAverage = FALSE,
+  maxHorizon = 5, horizonAverage = FALSE, saveModels = ifelse(length(x) >
+  500, FALSE, TRUE), saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
   verbose = TRUE)
 }
 \arguments{
-\item{x}{the input time series}
+\item{x}{the input time series.}
 
-\item{FUN}{the model function used. See details.}
+\item{FUN}{the model function used. Custom functions are allowed. See details and examples.}
 
-\item{FCFUN}{a function that proces point forecasts for the model function. This defaults to \code{\link{forecast()}}.
+\item{FCFUN}{a function that process point forecasts for the model function. This defaults to \code{\link{forecast}}. Custom functions are allowed. See details and examples.
 See details.}
 
 \item{rolling}{should a rolling procedure be used? If TRUE, nonoverlapping windows of size \code{maxHorizon}
 will be used for fitting each model. If FALSE, the size of the dataset used for training will grow
 by one each iteration.}
 
-\item{maxHorizon}{maximum length of the forecast horizon to use for computing errors}
+\item{windowSize}{length of the window to build each model. When \code{rolling == FALSE}, the each model will be
+fit to a time series of this length, and when \code{rolling == TRUE} the first model will be fit to a series
+of this length and grow by one each iteration.}
+
+\item{maxHorizon}{maximum length of the forecast horizon to use for computing errors.}
 
 \item{horizonAverage}{should the final errors be an average over all forecast horizons up to \code{maxHorizon} instead of producing
 metrics for each individual horizon?}
 
-\item{verbose}{should the current progress be printed to the console?}
+\item{saveModels}{should the individual models be saved? Set this to \code{FALSE} on long time series to save memory.}
 
-\item{windoSize}{length of the window to build each model. When \code{rolling == TRUE}, the each model will be
-fit to a time series of this length, and when \code{rolling == FALSE} the first model will be fit to a series
-of this length and grow by one each iteration}
+\item{saveForecasts}{should the individual forecast from each model be saved? Set this to \code{FALSE} on long time series to save memory.}
+
+\item{verbose}{should the current progress be printed to the console?}
 }
 \description{
-Perform cross validation on time series
+Perform cross validation on a time series.
 }
 \details{
-Cross validation of time series is more complicated than regular k-folds of leave one out cross validation of datasets
+Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
 without serial correlation since observations \eqn{x_t}{x[t]} and \eqn{x_{t+n}}{x[t+n]} are not independent. The \code{cvts()} function overcomes
-this obstacle using two methods: rolling cross validation where an initial training window is used along with a forecast horizon
-and the initial window used for training grows by one each round until the training window and the forecast horizon capture the
-entire series or a nonrolling approach where a fixed training horizon is used that is shifted forward by the forecast horizon
+this obstacle using two methods: 1) rolling cross validation where an initial training window is used along with a forecast horizon
+and the initial window used for training grows by one observation each round until the training window and the forecast horizon capture the
+entire series or 2) a non-rolling approach where a fixed training length is used that is shifted forward by the forecast horizon
 after each iteration.
 \cr
 \cr
 For the rolling approach, training points are heavily recycled, both in terms of used for fitting
 and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}. In constrast, the models fit with
-the nonrolling approach share less overlap, and the predicted forecast values are also only compared to the actual values once.
-former approach is similar to leave one out cross validatoin whlie the latter resembles k-fold cross validation. As a result,
-rolling cross validation can use far more iterations and computationally take longer to complete, but a disadvantage of the
-nonrolling approach is the greater variance and general instability of cross validated errors.
+the non-rolling approach share less overlap, and the predicted forecast values are also only compared to the actual values once.
+The former approach is similar to leave-one-out cross validation while the latter resembles k-fold cross validation. As a result,
+rolling cross validation requires far more iterations and computationally takes longer to complete, but a disadvantage of the
+non-rolling approach is the greater variance and general instability of cross-validated errors.
+\cr
+\cr
+The \code{FUN} and \code{FCFUN} arguments specify which function to use
+for generating a model and forecasting, respectively. While the functions
+from the "forecast" package can be used, user-defined functions can also
+be tested, but the object returned by \code{FCFUN} must
+accept the argument \code{h} and contain the point forecasts out to
+this horizon \code{h} in slot \code{$mean} of the returned object. An example is given with
+a custom model and forecast.
+\cr
+\cr
+For small time series (default \code{length <= 500}), all of the individual fit models are included in the final
+\code{cvts} object that is returned. This can grow quite large since functions such as \code{auto.arima} will
+save fitted values, residual values, summary statistics, coefficient matrices, etc. Setting \code{saveModels = FALSE}
+can be safely done if there is no need to examine individual models fit at every stage of cross validation since the
+forecasts from each fold and the associated residuals are always saved.
 }
 \examples{
+cvmod1 <- cvts(AirPassengers, FUN = stlm,
+               windowSize = 48, maxHorizon = 12)
 
-cvmod1 <- cvts(AirPassengers, FUN = ets, FCFUN = forecast, rolling = TRUE, windowSize = 48, maxHorizon = 12)
-cvmod2 <- cvts(AirPassengers, FUN = hybridModel, FCFUN = forecast, rolling = TRUE, windowSize = 48, maxHorizon = 12)
+\dontrun{
+cvmod2 <- cvts(USAccDeaths, FUN = ets,
+               saveModels = FALSE, saveForecasts = FALSE,
+               windowSize = 36, maxHorizon = 12)
+
+cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
+               FCFUN = forecast, rolling = TRUE, windowSize = 48,
+               maxHorizon = 12)
+
+# We can also use custom functions, for example fcast()
+from the "GMDH" package
+library(GMDH)
+GMDHForecast <- function(x, h){fcast(x, f.number = h)}
+gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
+gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
+
+# Example with custom model function and forecast function
+customMod <- function(x){
+ result <- list()
+ result$series <- x
+ result$last <- tail(x, n = 1)
+ class(result) <- "customMod"
+ return(result)
+}
+forecast.customMod <- function(x, h = 12){
+ result <- list()
+ result$model <- x
+ result$mean <- rep(x$last, h)
+ class(result) <- "forecast"
+ return(result)
+}
+cvobj <- cvts(AirPassengers, FUN = customMod, FCFUN = forecast.customMod)
+
+# Use the rwf() function from the "forecast" package.
+# This function does not have a modeling function and
+# instead calculates a forecast on the time series directly
+rwcv <- cvts(AirPassengers, FCFUN = rwf)
 }
 
+}
+\author{
+David Shaub
+}
 

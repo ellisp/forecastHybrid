@@ -12,7 +12,7 @@
 \item{...}{other arguments (ignored).}
 }
 \description{
-Print information about the hybridModel object
+Print information about the \code{hybridModel} object.
 }
 \details{
 Print the names of the individual component models and their weights.

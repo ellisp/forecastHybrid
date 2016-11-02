@@ -14,9 +14,9 @@ If \code{type = "models"}, use the regular plot methods from the component model
 \code{\link[forecast]{plot.Arima}}, \code{\link[forecast]{plot.ets}},
 \code{\link[forecast]{plot.tbats}}. Note: no plot
 methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
-\code{type = "models"}}
+\code{type = "models"}.}
 
-\item{...}{other arguments (ignored).}
+\item{...}{other arguments passed to \link{plot}.}
 }
 \value{
 None. Function produces a plot.
@@ -37,6 +37,9 @@ hm <- hybridModel(woolyrnq, models = "aenst")
 plot(hm, type = "fit")
 plot(hm, type = "models")
 }
+}
+\author{
+David Shaub
 }
 \seealso{
 \code{\link{hybridModel}}
