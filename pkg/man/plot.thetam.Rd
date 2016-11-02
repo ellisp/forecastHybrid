@@ -4,10 +4,13 @@
 \alias{plot.thetam}
 \title{Plot components from Theta model}
 \usage{
-plot.thetam(x, ...)
+plot.thetam(object, ...)
 }
 \arguments{
-\item{x}{Object of class "thetam".}
+\item{object}{Object of class "thetam".}
+}
+\value{
+None.  Function produces a plot.
 }
 \description{
 Produces a plot of the level components from the ETS model underlying a Theta model

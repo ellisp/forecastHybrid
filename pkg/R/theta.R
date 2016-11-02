@@ -96,13 +96,30 @@ forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10),
 #' 
 #' Produces a plot of the level components from the ETS model underlying a Theta model
 #' @export
-#' @param x Object of class "thetam".
+#' @param object Object of class "thetam".
+#' @return None.  Function produces a plot.
 #' @author Peter Ellis
-plot.thetam <- function(x, ...){
-   y <- x$x
-   plot(cbind(observed = y, level = x$states[, 1]), 
-        main = paste("Decomposition by", x$method, "method"), ...)
-   #TODO - add the slope
+plot.thetam <- function(object, ...){
+   # TODO - resolve why states is one element longer than observed data!
+   y <- object$x
+   n <- length(y)
+   alpha <- object$par["alpha"]
+   dummytime <- 1:n
+   if(object$seasonal){
+      plotdata <- cbind(
+         observed = y, 
+         state = object$states[-1, 1], 
+         seasonal = object$seasadj + dummytime - dummytime,
+         linear = object$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(object$x)) / alpha)
+   ) } else {
+      plotdata <- cbind(
+         observed = y,
+         state = object$states[ -1, 1],
+         linear = object$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(object$x)) / alpha)
+      )
+   }
+   plot(plotdata, main = paste("Decomposition by Theta method"), ...)
+   
 }
 
-# TODO - autoplot.thetam
+
