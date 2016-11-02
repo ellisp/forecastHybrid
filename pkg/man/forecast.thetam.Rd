@@ -22,6 +22,11 @@ An object of class \code{forecast}
 \description{
 Returns forecasts and other information for univariate Theta "models"
 }
+\examples{
+mod1 <- thetam(Nile)
+fc1 <- forecast(mod1)
+plot(fc1)
+}
 \author{
 Peter Ellis
 }
