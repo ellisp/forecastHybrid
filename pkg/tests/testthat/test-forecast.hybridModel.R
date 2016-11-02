@@ -3,6 +3,7 @@ if(require(forecast) &  require(testthat)){
   context("Testing input for forecast.hybridModel()")
   test_that("Testing invalid inputs", {
     hModel <- hybridModel(woolyrnq)
+    expect_error(hybridModel(1:3, models = "ae"))
     expect_error(forecast(object = hModel, h = -1L))
     expect_error(forecast(object = hModel, h = "a"))
     expect_error(forecast(object = hModel, h = 3.2))
