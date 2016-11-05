@@ -4,7 +4,7 @@ Version: 0.3.0.9000
 Date: 2016-11-03
 Authors@R: c(
    person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
-   person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("ctb"))
+   person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("aut"))
    )
 Description: Convenient functions for ensemble forecasts in R combining
     approaches from the 'forecast' package. Forecasts generated from auto.arima(), ets(),
