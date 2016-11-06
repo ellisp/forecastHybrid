@@ -282,7 +282,7 @@ hybridModel <- function(y, models = "aefnst",
     if(verbose){
       cat("Fitting the tbats model\n")
     }
-    modelResults$tbats <- do.call(tbats, c(list(y), e.args))
+    modelResults$tbats <- do.call(tbats, c(list(y), t.args))
   }
 
   # Set the model weights
