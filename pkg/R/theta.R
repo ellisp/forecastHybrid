@@ -38,6 +38,7 @@ thetam <- function(y){
    
    if(seasonal) {
       object$seasadj <- utils::tail(decomp$seasonal, m)
+      object$seasadjhist <- decomp$seasona
    }
    
    object$seasonal <- seasonal
@@ -101,24 +102,32 @@ forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10),
 #' @param ... Other plotting parameters passed through to \code{plot}
 #' @method plot thetam
 #' @return None.  Function produces a plot.
+#' @details The "state" component of the plot comes from the model \code{ets(..., model = "ANN")} that
+#' was fit as part of the theta method.  The "seasonal" component is the multipliers from multiplicative classical 
+#' decomposition seasonal adjustment that is performed before the \code{ets} model is fit.  The "linear"
+#' component shows the direction and slope of drift that is used in the forecasting to come.
+#' @examples
+#' model <- thetam(Nile)
+#' plot(model)
 #' @author Peter Ellis
+#' @seealso \code{\link{thetam}}
 plot.thetam <- function(x, ...){
-   # TODO - resolve why states is one element longer than observed data!
+   # Note that "states" from an object created by ets is one element longer than observed data.
    y <- x$x
    n <- length(y)
    alpha <- x$par["alpha"]
-   dummytime <- 1:n
+   linear <- x$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(x$x)) / alpha)
    if(x$seasonal){
       plotdata <- cbind(
          observed = y, 
          state = x$states[-1, 1], 
-         seasonal = x$seasadj + dummytime - dummytime,
-         linear = x$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(x$x)) / alpha)
+         seasonal = x$seasadjhist,
+         linear = linear
    ) } else {
       plotdata <- cbind(
          observed = y,
          state = x$states[ -1, 1],
-         linear = x$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(x$x)) / alpha)
+         linear = linear
       )
    }
    plot(plotdata, main = paste("Decomposition by Theta method"), ...)

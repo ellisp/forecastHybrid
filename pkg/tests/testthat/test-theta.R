@@ -54,3 +54,11 @@ test_that("hybrid models with theta give same results as when done manually", {
   expect_equal(sum((fc2a$mean + fc2b$mean) / 2 - fc1$mean), 0)
      
 })
+
+test_that("Generic `forecast` methods work on thetam objects", {
+   mod1 <- thetam(wineind)
+   plot(mod1)
+   forecast(mod1)
+   accuracy(mod1)
+   
+})

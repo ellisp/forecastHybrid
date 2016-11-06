@@ -17,7 +17,20 @@ None.  Function produces a plot.
 \description{
 Produces a plot of the level components from the ETS model underlying a Theta model
 }
+\details{
+The "state" component of the plot comes from the model \code{ets(..., model = "ANN")} that
+was fit as part of the theta method.  The "seasonal" component is the multipliers from multiplicative classical 
+decomposition seasonal adjustment that is performed before the \code{ets} model is fit.  The "linear"
+component shows the direction and slope of drift that is used in the forecasting to come.
+}
+\examples{
+model <- thetam(Nile)
+plot(model)
+}
 \author{
 Peter Ellis
+}
+\seealso{
+\code{\link{thetam}}
 }
 

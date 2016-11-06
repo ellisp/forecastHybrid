@@ -7,6 +7,3 @@
 ## ----load_library, message = FALSE---------------------------------------
 library(forecastHybrid)
 
-## ----plot_forecast, cache = TRUE-----------------------------------------
-plot(hForecast) 
-
