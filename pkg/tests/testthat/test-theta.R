@@ -44,7 +44,10 @@ test_that("the forecast(thetam(...)) returns the same results as thetaf(...)", {
    expect_gt(sum(fc3$lower - fc1$lower), 0)
 })
 
-
+test_that("invalid inputs to thetam", {
+   expect_error(thetam("hello"))
+   expect_error(thetam(mtcars))
+})
 
 test_that("hybrid models with theta give same results as when done manually", {
   mod1 <- hybridModel(gas, models = "ef") 
@@ -57,8 +60,9 @@ test_that("hybrid models with theta give same results as when done manually", {
 
 test_that("Generic `forecast` methods work on thetam objects", {
    mod1 <- thetam(wineind)
-   plot(mod1)
-   forecast(mod1)
-   accuracy(mod1)
-   
+   expect_error(plot(mod1), NA)
+   expect_error(forecast(mod1), NA)
+   expect_error(accuracy(mod1), NA)
+   expect_error(residuals(mod1), NA)
+   expect_error(fitted(mod1), NA)
 })

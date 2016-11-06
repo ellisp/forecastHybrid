@@ -45,7 +45,7 @@ thetam <- function(y){
    object$x <- origy
    object$drift <- stats::lsfit(0:(n - 1), y)$coef[2] / 2
    object$method <- "Theta"
-   class(object) <- c("thetam")
+   class(object) <- c("thetam", "ets")
    
    return(object)
 }
