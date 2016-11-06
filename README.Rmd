@@ -4,7 +4,7 @@
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/forecastHybrid)](http://www.r-pkg.org/pkg/forecastHybrid)
 
 # forecastHybrid
-Convenient functions for ensemble forecasts in R combining approaches from the [forecast](https://github.com/robjhyndman/forecast) package
+Convenient functions for ensemble forecasts in R combining approaches from the [forecast](https://github.com/robjhyndman/forecast) package.
 
 For a more detailed description of the package and usage, consult the [vignette](https://cran.r-project.org/web/packages/forecastHybrid/vignettes/forecastHybrid.html).
 
@@ -29,7 +29,7 @@ Version updates to CRAN will be published frequently after new features are impl
 
 ```{r cache = TRUE}
 library(forecastHybrid)
- 
+
 # Build a hybrid forecast on the wineind dataset using auto.arima, ets, and tbats models.
 # Each model is given equal weight
 hm1 <- hybridModel(wineind, models = "aet", weights = "equal")

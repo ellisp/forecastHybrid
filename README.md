@@ -4,7 +4,7 @@
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/forecastHybrid)](http://www.r-pkg.org/pkg/forecastHybrid)
 
 # forecastHybrid
-Convenient functions for ensemble forecasts in R combining approaches from the [forecast](https://github.com/robjhyndman/forecast) package
+Convenient functions for ensemble forecasts in R combining approaches from the [forecast](https://github.com/robjhyndman/forecast) package.
 
 For a more detailed description of the package and usage, consult the [vignette](https://cran.r-project.org/web/packages/forecastHybrid/vignettes/forecastHybrid.html).
 
@@ -31,7 +31,7 @@ Version updates to CRAN will be published frequently after new features are impl
 
 ```r
 library(forecastHybrid)
- 
+
 # Build a hybrid forecast on the wineind dataset using auto.arima, ets, and tbats models.
 # Each model is given equal weight
 hm1 <- hybridModel(wineind, models = "aet", weights = "equal")
@@ -48,7 +48,7 @@ hm1 <- hybridModel(wineind, models = "aet", weights = "equal")
 plot(forecast(hm1, h = 48))
 ```
 
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 
 ```r
 # Build the ensemble model on the same data but this time use auto.arima, nnetar, stlm, and tbats models.
@@ -67,7 +67,7 @@ hm2 <- hybridModel(wineind, models = "anst", weights = "equal")
 plot(forecast(hm2, h = 48))
 ```
 
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-2.png)
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-2.png)
 
 ```r
 # Extract the point forecasts from this model
@@ -78,16 +78,16 @@ fc$mean
 ```
 ##           Jan      Feb      Mar      Apr      May      Jun      Jul
 ## 1994                                                               
-## 1995 16720.19 20510.73 23942.53 24524.77 23989.32 24461.21 29362.26
-## 1996 16306.55 20716.57 23929.71 25067.83 24189.99 24385.75 29472.49
-## 1997 15838.69 20398.61 23551.80 25063.00 24027.20 24478.94 29405.79
-## 1998 15518.45 20343.42 23412.92 24642.51 23939.90 24512.96 29224.08
+## 1995 16201.35 20881.82 24108.16 24289.46 24099.33 24461.89 29209.40
+## 1996 15867.52 20527.05 24004.26 24567.30 23822.42 24483.89 29136.83
+## 1997 15739.09 20266.73 23692.47 24480.22 23639.51 24186.83 29006.33
+## 1998 15655.18 20278.66 23605.34 24629.38 23644.49 24286.92 29177.41
 ##           Aug      Sep      Oct      Nov      Dec
-## 1994          25346.72 26194.46 31832.46 35272.60
-## 1995 26926.20 25092.87 26120.77 31440.40 36271.90
-## 1996 26375.44 24686.76 26071.69 31654.00 36466.92
-## 1997 26570.11 24414.52 26043.36 31603.25 36362.85
-## 1998 26309.60
+## 1994          24963.59 26536.81 31868.13 36154.68
+## 1995 26880.68 24310.59 26440.99 31474.53 35888.28
+## 1996 26157.92 24352.95 25981.21 31503.84 35587.18
+## 1997 26435.72 24452.37 25985.84 31418.15 36013.63
+## 1998 25880.67
 ```
 
 ```r
