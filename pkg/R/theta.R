@@ -17,6 +17,14 @@
 #' plot(mod1)
 #' @seealso \code{\link{forecast.thetam}}
 thetam <- function(y){
+   if (any(class(y) %in% c("data.frame", "list", "matrix", "mts"))) {
+      stop("y should be a univariate time series")
+   }
+   if(!is.numeric(y)){
+      stop("y should be numeric")
+   }
+   y <- as.ts(y)
+   
    n <- length(y)
    m <- frequency(y)
    if (m > 1) {
@@ -107,7 +115,7 @@ forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10),
 #' decomposition seasonal adjustment that is performed before the \code{ets} model is fit.  The "linear"
 #' component shows the direction and slope of drift that is used in the forecasting to come.
 #' @examples
-#' model <- thetam(Nile)
+#' model <- thetam(wineind)
 #' plot(model)
 #' @author Peter Ellis
 #' @seealso \code{\link{thetam}}
