@@ -6,6 +6,7 @@ library(forecastHybrid)
 knit("README.Rmd", "README.md")
 
 document("pkg")
+build_vignettes("pkg")
 test("pkg")
 check("pkg")
 

@@ -5,7 +5,7 @@
 \title{Forecast using a Theta model}
 \usage{
 \method{forecast}{thetam}(object, h = ifelse(object$m > 1, 2 * object$m, 10),
-  level = c(80, 95), fan = FALSE)
+  level = c(80, 95), fan = FALSE, ...)
 }
 \arguments{
 \item{object}{An object of class "\code{thetam}.  Usually the result of a call to \code{link{thetam}}.}
@@ -15,6 +15,8 @@
 \item{level}{Confidence level for prediction intervals}
 
 \item{fan}{If TRUE, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.}
+
+\item{...}{Ignored}
 }
 \value{
 An object of class \code{forecast}

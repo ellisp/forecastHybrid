@@ -58,6 +58,7 @@ thetam <- function(y){
 #' @param h Number of periods for forecasting
 #' @param level Confidence level for prediction intervals
 #' @param fan If TRUE, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.
+#' @param ... Ignored
 #' @return An object of class \code{forecast}
 #' @examples
 #' mod1 <- thetam(Nile)
@@ -66,7 +67,7 @@ thetam <- function(y){
 #' @author Peter Ellis
 #' @seealso \code{\link{thetam}}
 forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10), 
-                            level = c(80, 95), fan = FALSE){
+                            level = c(80, 95), fan = FALSE, ...){
    if (fan) {
       level <- seq(51, 99, by = 3)
    } else {
@@ -96,26 +97,28 @@ forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10),
 #' 
 #' Produces a plot of the level components from the ETS model underlying a Theta model
 #' @export
-#' @param object Object of class "thetam".
+#' @param x Object of class "thetam".
+#' @param ... Other plotting parameters passed through to \code{plot}
+#' @method plot thetam
 #' @return None.  Function produces a plot.
 #' @author Peter Ellis
-plot.thetam <- function(object, ...){
+plot.thetam <- function(x, ...){
    # TODO - resolve why states is one element longer than observed data!
-   y <- object$x
+   y <- x$x
    n <- length(y)
-   alpha <- object$par["alpha"]
+   alpha <- x$par["alpha"]
    dummytime <- 1:n
-   if(object$seasonal){
+   if(x$seasonal){
       plotdata <- cbind(
          observed = y, 
-         state = object$states[-1, 1], 
-         seasonal = object$seasadj + dummytime - dummytime,
-         linear = object$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(object$x)) / alpha)
+         state = x$states[-1, 1], 
+         seasonal = x$seasadj + dummytime - dummytime,
+         linear = x$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(x$x)) / alpha)
    ) } else {
       plotdata <- cbind(
          observed = y,
-         state = object$states[ -1, 1],
-         linear = object$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(object$x)) / alpha)
+         state = x$states[ -1, 1],
+         linear = x$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(x$x)) / alpha)
       )
    }
    plot(plotdata, main = paste("Decomposition by Theta method"), ...)

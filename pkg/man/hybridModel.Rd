@@ -4,7 +4,7 @@
 \alias{hybridModel}
 \title{Hybrid time series modelling}
 \usage{
-hybridModel(y, models = "aenst", lambda = NULL, a.args = NULL,
+hybridModel(y, models = "aefnst", lambda = NULL, a.args = NULL,
   e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL,
   weights = c("equal", "insample.errors", "cv.errors"),
   errorMethod = c("RMSE", "MAE", "MASE"), cvHorizon = frequency(y),
@@ -97,7 +97,7 @@ a series well with a seasonal period longer than 24 and will ignore the seasonal
 \examples{
 \dontrun{
 
-# Fit an auto.arima, ets, nnetar, stlm, and tbats model
+# Fit an auto.arima, ets, thetam, nnetar, stlm, and tbats model
 # on the time series with equal weights
 mod1 <- hybridModel(AirPassengers)
 plot(forecast(mod1))

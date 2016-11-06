@@ -73,7 +73,7 @@
 #' @examples
 #' \dontrun{
 #'
-#' # Fit an auto.arima, ets, nnetar, stlm, and tbats model
+#' # Fit an auto.arima, ets, thetam, nnetar, stlm, and tbats model
 #' # on the time series with equal weights
 #' mod1 <- hybridModel(AirPassengers)
 #' plot(forecast(mod1))
@@ -94,7 +94,7 @@
 #'
 #' @author David Shaub
 #'
-hybridModel <- function(y, models = "aenst",
+hybridModel <- function(y, models = "aefnst",
                         lambda = NULL,
                         a.args = NULL,
                         e.args = NULL,
@@ -117,7 +117,7 @@ hybridModel <- function(y, models = "aenst",
     stop("The time series must be numeric and may not be a matrix or dataframe object.")
   }
   if(!length(y)){
-    stop("The time series must have obserations")
+    stop("The time series must have observations")
   }
     
    if(length(y) < 4){
@@ -129,7 +129,7 @@ hybridModel <- function(y, models = "aenst",
   # Match arguments to ensure validity
   weights <- match.arg(weights)
   errorMethod <- match.arg(errorMethod)
-
+  
   # Match the specified models
   expandedModels <- unique(tolower(unlist(strsplit(models, split = ""))))
   if(length(expandedModels) > 6L){

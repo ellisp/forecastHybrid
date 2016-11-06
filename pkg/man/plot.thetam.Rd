@@ -4,10 +4,12 @@
 \alias{plot.thetam}
 \title{Plot components from Theta model}
 \usage{
-plot.thetam(object, ...)
+\method{plot}{thetam}(x, ...)
 }
 \arguments{
-\item{object}{Object of class "thetam".}
+\item{x}{Object of class "thetam".}
+
+\item{...}{Other plotting parameters passed through to \code{plot}}
 }
 \value{
 None.  Function produces a plot.

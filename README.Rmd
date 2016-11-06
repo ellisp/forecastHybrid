@@ -27,7 +27,7 @@ Version updates to CRAN will be published frequently after new features are impl
 
 ```{r}
 library(forecastHybrid)
-
+ 
 # Build a hybrid forecast on the wineind dataset using auto.arima, ets, and tbats models.
 # Each model is given equal weight
 hm1 <- hybridModel(wineind, models = "aet", weights = "equal")

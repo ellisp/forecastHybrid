@@ -1,6 +1,6 @@
 # Version 0.3.0 [Unreleased]
 * Prediction intervals are now created for `nnetar` objects in the ensemble. This should address one aspect of incorrect prediction intervals (e.g. issue #37).
-* theta models can be added (by including "`f`" in the `models=` argument for `hybridModel()`)
+* theta models can be added (by including "`f`" in the `models=` argument for `hybridModel()`) and are indeed part of the default - so by default, hybridModel() will now fit six models
 * `accuracy.cvts` is exported
 * Time series must be at least four observations long
 
