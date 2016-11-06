@@ -1,10 +1,12 @@
 [![Travis-CI Build Status](https://travis-ci.org/ellisp/forecastHybrid.svg?branch=master)](https://travis-ci.org/ellisp/forecastHybrid)
 [![Coverage Status](https://coveralls.io/repos/github/ellisp/forecastHybrid/badge.svg?branch=master)](https://coveralls.io/github/ellisp/forecastHybrid?branch=master)
 [![CRAN version](http://www.r-pkg.org/badges/version/forecastHybrid)](http://www.r-pkg.org/pkg/forecastHybrid)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/ggseas)](http://www.r-pkg.org/pkg/ggseas)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/forecastHybrid)](http://www.r-pkg.org/pkg/forecastHybrid)
 
 # forecastHybrid
 Convenient functions for ensemble forecasts in R combining approaches from the [forecast](https://github.com/robjhyndman/forecast) package
+
+For a more detailed description of the package and usage, consult the [vignette](https://cran.r-project.org/web/packages/forecastHybrid/vignettes/forecastHybrid.html).
 
 The package is still under heavy development, but many basic features have been implemented. Some features (such as optimized parallelization between rather than within models, cross validation for determing model error rates, and automatically selecting the optimal combination of base models) have not yet been developed.
 
@@ -29,7 +31,7 @@ Version updates to CRAN will be published frequently after new features are impl
 
 ```r
 library(forecastHybrid)
-
+ 
 # Build a hybrid forecast on the wineind dataset using auto.arima, ets, and tbats models.
 # Each model is given equal weight
 hm1 <- hybridModel(wineind, models = "aet", weights = "equal")
@@ -46,7 +48,7 @@ hm1 <- hybridModel(wineind, models = "aet", weights = "equal")
 plot(forecast(hm1, h = 48))
 ```
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
 
 ```r
 # Build the ensemble model on the same data but this time use auto.arima, nnetar, stlm, and tbats models.
@@ -65,7 +67,7 @@ hm2 <- hybridModel(wineind, models = "anst", weights = "equal")
 plot(forecast(hm2, h = 48))
 ```
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-2.png)
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-2.png)
 
 ```r
 # Extract the point forecasts from this model
@@ -76,16 +78,16 @@ fc$mean
 ```
 ##           Jan      Feb      Mar      Apr      May      Jun      Jul
 ## 1994                                                               
-## 1995 15919.95 20332.41 23732.14 25154.14 23675.65 23958.53 29351.03
-## 1996 15469.95 20195.38 23196.22 24540.52 23848.19 24260.74 28693.68
-## 1997 15450.77 19946.43 23300.70 24498.34 23898.09 24346.73 28896.38
-## 1998 15311.75 20080.21 23061.14 24380.98 23801.07 24410.19 28770.02
+## 1995 16720.19 20510.73 23942.53 24524.77 23989.32 24461.21 29362.26
+## 1996 16306.55 20716.57 23929.71 25067.83 24189.99 24385.75 29472.49
+## 1997 15838.69 20398.61 23551.80 25063.00 24027.20 24478.94 29405.79
+## 1998 15518.45 20343.42 23412.92 24642.51 23939.90 24512.96 29224.08
 ##           Aug      Sep      Oct      Nov      Dec
-## 1994          24448.92 26624.91 31775.10 35879.09
-## 1995 26866.32 24207.95 26069.12 31657.68 36110.12
-## 1996 26282.85 24104.62 25812.04 31303.98 35955.70
-## 1997 26726.68 23714.78 25804.57 31223.07 35734.26
-## 1998 26406.37
+## 1994          25346.72 26194.46 31832.46 35272.60
+## 1995 26926.20 25092.87 26120.77 31440.40 36271.90
+## 1996 26375.44 24686.76 26071.69 31654.00 36466.92
+## 1997 26570.11 24414.52 26043.36 31603.25 36362.85
+## 1998 26309.60
 ```
 
 ```r
@@ -152,7 +154,7 @@ fc$lower
 
 ```
 ##            80%       95%
-##  [1,] 21607.82 20694.346
+##  [1,] 22270.74 20694.346
 ##  [2,] 22902.75 21598.537
 ##  [3,] 29048.62 27389.280
 ##  [4,] 31109.96 29327.301
@@ -168,7 +170,7 @@ fc$lower
 ## [14,] 21816.55 20527.275
 ## [15,] 27740.78 26096.665
 ## [16,] 29780.03 28009.915
-## [17,] 12182.56 10698.506
+## [17,] 12562.57 10698.506
 ## [18,] 17174.51 15989.302
 ## [19,] 20323.72 18427.796
 ## [20,] 20181.36 18967.695
@@ -203,7 +205,7 @@ fc$lower
 ```
 
 ```r
-# Produce a forecast with prediction interavals at the 70%, 80%, 90%, and 95% levels
+# Produce a forecast with prediction intervals at the 70%, 80%, 90%, and 95% levels
 fc2 <- forecast(hm2, h = 48, level = c(70, 80, 90, 95))
 ```
 

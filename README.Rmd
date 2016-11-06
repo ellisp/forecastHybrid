@@ -1,10 +1,12 @@
 [![Travis-CI Build Status](https://travis-ci.org/ellisp/forecastHybrid.svg?branch=master)](https://travis-ci.org/ellisp/forecastHybrid)
 [![Coverage Status](https://coveralls.io/repos/github/ellisp/forecastHybrid/badge.svg?branch=master)](https://coveralls.io/github/ellisp/forecastHybrid?branch=master)
 [![CRAN version](http://www.r-pkg.org/badges/version/forecastHybrid)](http://www.r-pkg.org/pkg/forecastHybrid)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/ggseas)](http://www.r-pkg.org/pkg/ggseas)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/forecastHybrid)](http://www.r-pkg.org/pkg/forecastHybrid)
 
 # forecastHybrid
 Convenient functions for ensemble forecasts in R combining approaches from the [forecast](https://github.com/robjhyndman/forecast) package
+
+For a more detailed description of the package and usage, consult the [vignette](https://cran.r-project.org/web/packages/forecastHybrid/vignettes/forecastHybrid.html).
 
 The package is still under heavy development, but many basic features have been implemented. Some features (such as optimized parallelization between rather than within models, cross validation for determing model error rates, and automatically selecting the optimal combination of base models) have not yet been developed.
 
@@ -25,7 +27,7 @@ Version updates to CRAN will be published frequently after new features are impl
 
 ## Usage
 
-```{r}
+```{r cache = TRUE}
 library(forecastHybrid)
  
 # Build a hybrid forecast on the wineind dataset using auto.arima, ets, and tbats models.
@@ -50,7 +52,7 @@ fc$upper
 # Extract the (default) lower 80% and 95% prediction intervals
 fc$lower
 
-# Produce a forecast with prediction interavals at the 70%, 80%, 90%, and 95% levels
+# Produce a forecast with prediction intervals at the 70%, 80%, 90%, and 95% levels
 fc2 <- forecast(hm2, h = 48, level = c(70, 80, 90, 95))
 ```
 
