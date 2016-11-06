@@ -24,7 +24,7 @@ decomposition seasonal adjustment that is performed before the \code{ets} model 
 component shows the direction and slope of drift that is used in the forecasting to come.
 }
 \examples{
-model <- thetam(Nile)
+model <- thetam(wineind)
 plot(model)
 }
 \author{
