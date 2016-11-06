@@ -118,7 +118,7 @@ forecast.hybridModel <- function(object,
      forecasts$pointForecasts[, "thetam"] <- forecasts$thetam$mean
   }
   if("nnetar" %in% includedModels){
-    forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xreg, PI = PI)
+    forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xreg, PI = PI, level = level)
     forecasts$pointForecasts[, "nnetar"] <- forecasts$nnetar$mean
   }
   if("stlm" %in% includedModels){
