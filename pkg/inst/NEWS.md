@@ -3,6 +3,7 @@
 * theta models can be added (by including "`f`" in the `models=` argument for `hybridModel()`) and are indeed part of the default - so by default, hybridModel() will now fit six models
 * `accuracy.cvts` is exported
 * Time series must be at least four observations long
+* Fixed an error where e.args was passed to tbats instead of t.args
 
 # Version 0.2.0 [2016-09-23]
 * Add timeseries cross validation with `cvts()`
