@@ -12,6 +12,7 @@ Description: Convenient functions for ensemble forecasts in R combining
     in-sample errors. Future methods such as cross validation are planned.
 Depends:
     R (>= 3.1.1),
+    ggplot2 (>= 2.2.0),
     forecast (>= 7.3)
 Suggests:
     knitr,
