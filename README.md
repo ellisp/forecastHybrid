@@ -208,3 +208,8 @@ fc$lower
 # Produce a forecast with prediction intervals at the 70%, 80%, 90%, and 95% levels
 fc2 <- forecast(hm2, h = 48, level = c(70, 80, 90, 95))
 ```
+
+## License
+(c) 2016 David Shaub and Peter Ellis.
+
+This package is free software released under the [GPL-3](http://www.gnu.org/licenses/gpl-3.0.en.html) license.
