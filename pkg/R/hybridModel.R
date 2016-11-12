@@ -10,8 +10,9 @@
 #' @param lambda
 #' Box-Cox transformation parameter.
 #' Ignored if NULL. Otherwise, data transformed before model is estimated.
-#' @param models A character string of up to five characters indicating which contributing models to use:
-#' a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), n (\code{\link[forecast]{nnetar}}),
+#' @param models A character string of up to six characters indicating which contributing models to use:
+#' a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), 
+#' f (\code{\link{thetam}}), n (\code{\link[forecast]{nnetar}}),
 #' s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}}).
 #' @param a.args an optional \code{list} of arguments to pass to \code{\link[forecast]{auto.arima}}. See details.
 #' @param e.args an optional \code{list} of arguments to pass to \code{\link[forecast]{ets}}. See details.
@@ -42,7 +43,7 @@
 #' the single horizon given in \code{cvHorizon}.
 #' @param verbose Should the status of which model is being fit/cross validated be printed to the terminal?
 #' @seealso \code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}},
-#' \code{\link[forecast]{ets}}, \code{\link[forecast]{nnetar}},
+#' \code{\link[forecast]{ets}}, \code{\link{thetam}}, \code{\link[forecast]{nnetar}},
 #' \code{\link[forecast]{stlm}}, \code{\link[forecast]{tbats}}
 #' @return An object of class hybridModel.
 #' The individual component models are stored inside of the object
@@ -72,7 +73,7 @@
 #' @examples
 #' \dontrun{
 #'
-#' # Fit an auto.arima, ets, nnetar, stlm, and tbats model
+#' # Fit an auto.arima, ets, thetam, nnetar, stlm, and tbats model
 #' # on the time series with equal weights
 #' mod1 <- hybridModel(AirPassengers)
 #' plot(forecast(mod1))
@@ -93,7 +94,7 @@
 #'
 #' @author David Shaub
 #'
-hybridModel <- function(y, models = "aenst",
+hybridModel <- function(y, models = "aefnst",
                         lambda = NULL,
                         a.args = NULL,
                         e.args = NULL,
@@ -116,7 +117,7 @@ hybridModel <- function(y, models = "aenst",
     stop("The time series must be numeric and may not be a matrix or dataframe object.")
   }
   if(!length(y)){
-    stop("The time series must have obserations")
+    stop("The time series must have observations")
   }
     
    if(length(y) < 4){
@@ -128,14 +129,14 @@ hybridModel <- function(y, models = "aenst",
   # Match arguments to ensure validity
   weights <- match.arg(weights)
   errorMethod <- match.arg(errorMethod)
-
+  
   # Match the specified models
   expandedModels <- unique(tolower(unlist(strsplit(models, split = ""))))
-  if(length(expandedModels) > 5L){
+  if(length(expandedModels) > 6L){
     stop("Invalid models specified.")
   }
   # All characters must be valid
-  if(!(all(expandedModels %in% c("a", "e", "n", "s", "t")))){
+  if(!(all(expandedModels %in% c("a", "e", "f", "n", "s", "t")))){
     stop("Invalid models specified.")
   }
   if(!length(expandedModels)){
@@ -175,6 +176,11 @@ hybridModel <- function(y, models = "aenst",
     warning("frequency(y) >= 24. The ets model will not be used.")
     expandedModels <- expandedModels[expandedModels != "e"]
   }
+  if(is.element("f", expandedModels) && frequency(y) >=24){
+     warning("frequency(y) >= 24. The Theta model will not be used.")
+     expandedModels <- expandedModels[expandedModels != "f"]
+  }
+  
   if(is.element("s", expandedModels)){
     if(frequency(y) < 2L){
       warning("The stlm model requires that the input data be a seasonal ts object. The stlm model will not be used.")
@@ -240,6 +246,13 @@ hybridModel <- function(y, models = "aenst",
     }
     modelResults$ets <- do.call(ets, c(list(y), e.args))
   }
+  # thetam()
+  if(is.element("f", expandedModels)){
+     if(verbose){
+        cat("Fitting the thetam model\n")
+     }
+     modelResults$thetam <- thetam(y)
+  }
   # nnetar()
   if(is.element("n", expandedModels)){
     if(verbose){
@@ -269,7 +282,7 @@ hybridModel <- function(y, models = "aenst",
     if(verbose){
       cat("Fitting the tbats model\n")
     }
-    modelResults$tbats <- do.call(tbats, c(list(y), e.args))
+    modelResults$tbats <- do.call(tbats, c(list(y), t.args))
   }
 
   # Set the model weights
@@ -308,6 +321,15 @@ hybridModel <- function(y, models = "aenst",
                                  horizonAverage = horizonAverage,
                                  verbose = FALSE,
                                  windowSize = windowSize)
+        } else if(i == "f"){
+           if(verbose){
+              cat("Cross validating the thetam model\n")
+           }
+           modResults$thetam <- cvts(y, FUN = thetam,
+                                  maxHorizon = cvHorizon,
+                                  horizonAverage = horizonAverage,
+                                  verbose = FALSE,
+                                  windowSize = windowSize)
         } else if(i == "n"){
           if(verbose){
             cat("Cross validating the nnetar model\n")
@@ -344,8 +366,10 @@ hybridModel <- function(y, models = "aenst",
     for(i in expandedModels){
       if(i == "a"){
         modelResults$weights[index] <- accuracy(modResults$auto.arima)[cvHorizon, errorMethod]
-      }else if(i == "e"){
+      } else if(i == "e"){
         modelResults$weights[index] <- accuracy(modResults$ets)[cvHorizon, errorMethod]
+      } else if(i == "f"){
+         modelResults$weights[index] <- accuracy(modResults$thetam)[cvHorizon, errorMethod]
       } else if(i == "n"){
         modelResults$weights[index] <- accuracy(modResults$nnetar)[cvHorizon, errorMethod]
       } else if(i == "s"){

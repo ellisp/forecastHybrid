@@ -4,7 +4,7 @@
 \alias{hybridModel}
 \title{Hybrid time series modelling}
 \usage{
-hybridModel(y, models = "aenst", lambda = NULL, a.args = NULL,
+hybridModel(y, models = "aefnst", lambda = NULL, a.args = NULL,
   e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL,
   weights = c("equal", "insample.errors", "cv.errors"),
   errorMethod = c("RMSE", "MAE", "MASE"), cvHorizon = frequency(y),
@@ -14,8 +14,9 @@ hybridModel(y, models = "aenst", lambda = NULL, a.args = NULL,
 \arguments{
 \item{y}{A numeric vector or time series.}
 
-\item{models}{A character string of up to five characters indicating which contributing models to use:
-a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), n (\code{\link[forecast]{nnetar}}),
+\item{models}{A character string of up to six characters indicating which contributing models to use:
+a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), 
+f (\code{\link{thetam}}), n (\code{\link[forecast]{nnetar}}),
 s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}}).}
 
 \item{lambda}{Box-Cox transformation parameter.
@@ -96,7 +97,7 @@ a series well with a seasonal period longer than 24 and will ignore the seasonal
 \examples{
 \dontrun{
 
-# Fit an auto.arima, ets, nnetar, stlm, and tbats model
+# Fit an auto.arima, ets, thetam, nnetar, stlm, and tbats model
 # on the time series with equal weights
 mod1 <- hybridModel(AirPassengers)
 plot(forecast(mod1))
@@ -121,7 +122,7 @@ David Shaub
 }
 \seealso{
 \code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}},
-\code{\link[forecast]{ets}}, \code{\link[forecast]{nnetar}},
+\code{\link[forecast]{ets}}, \code{\link{thetam}}, \code{\link[forecast]{nnetar}},
 \code{\link[forecast]{stlm}}, \code{\link[forecast]{tbats}}
 }
 
