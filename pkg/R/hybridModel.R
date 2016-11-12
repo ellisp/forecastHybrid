@@ -11,7 +11,7 @@
 #' Box-Cox transformation parameter.
 #' Ignored if NULL. Otherwise, data transformed before model is estimated.
 #' @param models A character string of up to six characters indicating which contributing models to use:
-#' a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), 
+#' a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}),
 #' f (\code{\link{thetam}}), n (\code{\link[forecast]{nnetar}}),
 #' s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}}).
 #' @param a.args an optional \code{list} of arguments to pass to \code{\link[forecast]{auto.arima}}. See details.
@@ -119,17 +119,17 @@ hybridModel <- function(y, models = "aefnst",
   if(!length(y)){
     stop("The time series must have observations")
   }
-    
+
    if(length(y) < 4){
       stop("The time series must have at least four observations")
    }
-   
+
   y <- as.ts(y)
 
   # Match arguments to ensure validity
   weights <- match.arg(weights)
   errorMethod <- match.arg(errorMethod)
-  
+
   # Match the specified models
   expandedModels <- unique(tolower(unlist(strsplit(models, split = ""))))
   if(length(expandedModels) > 6L){
@@ -180,7 +180,7 @@ hybridModel <- function(y, models = "aefnst",
      warning("frequency(y) >= 24. The Theta model will not be used.")
      expandedModels <- expandedModels[expandedModels != "f"]
   }
-  
+
   if(is.element("s", expandedModels)){
     if(frequency(y) < 2L){
       warning("The stlm model requires that the input data be a seasonal ts object. The stlm model will not be used.")
@@ -604,6 +604,8 @@ print.hybridModel <- function(x, ...){
 #' \code{\link[forecast]{plot.tbats}}. Note: no plot
 #' methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
 #' \code{type = "models"}.
+#' @param ggplot should the \code{\link{autoplot}} function
+#' be used (when available) for the plots?
 #' @param ... other arguments passed to \link{plot}.
 #' @seealso \code{\link{hybridModel}}
 #' @return None. Function produces a plot.
@@ -622,9 +624,11 @@ print.hybridModel <- function(x, ...){
 #' @export
 #'
 #' @author David Shaub
+#' @import ggplot2
 #'
 plot.hybridModel <- function(x,
                              type = c("fit", "models"),
+                             ggplot = FALSE,
                              ...){
   type <- match.arg(type)
   #chkDots(...)
@@ -643,7 +647,12 @@ plot.hybridModel <- function(x,
   } else if(type == "models"){
     plotModels <- x$models[x$models != "stlm" & x$models != "nnetar"]
     for(i in seq_along(plotModels)){
-      plot(x[[plotModels[i]]])
+       # tbats isn't supported by autoplot
+       if(ggplot && i != "tbats"){
+          autoplot(x[[plotModels[i]]])
+       } else{
+          plot(x[[plotModels[i]]])
+       }
     }
   }
 }
