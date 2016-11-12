@@ -208,8 +208,3 @@ fc$lower
 # Produce a forecast with prediction intervals at the 70%, 80%, 90%, and 95% levels
 fc2 <- forecast(hm2, h = 48, level = c(70, 80, 90, 95))
 ```
-
-```
-## Error in forecasts[[j]]$upper[, i]: subscript out of bounds
-```
-
