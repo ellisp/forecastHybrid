@@ -634,16 +634,29 @@ plot.hybridModel <- function(x,
   #chkDots(...)
   plotModels <- x$models
   if(type == "fit"){
-    # Set the highest and lowest axis scale
-    ymax <- max(sapply(plotModels, FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
-    ymin <- min(sapply(plotModels, FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
-    range <- ymax - ymin
-    plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range), ...)
-    #title(main = "Plot of original series (black) and fitted component models", outer = TRUE)
-    for(i in seq_along(plotModels)){
-      lines(fitted(x[[plotModels[i]]]), col = i + 1)
-    }
-    legend("top", plotModels, fill = 2:(length(plotModels) + 1), horiz = TRUE)
+	  if(ggplot){
+		  plotFrame <- data.frame(matrix(0, nrow = length(x$x), ncol = 0))
+		  for(i in plotModels){
+			  plotFrame[i] <- fitted(x[[i]])
+		  }
+		  names(plotFrame) <- x$models
+		  plotFrame$date <- as.Date(time(x$x))
+		  plotFrame <- reshape2::melt(plotFrame, id = "date")
+		  ggplot(data = plotFrame,
+				aes(x = date, y = variable, col = variable))
+		  
+	  } else{
+		      # Set the highest and lowest axis scale
+		ymax <- max(sapply(plotModels, FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
+		ymin <- min(sapply(plotModels, FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
+		range <- ymax - ymin
+		plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range), ...)
+		#title(main = "Plot of original series (black) and fitted component models", outer = TRUE)
+		for(i in seq_along(plotModels)){
+		  lines(fitted(x[[plotModels[i]]]), col = i + 1)
+		}
+		legend("top", plotModels, fill = 2:(length(plotModels) + 1), horiz = TRUE)
+	}
   } else if(type == "models"){
     plotModels <- x$models[x$models != "stlm" & x$models != "nnetar"]
     for(i in seq_along(plotModels)){
