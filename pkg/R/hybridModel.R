@@ -550,7 +550,7 @@ accuracy.hybridModel <- function(f,
 #'Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy measures
 #'\code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy is calculated for each
 #'forecast horizon up to \code{maxHorizon}
-#'
+#'@export
 accuracy.cvts <- function(f, ...){
   ME <- colMeans(f$residuals)
   RMSE <- apply(f$residuals, MARGIN = 2, FUN = function(x){sqrt(sum(x ^ 2)/ length(x))})
