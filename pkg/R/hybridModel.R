@@ -645,8 +645,9 @@ plot.hybridModel <- function(x,
          names(plotFrame) <- plotModels
          plotFrame$date <- as.Date(time(x$x))
          plotFrame <- reshape2::melt(plotFrame, id = "date")
-         ggplot(data = plotFrame,
-                aes(x = date, y = as.numeric(value), col = as.numeric(variable)))
+         ggplot(data = plotFrame, 
+                aes(x = date, y = as.numeric(value), col = variable)) +
+            geom_line() + scale_y_continuous(name = "y")
          
       } else{
          # Set the highest and lowest axis scale
