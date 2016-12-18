@@ -29,7 +29,7 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(wineind, models = "fs", a.args = list()))
     expect_warning(hybridModel(wineind, models = "fs", e.args = list()))
     expect_warning(hybridModel(wineind, models = "fs", n.args = list()))
-    expect_warning(hybridModel(wineind, models = "fs", s.args = list()))
+    expect_warning(hybridModel(wineind, models = "fn", s.args = list()))
     expect_warning(hybridModel(wineind, models = "fs", t.args = list()))
     # nnetar() with 2 * frequency(y) >= length(y)
     expect_warning(hybridModel(ts(rnorm(50), f = 24), models = "fsn"))
