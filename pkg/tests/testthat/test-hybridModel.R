@@ -66,8 +66,10 @@ if(require(forecast) & require(testthat)){
     expect_true(length(fitted(exampleModel, individual = TRUE)) == length(residuals(exampleModel, individual = TRUE)))
     expect_error(accuracy(exampleModel), NA)
     expect_error(accuracy(exampleModel, individual = TRUE), NA)
-    expect_error(plot(exampleModel, type = "fit"), NA)
-    expect_error(plot(exampleModel, type = "models"), NA)
+    expect_error(plot(exampleModel, type = "fit", ggplot = FALSE), NA)
+    expect_error(plot(exampleModel, type = "models", ggplot = FALSE), NA)
+    expect_error(plot(exampleModel, type = "fit", ggplot = TRUE), NA)
+    expect_error(plot(exampleModel, type = "models", ggplot = TRUE), NA)
   })
   context("Testing cv.errors")
     test_that("Testing hybridModel(weights = \"cv.errors\")", {
