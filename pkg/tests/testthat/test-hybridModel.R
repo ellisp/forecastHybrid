@@ -26,17 +26,17 @@ if(require(forecast) & require(testthat)){
 
   })
   test_that("Testing for warnings", {
-    expect_warning(hybridModel(wineind, models = "en", a.args = list()))
-    expect_warning(hybridModel(wineind, models = "an", e.args = list()))
-    expect_warning(hybridModel(wineind, models = "ae", n.args = list()))
-    expect_warning(hybridModel(wineind, models = "an", s.args = list()))
-    expect_warning(hybridModel(wineind, models = "an", t.args = list()))
+    expect_warning(hybridModel(wineind, models = "fs", a.args = list()))
+    expect_warning(hybridModel(wineind, models = "fs", e.args = list()))
+    expect_warning(hybridModel(wineind, models = "fs", n.args = list()))
+    expect_warning(hybridModel(wineind, models = "fs", s.args = list()))
+    expect_warning(hybridModel(wineind, models = "fs", t.args = list()))
     # nnetar() with 2 * frequency(y) >= length(y)
-    expect_warning(hybridModel(ts(rnorm(50), f = 24), models = "aen"))
+    expect_warning(hybridModel(ts(rnorm(50), f = 24), models = "fsn"))
     # stlm() with 2 * frequency(y) >= length(y)
-    expect_warning(hybridModel(ts(rnorm(20), f = 12), models = "aes"))
+    expect_warning(hybridModel(ts(rnorm(20), f = 12), models = "efs"))
     # Currently unimplemented features
-    expect_warning(hybridModel(wineind, models = "ae", parallel = TRUE))
+    expect_warning(hybridModel(wineind, models = "fs", parallel = TRUE))
     #expect_warning(hybridModel(wineind, models = "ae", weights = "cv.errors"))
   })
   test_that("Testing valid inputs", {
@@ -46,9 +46,11 @@ if(require(forecast) & require(testthat)){
                              a.args = list(xreg = matrix(runif(100), nrow = 100))), NA)
     expect_warning(hybridModel(y = rnorm(10), models = "en",
                                a.args = list(lambda = 0.5)))
-    expect_error(hybridModel(wineind, models = "atens"), NA)
-    expect_error(hybridModel(wineind, models = "aenst",
+    #expect_error(hybridModel(wineind, models = "atensf"), NA)
+    expect_error(hybridModel(wineind, models = "aensft",
                              weights = "insample.errors"), NA)
+    # soft deprecated insample.errors
+    expect_warning(hybridModel(wineind, models = "fs", weights = "insample.errors"))
     expect_error(hybridModel(wineind, models = "ae",
                              e.args = list(lambda = 0.5)), NA)
   })
