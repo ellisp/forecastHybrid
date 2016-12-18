@@ -644,6 +644,9 @@ plot.hybridModel <- function(x,
          }
          names(plotFrame) <- plotModels
          plotFrame$date <- as.Date(time(x$x))
+         # Appease R CMD check for undeclared variable, value
+         variable <- NULL
+         value <- NULL
          plotFrame <- reshape2::melt(plotFrame, id = "date")
          ggplot(data = plotFrame, 
                 aes(x = date, y = as.numeric(value), col = variable)) +
