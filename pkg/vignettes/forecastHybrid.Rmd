@@ -82,6 +82,14 @@ plot(hm1, type = "models")
 
 ```
 
+Since version 0.4.0, `ggplot` graphs are available. Note, however, that the `nnetar`, and `tbats` models do not have `ggplot::autoplot()` methods, so these are not plotted.
+
+```{r plots_ggplot, cache = TRUE}
+plot(hm1, type = "fit", ggplot = TRUE) 
+plot(hm1, type = "models", ggplot = TRUE)
+
+```
+
 By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles [see @Armstrong2001], but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass this value to the ```errorMethod``` argument and pass either ```"insample.errors"``` or ```"cv.errors"``` to the ```weights``` argument.
 ```{r errorMethod, cache = TRUE}
 hm2 <- hybridModel(wineind, weights = "insample.errors", errorMethod = "MASE", models = "aenst")
@@ -176,9 +184,9 @@ beaverhm <- hybridModel(ts(trainSet$temp, f = 6),
 # Forecast future values
 #forecast won't run in current version, next release allows
 #forecast with stlm with xreg
-#beaverfc <- forecast(beaverhm, xreg = testXreg)
+beaverfc <- forecast(beaverhm, xreg = testXreg)
 
 # View the accuracy of the model
-#accuracy(beaverfc, testSet$temp)
+accuracy(beaverfc, testSet$temp)
 ```
 
