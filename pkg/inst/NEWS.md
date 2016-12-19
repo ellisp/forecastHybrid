@@ -1,8 +1,8 @@
-# Version 0.3.0 [Unreleased]
+# Version 0.3.0 [2016-12-18]
 * Prediction intervals are now created for `nnetar` objects in the ensemble. This should address one aspect of incorrect prediction intervals (e.g. issue #37).
-* theta models can be added (by including "`f`" in the `models=` argument for `hybridModel()`) and are indeed part of the default - so by default, hybridModel() will now fit six models
-* `ggplot2` graphics are now available for `plot.hybridModel()` by passing the argument `ggplot = TRUE`
-* `accuracy.cvts()` is exported
+* theta models can be added (by including "`f`" in the `models =` argument for `hybridModel()`) and are indeed part of the default - so by default, hybridModel() will now fit six models
+* `accuracy.cvts()` is now exported
+* `plot.hybridModel()` now supports `ggplot2` graphics when the argument `ggplot = TRUE` is passed.
 * Time series must be at least four observations long
 * Fixed an error where e.args was passed to tbats instead of t.args
 
