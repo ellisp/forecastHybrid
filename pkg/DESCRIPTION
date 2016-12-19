@@ -1,6 +1,6 @@
 Package: forecastHybrid
 Title: Convenient Functions for Ensemble Time Series Forecasts
-Version: 0.3.0
+Version: 0.3.x
 Date: 2016-12-18
 Authors@R: c(
    person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
@@ -8,8 +8,9 @@ Authors@R: c(
    )
 Description: Convenient functions for ensemble forecasts in R combining
     approaches from the 'forecast' package. Forecasts generated from auto.arima(), ets(),
-    nnetar(), stlm(), and tbats() can be combined with equal weights or weights based on
-    in-sample errors. Future methods such as cross validation are planned.
+    thetam(), nnetar(), stlm(), and tbats() can be combined with equal weights, weights
+    based on in-sample errors, or CV weights. Cross validation for time series data
+    and user-supplied models and forecasting functions is also supported to evaluate model accuracy.
 Depends:
     R (>= 3.1.1),
     ggplot2 (>= 2.2.0),
