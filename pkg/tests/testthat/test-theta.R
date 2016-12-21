@@ -60,7 +60,9 @@ test_that("hybrid models with theta give same results as when done manually", {
 
 test_that("Generic `forecast` methods work on thetam objects", {
    mod1 <- thetam(wineind)
+   mod2 <- thetam(rnorm(100))
    expect_error(plot(mod1), NA)
+   expect_error(plot(mod2), NA)
    expect_error(forecast(mod1), NA)
    expect_error(accuracy(mod1), NA)
    expect_error(residuals(mod1), NA)
