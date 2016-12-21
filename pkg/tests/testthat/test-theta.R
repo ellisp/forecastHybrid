@@ -50,7 +50,7 @@ test_that("invalid inputs to thetam", {
 })
 
 test_that("hybrid models with theta give same results as when done manually", {
-  mod1 <- hybridModel(gas, models = "ef") 
+  mod1 <- hybridModel(gas, models = "fs") 
   fc1 <- forecast(mod1, h = 12)
   fc2a <- forecast(ets(gas), h = 12)
   fc2b <- thetaf(gas, h = 12)
