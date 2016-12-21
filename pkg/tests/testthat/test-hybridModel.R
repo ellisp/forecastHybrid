@@ -35,9 +35,9 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(ts(rnorm(50), f = 24), models = "fsn"))
     # stlm() with 2 * frequency(y) >= length(y)
     expect_warning(hybridModel(ts(rnorm(20), f = 12), models = "efs"))
-    # Currently unimplemented features
+    # ets with frequency(y) > 24
+    expect_warning(hybridModel(ts(rnorm(100), f = 25), models = "ens"))
     expect_warning(hybridModel(wineind, models = "fs", parallel = TRUE))
-    #expect_warning(hybridModel(wineind, models = "ae", weights = "cv.errors"))
   })
   test_that("Testing valid inputs", {
     set.seed(54321)
