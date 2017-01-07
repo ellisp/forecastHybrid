@@ -13,7 +13,8 @@ if(require(forecast) &  require(testthat)){
      expect_error(cvts(rnorm(100), saveModels = FALSE, saveForecasts = FALSE), NA)
   })
   test_that("Testing accuracy.cvts()", {
-     cv <- cvts(AirPassengers)
-     expect_error(accuracy(cv), NA)
+    inputSeries <- ts(rnorm(30), f = 4)
+    cv <- cvts(inputSeries, windowSize = 8, maxHorizon = 8)
+    expect_error(accuracy(cv), NA)
   })
 }
