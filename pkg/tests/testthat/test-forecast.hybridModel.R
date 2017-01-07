@@ -16,20 +16,28 @@ if(require(forecast) &  require(testthat)){
                                      xreg = 1:12))
   })
   test_that("Testing forecasts with xreg", {
-    mm <- matrix(runif(length(wineind)), nrow = length(wineind))
-    expect_error(aa <- hybridModel(wineind, models = "aenst", a.args = list(xreg = mm), s.args = list(xreg = mm)))
-    aa <- hybridModel(wineind, models = "aenst", a.args = list(xreg = mm), n.args = list (xreg = mm))
+    inputSeries <- ts(wineind[1:25], f = frequency(wineind))
+    mm <- matrix(runif(length(inputSeries)), nrow = length(inputSeries))
+    # stlm only works with xreg when method = "arima" is passed in s.args
+    expect_error(aa <- hybridModel(inputSeries, models = "afns", a.args = list(xreg = mm), s.args = list(xreg = mm)))
+    aa <- hybridModel(inputSeries, models = "afns",
+                      a.args = list(xreg = mm),
+                      n.args = list (xreg = mm),
+                      s.args = list(xreg = mm, method = "arima"))
     # If xreg is used and no h is provided, overwrite h
-    expect_error(tmp <- forecast(aa, xreg = matrix(rnorm(20), nrow = 20)), NA)
+    newXreg <- matrix(rnorm(20), nrow = 20)
+    expect_error(tmp <- forecast(aa, xreg = newXreg, npaths = 50), NA)
     # If nrow(xreg) != h, issue a warning but set h <- nrow(xreg)
-    expect_warning(forecast(aa, h = 10, xreg = matrix(rnorm(20), nrow = 20), PI = FALSE))
+    expect_warning(forecast(aa, h = 10, xreg = newXreg, PI = FALSE))
+    newXreg <- matrix(rnorm(24), nrow = 24)
     expect_error(forecast(aa, xreg = matrix(rnorm(24), nrow = 24), PI = FALSE), NA)
-    expect_true(length(forecast(aa, xreg = matrix(rnorm(24), nrow = 24), PI = FALSE)$mean) == 24L)
-    expect_true(class(forecast(aa, xreg = matrix(rnorm(24), nrow = 24), PI = FALSE)) == "forecast")
+    expect_true(length(forecast(aa, xreg = newXreg, PI = FALSE)$mean) == 24L)
+    expect_true(class(forecast(aa, xreg = newXreg, PI = FALSE)) == "forecast")
     # Prediction intervals for nnetar are nondeterministic, so this will fail
+    # Testing this is slow, so leave it out for now
     #expect_true(all(forecast(aa, xreg = mm,  h = nrow(mm), level = 0.9)$upper == forecast(aa, xreg = mm,  h = nrow(mm), level = 90)$upper))
     expect_error(forecast(aa, xreg = mm, level = 110))
-    # Prediction intervals for nnetar are nondeterministic, so this will fail
+    # Fan should generate 17 prediction intervals
     #expect_true(ncol(forecast(aa, xreg = mm, h = nrow(mm), fan = TRUE)$upper) == 17)
   })
 }
