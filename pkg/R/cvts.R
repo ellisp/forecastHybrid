@@ -143,7 +143,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # Combined code for rolling/nonrolling CV
 
   results <- matrix(NA,
-                    nrow = ifelse(rolling, length(x) - windowSize - maxHorizon, as.integer((length(x) - windowSize) / maxHorizon)),
+                    nrow = ifelse(rolling, length(x) - windowSize - maxHorizon + 1, as.integer((length(x) - windowSize) / maxHorizon)),
                     ncol = maxHorizon)
 
   forecasts <- fits <- vector("list", nrow(results))
@@ -161,10 +161,11 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     }
     # Sample the correct slice for rolling
     if(rolling){
-      etsp <- stsp + (i + windowSize - 2) / frequency(x)
+      etsp <- stsp + (windowSize - 1)/frequency(x)
       y <- window(x, start = stsp, end = etsp)
-      fstsp <- stsp + (i + windowSize - 1) / frequency(x)
+      fstsp <- stsp + windowSize / frequency(x)
       fetsp <- fstsp + (maxHorizon - 1) / frequency(x)
+      stsp <- stsp + 1 / frequency(x)
     }
     # Sample the correct slice for nonrolling
     else{
