@@ -62,7 +62,7 @@ if(require(forecast) & require(testthat)){
   })
   context("Testing generic functions")
   test_that("Testing is.hybridModel(), fitted.hybridModel(), residuals.hybridModel(), and accuracy.hybridModel()", {
-    inputSeries <- ts(rnorm(9), f = 4)
+    inputSeries <- wineind
     exampleModel <- hybridModel(inputSeries)
     expect_true(is.hybridModel(exampleModel))
     expect_true(length(fitted(exampleModel)) == length(residuals(exampleModel)))
