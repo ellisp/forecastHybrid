@@ -16,11 +16,16 @@ if(require(forecast) &  require(testthat)){
                                      xreg = 1:12))
   })
   test_that("Testing forecasts with xreg", {
+    # # Test a simple et model
+    # inputSeries <- ts(rnorm(9), f = 4)
+    # hm <- hybridModel(inputSeries, models = "et")
+    # expect_error(forecast(hm), NA)
+    # Test xregs
     inputSeries <- ts(wineind[1:25], f = frequency(wineind))
     mm <- matrix(runif(length(inputSeries)), nrow = length(inputSeries))
     # stlm only works with xreg when method = "arima" is passed in s.args
     expect_error(aa <- hybridModel(inputSeries, models = "afns", a.args = list(xreg = mm), s.args = list(xreg = mm)))
-    aa <- hybridModel(inputSeries, models = "afns",
+    aa <- hybridModel(inputSeries, models = "aefnst",
                       a.args = list(xreg = mm),
                       n.args = list (xreg = mm),
                       s.args = list(xreg = mm, method = "arima"))
