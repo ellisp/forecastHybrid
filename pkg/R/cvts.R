@@ -50,10 +50,12 @@
 #' save fitted values, residual values, summary statistics, coefficient matrices, etc. Setting \code{saveModels = FALSE}
 #' can be safely done if there is no need to examine individual models fit at every stage of cross validation since the
 #' forecasts from each fold and the associated residuals are always saved.
+#' @seealso \code{\link{accuracy.cvts}}
 #'
 #' @examples
 #' cvmod1 <- cvts(AirPassengers, FUN = stlm,
 #'                windowSize = 48, maxHorizon = 12)
+#' accuracy(cvmod1)
 #'
 #' \dontrun{
 #' cvmod2 <- cvts(USAccDeaths, FUN = ets,
