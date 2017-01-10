@@ -34,7 +34,7 @@ if(require(forecast) &  require(testthat)){
         return(result)
      }
      
-     cv <- cvts(AirPassengers, FUN = naive_forecast, FCFUN = forecast, rolling = TRUE, windowSize = 1,
+     cv <- cvts(AirPassengers, FUN = naive_forecast, FCFUN = forecast.naive_model, rolling = TRUE, windowSize = 1,
                 maxHorizon = 1)
      
      forecasts <- vapply(cv$forecasts, function(x) x[[2]], numeric(1))
