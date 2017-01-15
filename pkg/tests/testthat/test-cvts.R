@@ -40,5 +40,19 @@ if(require(forecast) &  require(testthat)){
      train_series <- vapply(cv$forecasts, function(x) x[[1]]$series, numeric(1))
      expect_equal(AirPassengers[1:(length(AirPassengers) - 1)], train_series)
      expect_equal(AirPassengers[1:(length(AirPassengers) - 1)], forecasts)
-  })
+   })
+  
+   test_that("Additional parameters can be passed to fitting functions", {
+      cv <- cvts(AirPassengers, FUN = ets, FCFUN = forecast, rolling = FALSE, windowSize = 12,
+                 maxHorizon = 12, model = "MAM")
+      
+      fc_last <- cv$forecasts[[11]]
+      ets_fit <- ets(window(AirPassengers, end = c(1959, 12)), model = "MAM")
+      
+      ## The call objects alone are different seemingly because of the do.call used in cvts
+      ets_without_call <- forecast(ets_fit, 12) %>% {.[setdiff(names(.), c("model", "call"))]}
+      fc_last_without_call <- cv$forecasts[[11]][setdiff(names(cv$forecasts[[11]]), c("model", "call"))]
+      
+      expect_identical(ets_without_call, fc_last_without_call)
+   })
 }

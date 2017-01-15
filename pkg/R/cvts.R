@@ -19,6 +19,7 @@
 #' @param saveModels should the individual models be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param saveForecasts should the individual forecast from each model be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param verbose should the current progress be printed to the console?
+#' @param ... Other arguments to be passed to the model function FUN
 #'
 #' @details Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
 #' without serial correlation since observations \eqn{x_t}{x[t]} and \eqn{x_{t+n}}{x[t+n]} are not independent. The \code{cvts()} function overcomes
@@ -101,7 +102,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  horizonAverage = FALSE,
                  saveModels = ifelse(length(x) > 500, FALSE, TRUE),
                  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
-                 verbose = TRUE){
+                 verbose = TRUE, ...){
   # Default model function
   # This can be useful for methods that estimate the model and forecasts in one step
   # e.g. GMDH() from the "GMDH" package or thetaf()/meanf()/rwf() from "forecast". In this case,
@@ -177,7 +178,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     ynext <- window(x, start = fstsp, end = fetsp)
 
     # Perfom the simulation
-    mod <- do.call(FUN, list(y))
+    mod <- do.call(FUN, list(y, ...))
     fc <- do.call(FCFUN, list(mod, h = maxHorizon))
     if(saveModels){
       fits[[i]] <- mod
