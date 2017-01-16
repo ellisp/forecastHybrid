@@ -204,5 +204,30 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   return(result)
 }
 
-
+#' Extract cross validated rolling forecasts
+#' 
+#' Obtain cross validated forecasts when rolling cross validation is used. The object is not
+#' inspected to see if it was fit using a rolling origin
+#' 
+#' @importFrom purrr map
+#' @importFrom purrr reduce
+#' @export 
+#' @param cvts An object of class cvts
+#' 
+#' @return Forecasts computed via a rolling origin
+#' 
+#' @details Combine the cross validated forecasts fit with a rolling origin. This may be useful
+#' to visualize and investigate the cross validated performance of the model
+#' 
+#' @examples 
+#' \dontrun{
+#' cv <- cvts(AirPassengers, FUN = "ets", FCFUN = "forecast", 
+#'         rolling = TRUE, windowSize = 12, horizon = 2)
+#' 
+#' extract_rolling_forecasts(cv)
+#' }
+extract_rolling_forecasts <- function(cvts) {
+   map(cvts$forecasts, ~ .x$mean) %>%
+      reduce(combine_ts)
+}
 
