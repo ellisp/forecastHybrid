@@ -16,7 +16,8 @@ Depends:
     ggplot2 (>= 2.2.0),
     forecast (>= 7.3)
 Imports:
-    reshape2 (>= 1.4.2)
+    reshape2 (>= 1.4.2),
+    purrr (>= 0.2.1)
 Suggests:
     knitr,
     rmarkdown,
