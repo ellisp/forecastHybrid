@@ -19,8 +19,8 @@
 #' that the time series are sequential
 #' 
 #' @examples 
-#' combine_ts(window(AirPassengers, end = c(1951, 12)), window(AirPassengers, start = c(1952, 1)))
-combine_ts <- function(...) {
+#' tsCombine(window(AirPassengers, end = c(1951, 12)), window(AirPassengers, start = c(1952, 1)))
+tsCombine <- function(...) {
    ts.union(..., dframe = TRUE) %>%
       apply(1, function(x) x[min(which(!is.na(x)))]) %>%
       ts(start = start(...), frequency = frequency(...))

@@ -224,10 +224,10 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 #' cv <- cvts(AirPassengers, FUN = "ets", FCFUN = "forecast", 
 #'         rolling = TRUE, windowSize = 12, horizon = 2)
 #' 
-#' extract_rolling_forecasts(cv)
+#' extractRollingForecasts(cv)
 #' }
-extract_rolling_forecasts <- function(cvts) {
+extractRollingForecasts <- function(cvts) {
    map(cvts$forecasts, ~ .x$mean) %>%
-      reduce(combine_ts)
+      reduce(tsCombine)
 }
 
