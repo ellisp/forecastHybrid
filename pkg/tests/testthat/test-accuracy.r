@@ -8,5 +8,5 @@ test_that("accuracy generic function works", {
    expect_error(accuracy(hm$stlm), NA)
    expect_error(accuracy(hm$tbats), NA)
    expect_error(accuracy(hm$thetam), NA)
-   
+   expect_true(FALSE)
 })
