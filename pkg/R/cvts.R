@@ -155,6 +155,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # Perform the cv fits
   # adapted from code from Rob Hyndman at http://robjhyndman.com/hyndsight/tscvexample/
   # licensend under >= GPL2 from the author
+  
+  # TODO: Clean up subsetting using time(x)
   stsp <- tsp(x)[1]
   for(i in 1:nrow(results)){
     if(verbose){
@@ -199,7 +201,24 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   if(!saveForecasts){
     forecasts <- NULL
   }
-  result <- list(forecasts = forecasts, models = fits, residuals = results)
+  
+  params <- list(FUN = FUN,
+                 FCFUN = FCFUN,
+                 rolling = rolling,
+                 windowSize = windowSize,
+                 maxHorizon = maxHorizon,
+                 horizonAverage = horizonAverage,
+                 saveModels = saveModels,
+                 saveForecasts = saveForecasts,
+                 verbose = verbose,
+                 extra = list(...))
+  
+  result <- list(x = x,
+               params = params,
+               forecasts = forecasts, 
+               models = fits, 
+               residuals = results)
+  
   class(result) <- "cvts"
   return(result)
 }
