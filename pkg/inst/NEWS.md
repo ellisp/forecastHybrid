@@ -1,3 +1,11 @@
+# Version 0.3.1 [Unreleased]
+* Fixed a bug in `cvts()` when using `rolling = TRUE` whereby the incorrect number of periods were calulated. Thanks to Ganesh Krishnan for the bugfix.
+  * The `cvts()` function now allows additional arguments to be passed with `...`.
+* Additional `...` arguments can be passed to the individual component models in `forecast.hybridModel()`.
+* Documentation fixes and improvements, particularly for the `cvts()` function.
+* Unit tests were optimized for speed, and the package builds in half the previous time.
+* The behavior of the `forecast()` function from the "forecast" package when multiple or single prediction intervals are passed has changed. The prediction inervals are now consistently returned as matrices. This change fixes a bug in `forecast.hybridModel()` when multiple prediction intervals are used.
+
 # Version 0.3.0 [2016-12-18]
 * Prediction intervals are now created for `nnetar` objects in the ensemble. This should address one aspect of incorrect prediction intervals (e.g. issue #37).
 * theta models can be added (by including "`f`" in the `models =` argument for `hybridModel()`) and are indeed part of the default - so by default, hybridModel() will now fit six models

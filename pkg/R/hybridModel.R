@@ -538,19 +538,21 @@ accuracy.hybridModel <- function(f,
   return(forecast::accuracy(f$fitted, getResponse(f)))
 }
 
-#'Accuracy measures for cross-validated time series
+#' Accuracy measures for cross-validated time series
 #'
-#'Returns range of summary measures of the cross-validated forecast accuracy
-#'for \code{cvts} objects.
+#' Returns range of summary measures of the cross-validated forecast accuracy
+#' for \code{cvts} objects.
 #'
-#'@param f a \code{cvts} objected created by \code{\link{cvts}}.
-#'@param ... other arguments (ignored).
+#' @param f a \code{cvts} objected created by \code{\link{cvts}}.
+#' @param ... other arguments (ignored).
 #'
-#'@details
-#'Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy measures
-#'\code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy is calculated for each
-#'forecast horizon up to \code{maxHorizon}
-#'@export
+#' @details
+#' Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy measures
+#' \code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy is calculated for each
+#' forecast horizon up to \code{maxHorizon}
+#' @export
+#' @author David Shaub
+#' 
 accuracy.cvts <- function(f, ...){
   ME <- colMeans(f$residuals)
   RMSE <- apply(f$residuals, MARGIN = 2, FUN = function(x){sqrt(sum(x ^ 2)/ length(x))})

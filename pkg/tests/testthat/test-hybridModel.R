@@ -22,7 +22,7 @@ if(require(forecast) & require(testthat)){
     expect_error(hybridModel(wineind, models = ""))
     expect_error(hybridModel(wineind, parallel = "a"))
     # warning when component model fits perfectly and weights = "insample.error"
-    expect_warning(hybridModel(y = ts(1:100, frequency = 4), weights = "insample.errors"))
+    expect_warning(hybridModel(y = ts(1:9, frequency = 4), weights = "insample.errors"))
 
   })
   test_that("Testing for warnings", {
@@ -46,12 +46,12 @@ if(require(forecast) & require(testthat)){
                              a.args = list(xreg = matrix(runif(100), nrow = 100))), NA)
     expect_warning(hybridModel(y = rnorm(10), models = "en",
                                a.args = list(lambda = 0.5)))
-    #expect_error(hybridModel(wineind, models = "atensf"), NA)
-    expect_error(hybridModel(wineind, models = "aensft",
+    inputSeries <- ts(rnorm(9), f = 4)
+    expect_error(hybridModel(inputSeries, models = "aensft",
                              weights = "insample.errors"), NA)
     # soft deprecated insample.errors
     expect_warning(hybridModel(wineind, models = "fs", weights = "insample.errors"))
-    expect_error(hybridModel(wineind, models = "ae",
+    expect_error(hybridModel(inputSeries, models = "ae",
                              e.args = list(lambda = 0.5)), NA)
   })
   test_that("Testing model matching", {
@@ -62,7 +62,8 @@ if(require(forecast) & require(testthat)){
   })
   context("Testing generic functions")
   test_that("Testing is.hybridModel(), fitted.hybridModel(), residuals.hybridModel(), and accuracy.hybridModel()", {
-    exampleModel <- hybridModel(wineind)
+    inputSeries <- wineind
+    exampleModel <- hybridModel(inputSeries)
     expect_true(is.hybridModel(exampleModel))
     expect_true(length(fitted(exampleModel)) == length(residuals(exampleModel)))
     expect_true(length(fitted(exampleModel, individual = TRUE)) == length(residuals(exampleModel, individual = TRUE)))
@@ -75,7 +76,8 @@ if(require(forecast) & require(testthat)){
   })
   context("Testing cv.errors")
     test_that("Testing hybridModel(weights = \"cv.errors\")", {
-      expect_error(cvMod <- hybridModel(woolyrnq, weights = "cv.errors"), NA)
+      inputSeries <- ts(rnorm(20), f = 4)
+      expect_error(cvMod <- hybridModel(inputSeries, weights = "cv.errors", windowSize = 14, cvHorizon = 3), NA)
       expect_true(length(cvMod$weights) == length(unique(cvMod$weights)))
     })
 }

@@ -15,7 +15,7 @@
 #' @param PI should prediction intervals be produced? If a \code{nnetar} model is in the ensemble, this can be quite slow,
 #' so disabling prediction intervals will speed up the forecast generation. If \code{FALSE}, the arguments \code{level}
 #' and \code{fan} are ignored.
-#' @param ... other arguments; currently not used.
+#' @param ... other arguments passed to the individual \code{forecast} generic methods.
 #' @seealso \code{\link{hybridModel}}
 #' @details if \code{xreg} was used in construcing the \code{hybridModel},
 #' it must also be passed into \code{forecast.hybridModel}.
@@ -106,27 +106,27 @@ forecast.hybridModel <- function(object,
   forecasts$pointForecasts <- matrix(numeric(), nrow = h, ncol = length(includedModels))
   colnames(forecasts$pointForecasts) <- includedModels
   if("auto.arima" %in% includedModels){
-    forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xreg, level = level)
+    forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xreg, level = level, ...)
     forecasts$pointForecasts[, "auto.arima"] <- forecasts$auto.arima$mean
   }
   if("ets" %in% includedModels){
-    forecasts$ets <- forecast(object$ets, h = h, level = level)
+    forecasts$ets <- forecast(object$ets, h = h, level = level, ...)
     forecasts$pointForecasts[, "ets"] <- forecasts$ets$mean
   }
   if("thetam" %in% includedModels){
-     forecasts$thetam <- forecast(object$thetam, h = h, level = level)
+     forecasts$thetam <- forecast(object$thetam, h = h, level = level, ...)
      forecasts$pointForecasts[, "thetam"] <- forecasts$thetam$mean
   }
   if("nnetar" %in% includedModels){
-    forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xreg, PI = PI, level = level)
+    forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xreg, PI = PI, level = level, ...)
     forecasts$pointForecasts[, "nnetar"] <- forecasts$nnetar$mean
   }
   if("stlm" %in% includedModels){
-    forecasts$stlm <- forecast(object$stlm, h = h, xreg = xreg, level = level)
+    forecasts$stlm <- forecast(object$stlm, h = h, xreg = xreg, level = level, ...)
     forecasts$pointForecasts[, "stlm"] <- forecasts$stlm$mean
   }
   if("tbats" %in% includedModels){
-    forecasts$tbats <- forecast(object$tbats, h = h, level = level)
+    forecasts$tbats <- forecast(object$tbats, h = h, level = level, ...)
     forecasts$pointForecasts[, "tbats"] <- forecasts$tbats$mean
   }
 
