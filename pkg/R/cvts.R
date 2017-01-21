@@ -228,8 +228,6 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 #' Obtain cross validated forecasts when rolling cross validation is used. The object is not
 #' inspected to see if it was fit using a rolling origin
 #' 
-#' @importFrom purrr map
-#' @importFrom purrr reduce
 #' @export 
 #' @param cvts An object of class cvts
 #' 
