@@ -245,8 +245,20 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 #' 
 #' extractRollingForecasts(cv)
 #' }
-extractRollingForecasts <- function(cvts) {
-   map(cvts$forecasts, ~ .x$mean) %>%
-      reduce(tsCombine)
+extractForecasts <- function(cv, horizon = 1) {
+      if (horizon > cv$params$maxHorizon) 
+         stop("Cannot extract forecasts with a horizon greater than the model maxHorizon")
+      pointfList <- Map(function(fcast) {
+         pointf <- fcast$mean
+         window(pointf, start = time(pointf)[horizon], 
+                                   end = time(pointf)[horizon])
+         }, 
+         cv$forecasts) 
+      
+      pointf <- Reduce(tsCombine, pointfList)
+      
+      #Ensure all points in the original series are represented (makes it easy for comparisons)
+      template <- replace(cv$x, c(1:length(cv$x)), NA)
+      return(tsCombine(pointf, template))
 }
 
