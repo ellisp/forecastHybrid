@@ -55,22 +55,22 @@ if(require(forecast) &  require(testthat)){
       ets_fit <- ets(window(AirPassengers, end = c(1959, 12)), model = "MAM")
       
       ## The call objects alone are different seemingly because of the do.call used in cvts
-      ets_without_call <- forecast(ets_fit, 12) %>% {.[setdiff(names(.), c("model", "call"))]}
-      fc_last_without_call <- cv$forecasts[[11]][setdiff(names(cv$forecasts[[11]]), c("model", "call"))]
+      ets_with_call <- forecast(ets_fit, 12) 
+      ets_without_call <- ets_with_call[setdiff(names(ets_with_call), c("model", "call"))]
+      fc_last_without_call <- cv$forecasts[[11]][setdiff(names(cv$forecasts[[11]]), 
+                                                         c("model", "call"))]
       
       expect_identical(ets_without_call, fc_last_without_call)
    })
    
-   test_that("Extract rolling forecasts works", {
+   test_that("Extract forecasts works", {
      
+      cv <- cvts(AirPassengers, FUN = naive_forecast, FCFUN = forecastFunction, rolling = TRUE, 
+                 windowSize = 1, maxHorizon = 1)
       
-      cv <- cvts(AirPassengers, FUN = naive_forecast, FCFUN = forecastFunction, rolling = TRUE, windowSize = 1,
-                 maxHorizon = 1)
-      
-      forecasts <- extractRollingForecasts(cv) %>%
-         lag() 
+      lagged_forecasts <- window(lag(extractForecasts(cv, 1)), start = c(1949, 1))
       orig <- window(AirPassengers, end = c(1960, 11))
       
-      expect_equal(forecasts, orig)
+      expect_equal(lagged_forecasts, orig)
    })
 }
