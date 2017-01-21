@@ -1,5 +1,25 @@
 # Unit tests on the cvts function
 if(require(forecast) &  require(testthat)){
+   naive_forecast <- function(train) {
+      result <- list()
+      result$series <- train
+      result$forecast <- train[length(train)]
+      class(result) <- "naive_model"
+      return(result)
+   }
+   
+   forecastFunction <- function(model, h = 12) {
+      result <- list()
+      result$model <- model
+      freq <- tsp(model$series)[3]
+      result$mean <- rep(model$forecast, h)
+      tsp(result$mean) <- c(tsp(model$series)[2] + 1/freq, tsp(model$series)[2] + h/freq,
+                            freq) 
+      
+      class(result) <- "forecast"
+      return(result)
+   }
+   
   context("Testing input for cvts()")
   test_that("Testing invalid inputs", {
     expect_error(cvts("invalid"))
@@ -17,23 +37,8 @@ if(require(forecast) &  require(testthat)){
      expect_error(accuracy(cv), NA)
   })
   test_that("Rolling forecasts work", {
-     naive_forecast <- function(train) {
-        result <- list()
-        result$series <- train
-        result$forecast <- train[length(train)]
-        class(result) <- "naive_model"
-        return(result)
-     }
      
-     forecast.naive_model <- function(model, h = 12) {
-        result <- list()
-        result$model <- model
-        result$mean <- rep(model$forecast, h)
-        class(result) <- "forecast"
-        return(result)
-     }
-     
-     cv <- cvts(AirPassengers, FUN = naive_forecast, FCFUN = forecast, rolling = TRUE, windowSize = 1,
+     cv <- cvts(AirPassengers, FUN = naive_forecast, FCFUN = forecastFunction, rolling = TRUE, windowSize = 1,
                 maxHorizon = 1)
      
      forecasts <- vapply(cv$forecasts, function(x) x[[2]], numeric(1))
@@ -57,30 +62,12 @@ if(require(forecast) &  require(testthat)){
    })
    
    test_that("Extract rolling forecasts works", {
-      naive_forecast <- function(train) {
-         result <- list()
-         result$series <- train
-         result$forecast <- train[length(train)]
-         class(result) <- "naive_model"
-         return(result)
-      }
+     
       
-      forecast.naive_model <- function(model, h = 12) {
-         result <- list()
-         result$model <- model
-         freq <- tsp(model$series)[3]
-         result$mean <- rep(model$forecast, h)
-         tsp(result$mean) <- c(tsp(model$series)[2] + 1/freq, tsp(model$series)[2] + h/freq,
-                                freq) 
-                           
-         class(result) <- "forecast"
-         return(result)
-      }
-      
-      cv <- cvts(AirPassengers, FUN = naive_forecast, FCFUN = forecast, rolling = TRUE, windowSize = 1,
+      cv <- cvts(AirPassengers, FUN = naive_forecast, FCFUN = forecastFunction, rolling = TRUE, windowSize = 1,
                  maxHorizon = 1)
       
-      forecasts <- extract_rolling_forecasts(cv) %>%
+      forecasts <- extractRollingForecasts(cv) %>%
          lag() 
       orig <- window(AirPassengers, end = c(1960, 11))
       
