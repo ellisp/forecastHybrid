@@ -73,4 +73,23 @@ if(require(forecast) &  require(testthat)){
       
       expect_equal(lagged_forecasts, orig)
    })
+
+   test_that("Time series partitions work", {
+
+       slices <- tsPartition(AirPassengers, TRUE, 1, 1)
+       trainIndices <- Map(function(x) x$trainIndices, slices)
+       allTrainIndices <- Reduce(c, trainIndices)
+       expect_equal(allTrainIndices, seq(1, length(AirPassengers) - 1, 1))
+
+       testIndices <- Map(function(x) x$testIndices, slices)
+       allTestIndices <- Reduce(c, testIndices)
+       expect_equal(allTestIndices, seq(2, length(AirPassengers), 1))
+
+       maxHorizon <- sample(c(1:10), 1)
+       slices <- tsPartition(AirPassengers, FALSE, 1, maxHorizon)
+       trainIndices <- Map(function(x) x$trainIndices, slices)
+       expectedTrainIndices <- lapply(seq(1, (length(AirPassengers) - 1), 1), function(x) seq(1, x, 1))
+       expect_equal(trainIndices, expectedTrainIndices)
+   })
+   
 }
