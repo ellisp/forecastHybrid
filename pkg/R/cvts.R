@@ -150,48 +150,35 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                     ncol = maxHorizon)
 
   forecasts <- fits <- vector("list", nrow(results))
+  slices <- tsPartition(x, rolling, windowSize, maxHorizon)
 
-  # Needed for nonrolling
-  startWindow <- 1
-  endWindow <- windowSize
   # Perform the cv fits
   # adapted from code from Rob Hyndman at http://robjhyndman.com/hyndsight/tscvexample/
   # licensend under >= GPL2 from the author
   
-  # TODO: Clean up subsetting using time(x)
-  stsp <- tsp(x)[1]
-  for(i in 1:nrow(results)){
+  for (sliceNum in seq_along(slices)) {
     if(verbose){
-      cat("Fitting fold", i, "of", nrow(results), "\n")
+      cat("Fitting fold", sliceNum, "of", nrow(results), "\n")
     }
-    # Sample the correct slice for rolling
-    if(rolling){
-      etsp <- stsp + (windowSize - 1)/frequency(x)
-      y <- window(x, start = stsp, end = etsp)
-      fstsp <- stsp + windowSize / frequency(x)
-      fetsp <- fstsp + (maxHorizon - 1) / frequency(x)
-      stsp <- stsp + 1 / frequency(x)
-    }
-    # Sample the correct slice for nonrolling
-    else{
-      etsp <- stsp + (windowSize - 1) / frequency(x) + maxHorizon * (i - 1) / frequency(x)
-      y <- window(x, end = etsp)
-      fstsp <- tsp(y)[2] + 1 / frequency(x)
-      fetsp <- stsp + (windowSize - 1) / frequency(x) + maxHorizon * i / frequency(x)
-    }
-    ynext <- window(x, start = fstsp, end = fetsp)
 
-    # Perfom the simulation
-    mod <- do.call(FUN, list(y, ...))
+    tsTrain <- tsSubsetWithIndices(x, slices[[sliceNum]]$trainIndices)
+    tsTest <- tsSubsetWithIndices(x, slices[[sliceNum]]$testIndices)
+
+    mod <- do.call(FUN, list(tsTrain, ...))
     fc <- do.call(FCFUN, list(mod, h = maxHorizon))
+    
     if(saveModels){
-      fits[[i]] <- mod
+      fits[[sliceNum]] <- mod
     }
+
     if(saveForecasts){
-      forecasts[[i]] <- fc
+      forecasts[[sliceNum]] <- fc
     }
-    results[i, ] <- ynext - fc$mean
+    
+    results[sliceNum, ] <- tsTest - fc$mean
+
   }
+  
   # Average the results from all forecast horizons up to maxHorizon
   if(horizonAverage){
     results <- as.matrix(rowMeans(results), ncol = 1)
