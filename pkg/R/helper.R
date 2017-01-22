@@ -20,7 +20,8 @@
 #' If the function call is tsCombine(t1, t2), the overlapping portion of t1 and t2 
 #' (Aug-Dec 2015 in this example), would have values from t1 as long as they are not NA. 
 #' If the call is tsCombine(t2, t1), it will have values from t2 as long as they are not NA. 
-#' 
+#'
+#' @author Ganesh Krishnan 
 #' @examples 
 #' tsCombine(window(AirPassengers, end = c(1951, 12)), window(AirPassengers, start = c(1952, 1)))
 tsCombine <- function(...) {
