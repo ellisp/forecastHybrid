@@ -19,6 +19,7 @@
 #' @param saveModels should the individual models be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param saveForecasts should the individual forecast from each model be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param verbose should the current progress be printed to the console?
+#' @param ... Other arguments to be passed to the model function FUN
 #'
 #' @details Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
 #' without serial correlation since observations \eqn{x_t}{x[t]} and \eqn{x_{t+n}}{x[t+n]} are not independent. The \code{cvts()} function overcomes
@@ -103,7 +104,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  horizonAverage = FALSE,
                  saveModels = ifelse(length(x) > 500, FALSE, TRUE),
                  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
-                 verbose = TRUE){
+                 verbose = TRUE, ...){
   # Default model function
   # This can be useful for methods that estimate the model and forecasts in one step
   # e.g. GMDH() from the "GMDH" package or thetaf()/meanf()/rwf() from "forecast". In this case,
@@ -156,6 +157,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # Perform the cv fits
   # adapted from code from Rob Hyndman at http://robjhyndman.com/hyndsight/tscvexample/
   # licensend under >= GPL2 from the author
+  
+  # TODO: Clean up subsetting using time(x)
   stsp <- tsp(x)[1]
   for(i in 1:nrow(results)){
     if(verbose){
@@ -179,7 +182,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     ynext <- window(x, start = fstsp, end = fetsp)
 
     # Perfom the simulation
-    mod <- do.call(FUN, list(y))
+    mod <- do.call(FUN, list(y, ...))
     fc <- do.call(FCFUN, list(mod, h = maxHorizon))
     if(saveModels){
       fits[[i]] <- mod
@@ -200,10 +203,62 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   if(!saveForecasts){
     forecasts <- NULL
   }
-  result <- list(forecasts = forecasts, models = fits, residuals = results)
+  
+  params <- list(FUN = FUN,
+                 FCFUN = FCFUN,
+                 rolling = rolling,
+                 windowSize = windowSize,
+                 maxHorizon = maxHorizon,
+                 horizonAverage = horizonAverage,
+                 saveModels = saveModels,
+                 saveForecasts = saveForecasts,
+                 verbose = verbose,
+                 extra = list(...))
+  
+  result <- list(x = x,
+               params = params,
+               forecasts = forecasts, 
+               models = fits, 
+               residuals = results)
+  
   class(result) <- "cvts"
   return(result)
 }
 
-
+#' Extract cross validated rolling forecasts
+#' 
+#' Obtain cross validated forecasts when rolling cross validation is used. The object is not
+#' inspected to see if it was fit using a rolling origin
+#' 
+#' @export 
+#' @param cvts An object of class cvts
+#' 
+#' @return Forecasts computed via a rolling origin
+#' 
+#' @details Combine the cross validated forecasts fit with a rolling origin. This may be useful
+#' to visualize and investigate the cross validated performance of the model
+#' 
+#' @examples 
+#' \dontrun{
+#' cv <- cvts(AirPassengers, FUN = "ets", FCFUN = "forecast", 
+#'         rolling = TRUE, windowSize = 12, horizon = 2)
+#' 
+#' extractRollingForecasts(cv)
+#' }
+extractForecasts <- function(cv, horizon = 1) {
+      if (horizon > cv$params$maxHorizon) 
+         stop("Cannot extract forecasts with a horizon greater than the model maxHorizon")
+      pointfList <- Map(function(fcast) {
+         pointf <- fcast$mean
+         window(pointf, start = time(pointf)[horizon], 
+                                   end = time(pointf)[horizon])
+         }, 
+         cv$forecasts) 
+      
+      pointf <- Reduce(tsCombine, pointfList)
+      
+      #Ensure all points in the original series are represented (makes it easy for comparisons)
+      template <- replace(cv$x, c(1:length(cv$x)), NA)
+      return(tsCombine(pointf, template))
+}
 
