@@ -16,6 +16,7 @@
 #' @param maxHorizon maximum length of the forecast horizon to use for computing errors.
 #' @param horizonAverage should the final errors be an average over all forecast horizons up to \code{maxHorizon} instead of producing
 #' metrics for each individual horizon?
+#' @param xreg External regressors to be used to fit the model. Only used if FUN accepts xreg as an argument. FCFUN is also expected to accept it (see details)
 #' @param saveModels should the individual models be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param saveForecasts should the individual forecast from each model be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param verbose should the current progress be printed to the console?
@@ -51,6 +52,9 @@
 #' save fitted values, residual values, summary statistics, coefficient matrices, etc. Setting \code{saveModels = FALSE}
 #' can be safely done if there is no need to examine individual models fit at every stage of cross validation since the
 #' forecasts from each fold and the associated residuals are always saved.
+#'
+#' External regressors are allowed via the xreg argument. It is assumed that both FUN and FCFUN accept the xreg parameter if xreg is not NULL.
+#' If FUN does not accept the xreg parameter a warning will be given. No warning is provided if FCFUN does not use the xreg parameter.
 #' @seealso \code{\link{accuracy.cvts}}
 #'
 #' @examples
@@ -102,6 +106,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
                  maxHorizon = 5,
                  horizonAverage = FALSE,
+                 xreg = NULL,
                  saveModels = ifelse(length(x) > 500, FALSE, TRUE),
                  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
                  verbose = TRUE, ...){
@@ -143,6 +148,16 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     stop("The time series must be longer than windowSize + 2 * maxHorizon.")
   }
 
+  # Check if fitting function accepts xreg when xreg is not NULL
+  xregUse <- FALSE
+  if (!is.null(xreg)) {
+    fitArgs <- formals(FUN)
+    if (any(grepl("xreg", names(fitArgs))))
+      xregUse <- TRUE
+    else
+      warning("Ignoring xreg parameter since fitting function does not accept xreg")
+  }
+  
   # Combined code for rolling/nonrolling CV
 
   results <- matrix(NA,
@@ -161,11 +176,21 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
       cat("Fitting fold", sliceNum, "of", nrow(results), "\n")
     }
 
-    tsTrain <- tsSubsetWithIndices(x, slices[[sliceNum]]$trainIndices)
-    tsTest <- tsSubsetWithIndices(x, slices[[sliceNum]]$testIndices)
+    trainIndices <- slices[[sliceNum]]$trainIndices
+    testIndices <- slices[[sliceNum]]$testIndices
+    
+    tsTrain <- tsSubsetWithIndices(x, trainIndices)
+    tsTest <- tsSubsetWithIndices(x, testIndices)
 
-    mod <- do.call(FUN, list(tsTrain, ...))
-    fc <- do.call(FCFUN, list(mod, h = maxHorizon))
+    if (xregUse) {
+      xregTrain <- xreg[trainIndices,,drop = FALSE]
+      xregTest <- xreg[testIndices,,drop = FALSE]
+      mod <- do.call(FUN, list(tsTrain, xreg = xregTrain, ...))
+      fc <- do.call(FCFUN, list(mod, xreg = xregTest, h = maxHorizon))
+    } else {
+      mod <- do.call(FUN, list(tsTrain, ...))
+      fc <- do.call(FCFUN, list(mod, h = maxHorizon))
+    }
     
     if(saveModels){
       fits[[sliceNum]] <- mod
