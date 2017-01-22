@@ -231,13 +231,15 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 #' inspected to see if it was fit using a rolling origin
 #' 
 #' @export 
-#' @param cvts An object of class cvts
+#' @param cv An object of class cvts
+#' @param h The forecast horizon from each fold to extract
 #' 
 #' @return Forecasts computed via a rolling origin
 #' 
 #' @details Combine the cross validated forecasts fit with a rolling origin. This may be useful
 #' to visualize and investigate the cross validated performance of the model
 #' 
+#' @author Ganesh Krishnan
 #' @examples 
 #' \dontrun{
 #' cv <- cvts(AirPassengers, FUN = "ets", FCFUN = "forecast", 
