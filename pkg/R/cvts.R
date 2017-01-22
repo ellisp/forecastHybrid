@@ -225,6 +225,50 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   return(result)
 }
 
+#' Generate training and test indices for time series cross validation
+#' 
+#' Training and test indices are generated for time series cross validation.
+#' Generated indices are based on the training windowSize, forecast horizons
+#' and whether a rolling or non-rolling cross validation procedure is desired.
+#' 
+#' @export 
+#' @param x A time series
+#' @param rolling Should indices be generated for a rolling or non-rolling procedure?
+#' @param windowSize Size of window for training
+#' @param maxHorizon Maximum forecast horizon
+#' 
+#' @return List containing train and test indices for each fold
+#' 
+#' @author Ganesh Krishnan
+#' @examples 
+#' \dontrun{
+#' tsPartition(AirPassengers, rolling = TRUE, windowSize = 10, maxHorizon = 2)
+#' }
+
+tsPartition <- function(x, rolling, windowSize, maxHorizon) {
+  numPartitions <- ifelse(rolling, length(x) - windowSize - maxHorizon + 1, as.integer((length(x) - windowSize) / maxHorizon))
+
+  slices <- rep(list(NA), numPartitions)
+  start <- 1
+
+    for (i in 1:numPartitions) {
+        if(rolling){
+            trainIndices <- seq(start, start + windowSize - 1, 1)
+            testIndices <-  seq(start + windowSize, start + windowSize + maxHorizon - 1)
+            start <- start + 1
+        }
+        ## Sample the correct slice for nonrolling
+        else{
+            trainIndices <- seq(start, start + windowSize - 1 + maxHorizon * (i - 1), 1)
+            testIndices <- seq(start + windowSize + maxHorizon * (i - 1), start + windowSize - 1 + maxHorizon * i)
+        }
+
+        slices[[i]] <- list(trainIndices = trainIndices, testIndices = testIndices)
+    }
+
+    return(slices)
+}
+
 #' Extract cross validated rolling forecasts
 #' 
 #' Obtain cross validated forecasts when rolling cross validation is used. The object is not
