@@ -229,6 +229,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  extra = list(...))
   
   result <- list(x = x,
+               xreg = xreg,
                params = params,
                forecasts = forecasts, 
                models = fits, 
