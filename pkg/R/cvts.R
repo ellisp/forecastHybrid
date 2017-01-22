@@ -152,9 +152,10 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   xregUse <- FALSE
   if (!is.null(xreg)) {
     fitArgs <- formals(FUN)
-    if (any(grepl("xreg", names(fitArgs))))
+    if (any(grepl("xreg", names(fitArgs)))) {
       xregUse <- TRUE
-    else
+      xreg <- as.matrix(xreg)
+    } else
       warning("Ignoring xreg parameter since fitting function does not accept xreg")
   }
   
