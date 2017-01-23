@@ -73,4 +73,37 @@ if(require(forecast) &  require(testthat)){
       
       expect_equal(lagged_forecasts, orig)
    })
-}
+
+   test_that("Time series partitions work", {
+
+       slices <- tsPartition(AirPassengers, TRUE, 1, 1)
+       trainIndices <- Map(function(x) x$trainIndices, slices)
+       allTrainIndices <- Reduce(c, trainIndices)
+       expect_equal(allTrainIndices, seq(1, length(AirPassengers) - 1, 1))
+
+       testIndices <- Map(function(x) x$testIndices, slices)
+       allTestIndices <- Reduce(c, testIndices)
+       expect_equal(allTestIndices, seq(2, length(AirPassengers), 1))
+   })
+
+   test_that("xreg is properly used", {
+       ## Ensure xreg is ignored when a model that does not accept xreg is used
+       expect_warning(cvts(AirPassengers, ets, xreg = data.frame(x = rnorm(AirPassengers))), "Ignoring xreg parameter since fitting function does not accept xreg")
+
+       ## Ensure xreg is ignored when NULL
+       cv <- cvts(AirPassengers, nnetar, xreg = NULL, windowSize = 100)
+       xregForEachModel <- Map(function (x) x$xreg, cv$models)
+       xregAllModels <- Reduce(c, xregForEachModel)
+       expect_identical(xregAllModels, NULL)
+
+       ## Ensure xreg is used when a model accepts xreg and xreg is a vector
+       xreg <-  rnorm(length(AirPassengers))
+       maxHorizon <- 2
+       cv <- cvts(AirPassengers, nnetar, maxHorizon = maxHorizon,
+                  xreg = xreg, windowSize = 100)
+
+       xregsAllModels <- Map(function(x) x$xreg, cv$models)
+       xregsLast <- xregsAllModels[[length(xregsAllModels)]]
+       expect_equal(xreg[1:(length(AirPassengers) - maxHorizon)], as.numeric(xregsLast))
+   })
+ }

@@ -25,3 +25,6 @@ forecastHybrid.Rcheck*
 pkg/vignettes/forecastHybrid_cache/*
 pkg/vignettes/forecastHybrid_files/*
 extended-tests/m3test.rda
+/pkg/R/.dir-locals.el
+/pkg/R/temp.R
+.gitignore
