@@ -290,7 +290,7 @@ tsPartition <- function(x, rolling, windowSize, maxHorizon) {
 #' 
 #' @export 
 #' @param cv An object of class cvts
-#' @param h The forecast horizon from each fold to extract
+#' @param horizon The forecast horizon from each fold to extract
 #' 
 #' @return Forecasts computed via a rolling origin
 #' 
