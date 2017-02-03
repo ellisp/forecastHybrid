@@ -157,8 +157,8 @@ forecast.hybridModel <- function(object,
         tmpUpper <- tmpLower <- matrix(NA, nrow = h, ncol = length(piModels))
         j2 <- 1
         for(j in piModels){
-           tmpUpper[, j2] <- as.numeric(forecasts[[j]]$upper[, i])
-           tmpLower[, j2] <- as.numeric(forecasts[[j]]$lower[, i])
+           tmpUpper[, j2] <- as.numeric(matrix(forecasts[[j]]$upper, nrow = h)[, i])
+           tmpLower[, j2] <- as.numeric(matrix(forecasts[[j]]$lower, nrow = h)[, i])
            j2 <- j2 + 1
         }
         # upper/lower prediction intervals are the extreme values for now
