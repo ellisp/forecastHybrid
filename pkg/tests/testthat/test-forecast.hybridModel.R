@@ -14,6 +14,7 @@ if(require(forecast) &  require(testthat)){
                                      xreg = matrix("a", nrow = 5, ncol = 2)))
     expect_error(forecast(object = hModel, h = 5,
                                      xreg = 1:12))
+    expect_error(forecast.hybridModel("a"))
   })
   test_that("Testing forecasts with xreg", {
     # # Test a simple et model
