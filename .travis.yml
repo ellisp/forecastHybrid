@@ -14,7 +14,7 @@ before_install:
   
 install:
   - Rscript -e 'install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown"))'
-  - Rscript -e 'devtools::install_deps()'
+  - Rscript -e 'devtools::install_deps(); install.packages("covr")'
 script:
   - Rscript -e 'devtools::check()'
   
