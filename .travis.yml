@@ -27,4 +27,4 @@ r_github_packages:
   - jimhester/covr
 
 after_success:
-  - covr::coveralls()'
+  - Rscript -e 'covr::coveralls()'
