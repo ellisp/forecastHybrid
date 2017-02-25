@@ -162,16 +162,16 @@ hybridModel <- function(y, models = "aefnst",
     warning("auto.arima was not selected in the models argument, but a.args was passed. Ignoring a.args")
   }
   if(!is.null(e.args) && !is.element("e", expandedModels)){
-    warning("ets was not selected in the models argument, but e.args was passed. Ignoring a.args")
+    warning("ets was not selected in the models argument, but e.args was passed. Ignoring e.args")
   }
   if(!is.null(n.args) && !is.element("n", expandedModels)){
-    warning("nnetar was not selected in the models argument, but n.args was passed. Ignoring a.args")
+    warning("nnetar was not selected in the models argument, but n.args was passed. Ignoring n.args")
   }
   if(!is.null(s.args) && !is.element("s", expandedModels)){
-    warning("stlm was not selected in the models argument, but s.args was passed. Ignoring a.args")
+    warning("stlm was not selected in the models argument, but s.args was passed. Ignoring s.args")
   }
   if(!is.null(t.args) && !is.element("t", expandedModels)){
-    warning("tbats was not selected in the models argument, but t.args was passed. Ignoring a.args")
+    warning("tbats was not selected in the models argument, but t.args was passed. Ignoring t.args")
   }
 
   # Check for problems for specific models (e.g. long seasonality for ets and non-seasonal for stlm or nnetar)
