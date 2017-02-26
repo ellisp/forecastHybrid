@@ -6,6 +6,7 @@
 #' @import forecast
 #' @import stats
 #' @import graphics
+#' @import zoo
 #' @param y A numeric vector or time series.
 #' @param lambda
 #' Box-Cox transformation parameter.
