@@ -6,6 +6,7 @@
 * Unit tests were optimized for speed, and the package tests in half the previous time.
 * The behavior of the `forecast()` function from the "forecast" package when multiple or single prediction intervals are passed has changed. The prediction inervals are now consistently returned as matrices. This change fixes a bug in `forecast.hybridModel()` when multiple prediction intervals are used.
 * Fixed a bug with `forecast.hybridModel()` for `ets`, `nnetar`, and `stlm` component models when the `level` argument was set to a single value.
+* Fixed warning message for superfolous lists passed to base models in `hybridModel()`
 
 # Version 0.3.0 [2016-12-18]
 * Prediction intervals are now created for `nnetar` objects in the ensemble. This should address one aspect of incorrect prediction intervals (e.g. issue #37).
