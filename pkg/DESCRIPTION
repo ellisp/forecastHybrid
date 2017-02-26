@@ -17,6 +17,7 @@ Depends:
     forecast (>= 7.3)
 Imports:
     reshape2 (>= 1.4.2),
+    zoo (>= 1.7)
 Suggests:
     knitr,
     rmarkdown,
