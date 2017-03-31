@@ -26,7 +26,7 @@ and \code{fan} are ignored.}
 
 \item{fan}{if \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.}
 
-\item{...}{other arguments; currently not used.}
+\item{...}{other arguments passed to the individual \code{forecast} generic methods.}
 }
 \value{
 An object of class \link[forecast]{forecast}.
@@ -63,10 +63,9 @@ fc$lower
 plot(fc)
 }
 }
-\author{
-David Shaub
-}
 \seealso{
 \code{\link{hybridModel}}
 }
-
+\author{
+David Shaub
+}

@@ -15,7 +15,7 @@ hybridModel(y, models = "aefnst", lambda = NULL, a.args = NULL,
 \item{y}{A numeric vector or time series.}
 
 \item{models}{A character string of up to six characters indicating which contributing models to use:
-a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}), 
+a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}),
 f (\code{\link{thetam}}), n (\code{\link[forecast]{nnetar}}),
 s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}}).}
 
@@ -117,12 +117,11 @@ mod3$stlm
 }
 
 }
-\author{
-David Shaub
-}
 \seealso{
 \code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}},
 \code{\link[forecast]{ets}}, \code{\link{thetam}}, \code{\link[forecast]{nnetar}},
 \code{\link[forecast]{stlm}}, \code{\link[forecast]{tbats}}
 }
-
+\author{
+David Shaub
+}

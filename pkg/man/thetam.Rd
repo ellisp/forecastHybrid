@@ -27,10 +27,9 @@ used in \code{hybridModel()}.
 mod1 <- thetam(Nile)
 plot(mod1)
 }
-\author{
-Peter Ellis
-}
 \seealso{
 \code{\link{forecast.thetam}}
 }
-
+\author{
+Peter Ellis
+}

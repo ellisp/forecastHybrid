@@ -1,6 +1,7 @@
-# Version 0.3.1 [Unreleased]
+# Version 0.4.0 [2017-03-31]
+* Import the "zoo" package 
 * Fixed a bug in `cvts()` when using `rolling = TRUE` whereby the incorrect number of periods were calulated. Thanks to Ganesh Krishnan for the bugfix.
-  * The `cvts()` function now allows additional arguments to be passed with `...`.
+  * The `cvts()` function now allows additional arguments to be passed with `...`. Thanks to Ganesh Krishnan.
 * Additional `...` arguments can be passed to the individual component models in `forecast.hybridModel()`.
 * Documentation fixes and improvements, particularly for the `cvts()` function.
 * Unit tests were optimized for speed, and the package tests in half the previous time.

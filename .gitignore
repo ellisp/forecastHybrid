@@ -28,3 +28,5 @@ extended-tests/m3test.rda
 /pkg/R/.dir-locals.el
 /pkg/R/temp.R
 .gitignore
+pkg/..Rcheck/
+pkg.Rcheck/

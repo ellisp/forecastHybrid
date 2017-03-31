@@ -20,4 +20,6 @@ Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The
 \code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy is calculated for each
 forecast horizon up to \code{maxHorizon}
 }
-
+\author{
+David Shaub
+}

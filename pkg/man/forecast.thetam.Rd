@@ -29,10 +29,9 @@ mod1 <- thetam(Nile)
 fc1 <- forecast(mod1)
 plot(fc1)
 }
-\author{
-Peter Ellis
-}
 \seealso{
 \code{\link{thetam}}
 }
-
+\author{
+Peter Ellis
+}

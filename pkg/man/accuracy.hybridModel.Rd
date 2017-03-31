@@ -24,10 +24,9 @@ objects.
 \details{
 Return the in-sample accuracy measures for the component models of the hybridModel
 }
-\author{
-David Shaub
-}
 \seealso{
 \code{\link[forecast]{accuracy}}
 }
-
+\author{
+David Shaub
+}

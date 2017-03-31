@@ -19,4 +19,3 @@ Generic method for accuracy.
 \seealso{
 \code{\link[forecast]{accuracy}}, \code{\link{accuracy.hybridModel}}
 }
-

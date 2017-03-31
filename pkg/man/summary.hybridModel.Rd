@@ -15,4 +15,3 @@ Print a summary of the hybridModel object
 \details{
 Print the names of the individual component models and their weights.
 }
-

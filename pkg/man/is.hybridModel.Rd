@@ -15,4 +15,3 @@ A boolean indicating if the object is a \code{hybridModel} is returned.
 \description{
 Test if the object is a \code{hybridModel} object.
 }
-

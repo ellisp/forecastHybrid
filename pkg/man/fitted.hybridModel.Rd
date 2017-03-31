@@ -23,4 +23,3 @@ Extract the model fitted values from the \code{hybridModel} object.
 \seealso{
 \code{\link{accuracy}}
 }
-

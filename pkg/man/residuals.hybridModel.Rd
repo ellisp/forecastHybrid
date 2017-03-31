@@ -23,4 +23,3 @@ Extract the model residuals from the \code{hybridModel} object.
 \seealso{
 \code{\link{accuracy}}
 }
-

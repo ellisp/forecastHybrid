@@ -27,10 +27,9 @@ component shows the direction and slope of drift that is used in the forecasting
 model <- thetam(wineind)
 plot(model)
 }
-\author{
-Peter Ellis
-}
 \seealso{
 \code{\link{thetam}}
 }
-
+\author{
+Peter Ellis
+}

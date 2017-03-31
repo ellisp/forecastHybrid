@@ -5,9 +5,9 @@
 \title{Cross validation for time series}
 \usage{
 cvts(x, FUN = NULL, FCFUN = NULL, rolling = FALSE, windowSize = 84,
-  maxHorizon = 5, horizonAverage = FALSE, saveModels = ifelse(length(x) >
-  500, FALSE, TRUE), saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
-  verbose = TRUE)
+  maxHorizon = 5, horizonAverage = FALSE, xreg = NULL,
+  saveModels = ifelse(length(x) > 500, FALSE, TRUE),
+  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE), verbose = TRUE, ...)
 }
 \arguments{
 \item{x}{the input time series.}
@@ -30,11 +30,15 @@ of this length and grow by one each iteration.}
 \item{horizonAverage}{should the final errors be an average over all forecast horizons up to \code{maxHorizon} instead of producing
 metrics for each individual horizon?}
 
+\item{xreg}{External regressors to be used to fit the model. Only used if FUN accepts xreg as an argument. FCFUN is also expected to accept it (see details)}
+
 \item{saveModels}{should the individual models be saved? Set this to \code{FALSE} on long time series to save memory.}
 
 \item{saveForecasts}{should the individual forecast from each model be saved? Set this to \code{FALSE} on long time series to save memory.}
 
 \item{verbose}{should the current progress be printed to the console?}
+
+\item{...}{Other arguments to be passed to the model function FUN}
 }
 \description{
 Perform cross validation on a time series.
@@ -70,10 +74,14 @@ For small time series (default \code{length <= 500}), all of the individual fit 
 save fitted values, residual values, summary statistics, coefficient matrices, etc. Setting \code{saveModels = FALSE}
 can be safely done if there is no need to examine individual models fit at every stage of cross validation since the
 forecasts from each fold and the associated residuals are always saved.
+
+External regressors are allowed via the xreg argument. It is assumed that both FUN and FCFUN accept the xreg parameter if xreg is not NULL.
+If FUN does not accept the xreg parameter a warning will be given. No warning is provided if FCFUN does not use the xreg parameter.
 }
 \examples{
 cvmod1 <- cvts(AirPassengers, FUN = stlm,
                windowSize = 48, maxHorizon = 12)
+accuracy(cvmod1)
 
 \dontrun{
 cvmod2 <- cvts(USAccDeaths, FUN = ets,
@@ -115,7 +123,9 @@ rwcv <- cvts(AirPassengers, FCFUN = rwf)
 }
 
 }
+\seealso{
+\code{\link{accuracy.cvts}}
+}
 \author{
 David Shaub
 }
-
