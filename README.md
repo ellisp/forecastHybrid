@@ -8,7 +8,7 @@ Convenient functions for ensemble forecasts in R combining approaches from the [
 
 For a more detailed description of the package and usage, consult the [vignette](https://cran.r-project.org/web/packages/forecastHybrid/vignettes/forecastHybrid.html).
 
-The package is still under heavy development, but many basic features have been implemented. Some features (such as optimized parallelization between rather than within models, cross validation for determing model error rates, and automatically selecting the optimal combination of base models) have not yet been developed.
+The package is still under development, but many basic features have been implemented. Some features (such as optimized parallelization between rather than within models and automatically selecting the optimal combination of base models) have not yet been developed.
 
 
 ## Installation
@@ -24,7 +24,7 @@ The latest development version can be installed using the [devtools](https://cra
 ```r
 devtools::install_github("ellisp/forecastHybrid/pkg")
 ```
-Version updates to CRAN will be published frequently after new features are implemented, so the development version is not recommended unless you plan to modify the code.
+Version updates to CRAN will be published frequently after new features are implemented, so the development version is not recommended unless you plan to modify the code or a particular bugfix is needed.
 
 ## Usage
 
@@ -210,6 +210,6 @@ fc2 <- forecast(hm2, h = 48, level = c(70, 80, 90, 95))
 ```
 
 ## License
-(c) 2016 David Shaub and Peter Ellis.
+(c) 2016-2017 David Shaub and Peter Ellis.
 
 This package is free software released under the [GPL-3](http://www.gnu.org/licenses/gpl-3.0.en.html) license.
