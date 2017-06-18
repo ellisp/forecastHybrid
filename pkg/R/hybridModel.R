@@ -481,33 +481,6 @@ residuals.hybridModel <- function(object,
 }
 
 
-#' Generic method for accuracy
-#'
-#' Generic method for accuracy.
-#'
-#' @param f an object of class forecast, or a numerical vector containing forecasts.
-#' It will also work with Arima, ets and lm objects if x is omitted - in which case
-#' in-sample accuracy measures are returned.
-#' @param ... other arguments (ignored).
-#' @seealso \code{\link[forecast]{accuracy}}, \code{\link{accuracy.hybridModel}}
-#' @export
-#'
-accuracy.default <-  function(f, ...){
-  forecast::accuracy(f, ...)
-}
-
-#' Generic method for accuracy
-#'
-#' Generic method for accuracy.
-#'
-#' @param f the input object.
-#' @param ... other arguments (ignored).
-#' @seealso \code{\link[forecast]{accuracy}}, \code{\link{accuracy.hybridModel}}
-#' @export
-accuracy <- function(f,...){
-  UseMethod("accuracy")
-}
-
 #' Accuracy measures for hybridModel objects
 #'
 #' Accuracy measures for hybridModel

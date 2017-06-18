@@ -1,3 +1,6 @@
+# Version 0.4.1 [2017-06-18]
+* The "forecast" package v8.1 now declares the S3 method `accuracy()`, so this is imported and no longer declared in "forecastHybrid".
+
 # Version 0.4.0 [2017-03-31]
 * Import the "zoo" package 
 * Fixed a bug in `cvts()` when using `rolling = TRUE` whereby the incorrect number of periods were calulated. Thanks to Ganesh Krishnan for the bugfix.
