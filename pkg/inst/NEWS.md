@@ -1,3 +1,10 @@
+# Version 1.0.8 [unreleased]
+* `cvts()` now supports parallel fitting through the `num.cores` argument.
+Note that if the model that you are fitting also utilizes parallelization,
+the number of cores used by each model multiplied by `num.cores` passed to
+`cvts()` should not exceed the number of cores on your machine.
+* The package versioning now follows [semantic versioning](http://semver.org/) more closely; however, the convention used will be `MAJOR.MINOR.RELEASE_NUM`.
+
 # Version 0.4.1 [2017-06-18]
 * The "forecast" package v8.1 now declares the S3 method `accuracy()`, so this is imported and no longer declared in "forecastHybrid".
 

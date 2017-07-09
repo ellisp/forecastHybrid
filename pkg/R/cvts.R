@@ -2,6 +2,7 @@
 #'
 #' Perform cross validation on a time series.
 #'
+#' @import doParallel
 #' @export
 #' @param x the input time series.
 #' @param FUN the model function used. Custom functions are allowed. See details and examples.
@@ -20,6 +21,9 @@
 #' @param saveModels should the individual models be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param saveForecasts should the individual forecast from each model be saved? Set this to \code{FALSE} on long time series to save memory.
 #' @param verbose should the current progress be printed to the console?
+#' @param num.cores the number of cores to use for parallel fitting. If the underlying model
+#' that is being fit also utilizes parallelization, the number of cores it is using multiplied
+#' by `num.cores` should not exceed the number of cores avaialble on your machine.
 #' @param ... Other arguments to be passed to the model function FUN
 #'
 #' @details Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
@@ -109,7 +113,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  xreg = NULL,
                  saveModels = ifelse(length(x) > 500, FALSE, TRUE),
                  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
-                 verbose = TRUE, ...){
+                 verbose = TRUE, num.cores = 1,
+                 ...){
   # Default model function
   # This can be useful for methods that estimate the model and forecasts in one step
   # e.g. GMDH() from the "GMDH" package or thetaf()/meanf()/rwf() from "forecast". In this case,
@@ -172,7 +177,10 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # adapted from code from Rob Hyndman at http://robjhyndman.com/hyndsight/tscvexample/
   # licensend under >= GPL2 from the author
   
-  for (sliceNum in seq_along(slices)) {
+  cl <- makeCluster(num.cores)
+  registerDoParallel(cl)
+  on.exit(stopCluster(cl))
+  results <- foreach (sliceNum = seq_along(slices), .packages = "forecastHybrid") %dopar% {
     if(verbose){
       cat("Fitting fold", sliceNum, "of", nrow(results), "\n")
     }
@@ -194,20 +202,21 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     }
     
     if(saveModels){
-      fits[[sliceNum]] <- mod
+      results$fits[[sliceNum]] <- mod
     }
 
     if(saveForecasts){
-      forecasts[[sliceNum]] <- fc
+      results$forecasts[[sliceNum]] <- fc
     }
     
-    results[sliceNum, ] <- tsTest - fc$mean
-
+    #results[sliceNum, ] <- tsTest - fc$mean
+    results$results <- tsTest - fc$mean
+    results
   }
   
   # Average the results from all forecast horizons up to maxHorizon
   if(horizonAverage){
-    results <- as.matrix(rowMeans(results), ncol = 1)
+    results <- as.matrix(rowMeans(results$results), ncol = 1)
   }
 
   if(!saveModels){
@@ -226,14 +235,15 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  saveModels = saveModels,
                  saveForecasts = saveForecasts,
                  verbose = verbose,
+                 num.cores = num.cores,
                  extra = list(...))
   
   result <- list(x = x,
                xreg = xreg,
                params = params,
-               forecasts = forecasts, 
-               models = fits, 
-               residuals = results)
+               forecasts = results$forecasts, 
+               models = results$fits, 
+               residuals = results$results)
   
   class(result) <- "cvts"
   return(result)

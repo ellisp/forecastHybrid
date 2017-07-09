@@ -1,6 +1,6 @@
 Package: forecastHybrid
 Title: Convenient Functions for Ensemble Time Series Forecasts
-Version: 0.4.1
+Version: 1.0.2
 Date: 2017-06-18
 Authors@R: c(
    person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
@@ -13,6 +13,7 @@ Description: Convenient functions for ensemble forecasts in R combining
     and user-supplied models and forecasting functions is also supported to evaluate model accuracy.
 Depends:
     R (>= 3.1.1),
+    doParallel(>= 1.0.10),
     ggplot2 (>= 2.2.0),
     forecast (>= 8.1)
 Imports:

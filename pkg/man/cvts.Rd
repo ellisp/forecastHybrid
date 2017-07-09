@@ -7,7 +7,8 @@
 cvts(x, FUN = NULL, FCFUN = NULL, rolling = FALSE, windowSize = 84,
   maxHorizon = 5, horizonAverage = FALSE, xreg = NULL,
   saveModels = ifelse(length(x) > 500, FALSE, TRUE),
-  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE), verbose = TRUE, ...)
+  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE), verbose = TRUE,
+  num.cores = 1, ...)
 }
 \arguments{
 \item{x}{the input time series.}
@@ -37,6 +38,10 @@ metrics for each individual horizon?}
 \item{saveForecasts}{should the individual forecast from each model be saved? Set this to \code{FALSE} on long time series to save memory.}
 
 \item{verbose}{should the current progress be printed to the console?}
+
+\item{num.cores}{the number of cores to use for parallel fitting. If the underlying model
+that is being fit also utilizes parallelization, the number of cores it is using multiplied
+by `num.cores` should not exceed the number of cores avaialble on your machine.}
 
 \item{...}{Other arguments to be passed to the model function FUN}
 }
