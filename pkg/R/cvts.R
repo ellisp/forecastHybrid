@@ -177,17 +177,18 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # adapted from code from Rob Hyndman at http://robjhyndman.com/hyndsight/tscvexample/
   # licensend under >= GPL2 from the author
   
-  cl <- makeCluster(num.cores)
-  registerDoParallel(cl)
-  on.exit(stopCluster(cl))
+  cl <- parallel::makeCluster(num.cores)
+  doParallel::registerDoParallel(cl)
+  on.exit(parallel::stopCluster(cl))
   results <- foreach (sliceNum = seq_along(slices), .packages = "forecastHybrid") %dopar% {
     if(verbose){
       cat("Fitting fold", sliceNum, "of", nrow(results), "\n")
     }
+     results <- list()
 
     trainIndices <- slices[[sliceNum]]$trainIndices
     testIndices <- slices[[sliceNum]]$testIndices
-    
+
     tsTrain <- tsSubsetWithIndices(x, trainIndices)
     tsTest <- tsSubsetWithIndices(x, testIndices)
 
@@ -200,7 +201,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
       mod <- do.call(FUN, list(tsTrain, ...))
       fc <- do.call(FCFUN, list(mod, h = maxHorizon))
     }
-    
+
     if(saveModels){
       results$fits[[sliceNum]] <- mod
     }
@@ -210,13 +211,13 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     }
     
     #results[sliceNum, ] <- tsTest - fc$mean
-    results$results <- tsTest - fc$mean
+    results$resids <- tsTest - fc$mean
     results
   }
   
   # Average the results from all forecast horizons up to maxHorizon
   if(horizonAverage){
-    results <- as.matrix(rowMeans(results$results), ncol = 1)
+    resids <- as.matrix(rowMeans(results$resids), ncol = 1)
   }
 
   if(!saveModels){
@@ -243,7 +244,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                params = params,
                forecasts = results$forecasts, 
                models = results$fits, 
-               residuals = results$results)
+               residuals = results$resids,
+               all = results)
   
   class(result) <- "cvts"
   return(result)
