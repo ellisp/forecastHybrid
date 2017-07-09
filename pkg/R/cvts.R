@@ -163,9 +163,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     } else
       warning("Ignoring xreg parameter since fitting function does not accept xreg")
   }
-  
-  # Combined code for rolling/nonrolling CV
 
+  # Combined code for rolling/nonrolling CV
   results <- matrix(NA,
                     nrow = ifelse(rolling, length(x) - windowSize - maxHorizon + 1, as.integer((length(x) - windowSize) / maxHorizon)),
                     ncol = maxHorizon)
@@ -176,11 +175,13 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # Perform the cv fits
   # adapted from code from Rob Hyndman at http://robjhyndman.com/hyndsight/tscvexample/
   # licensend under >= GPL2 from the author
-  
+
   cl <- parallel::makeCluster(num.cores)
   doParallel::registerDoParallel(cl)
   on.exit(parallel::stopCluster(cl))
-  results <- foreach (sliceNum = seq_along(slices), .packages = "forecastHybrid") %dopar% {
+  # Appease R CMD CHECK with sliceNum declaration
+  slideNum <- NULL
+  results <- foreach::foreach (sliceNum = seq_along(slices), .packages = "forecastHybrid") %dopar% {
     if(verbose){
       cat("Fitting fold", sliceNum, "of", nrow(results), "\n")
     }
@@ -203,33 +204,28 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     }
 
     if(saveModels){
-      results$fits[[sliceNum]] <- mod
+      results$fits <- mod
     }
 
     if(saveForecasts){
       results$forecasts <- fc
     }
-    
+
     #results[sliceNum, ] <- tsTest - fc$mean
     results$resids <- tsTest - fc$mean
     results
   }
 
-
   # Gather the parallel chunks
   residlist <- lapply(results, function(x) unlist(x$resids))
   resids <- matrix(unlist(residlist, use.names = FALSE),
                    ncol = maxHorizon, byrow = TRUE)
-  
-  result <- list()
-  for(i in seq_along(results)){
-     result$fits[[i]] <- unlist(results[[i]]$fits)
-     result$forecasts[[i]] <- results[[i]]$forecasts[[i]]
-  }
-  
+  forecasts <- lapply(results, function(x) x$forecasts)
+  fits <- lapply(results, function(x) x$fits)
+
   # Average the results from all forecast horizons up to maxHorizon
   if(horizonAverage){
-    resids <- as.matrix(rowMeans(results$resids), ncol = 1)
+    resids <- as.matrix(rowMeans(resids), ncol = 1)
   }
 
   if(!saveModels){
@@ -238,7 +234,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   if(!saveForecasts){
     forecasts <- NULL
   }
-  
+
   params <- list(FUN = FUN,
                  FCFUN = FCFUN,
                  rolling = rolling,
@@ -250,15 +246,14 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  verbose = verbose,
                  num.cores = num.cores,
                  extra = list(...))
-  
+
   result <- list(x = x,
                xreg = xreg,
                params = params,
-               forecasts = results$forecasts, 
-               models = results$fits, 
-               residuals = results$resids,
-               all = results)
-  
+               forecasts = forecasts, 
+               models = fits, 
+               residuals = resids)
+
   class(result) <- "cvts"
   return(result)
 }
@@ -338,11 +333,10 @@ extractForecasts <- function(cv, horizon = 1) {
                                    end = time(pointf)[horizon])
          }, 
          cv$forecasts) 
-      
+
       pointf <- Reduce(tsCombine, pointfList)
-      
+
       #Ensure all points in the original series are represented (makes it easy for comparisons)
       template <- replace(cv$x, c(1:length(cv$x)), NA)
       return(tsCombine(pointf, template))
 }
-
