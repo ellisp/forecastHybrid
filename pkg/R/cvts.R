@@ -207,12 +207,24 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     }
 
     if(saveForecasts){
-      results$forecasts[[sliceNum]] <- fc
+      results$forecasts <- fc
     }
     
     #results[sliceNum, ] <- tsTest - fc$mean
     results$resids <- tsTest - fc$mean
     results
+  }
+
+
+  # Gather the parallel chunks
+  residlist <- lapply(results, function(x) unlist(x$resids))
+  resids <- matrix(unlist(residlist, use.names = FALSE),
+                   ncol = maxHorizon, byrow = TRUE)
+  
+  result <- list()
+  for(i in seq_along(results)){
+     result$fits[[i]] <- unlist(results[[i]]$fits)
+     result$forecasts[[i]] <- results[[i]]$forecasts[[i]]
   }
   
   # Average the results from all forecast horizons up to maxHorizon
