@@ -1,4 +1,4 @@
-# Version 1.0.8 [unreleased]
+# Version 1.0.8 [2017-07-10]
 * `cvts()` now supports parallel fitting through the `num.cores` argument.
 Note that if the model that you are fitting also utilizes parallelization,
 the number of cores used by each model multiplied by `num.cores` passed to
