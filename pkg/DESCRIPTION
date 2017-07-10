@@ -1,7 +1,7 @@
 Package: forecastHybrid
 Title: Convenient Functions for Ensemble Time Series Forecasts
-Version: 1.0.2
-Date: 2017-06-18
+Version: 1.0.8
+Date: 2017-07-10
 Authors@R: c(
    person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
    person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("aut"))
@@ -15,9 +15,9 @@ Depends:
     R (>= 3.1.1),
     doParallel(>= 1.0.10),
     forecast (>= 8.1),
+    foreach(>= 1.4.3),
     ggplot2 (>= 2.2.0),
 Imports:
-    foreach(>= 1.4.3),
     reshape2 (>= 1.4.2),
     zoo (>= 1.7)
 Suggests:

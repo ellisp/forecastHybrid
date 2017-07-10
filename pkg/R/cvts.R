@@ -181,7 +181,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   on.exit(parallel::stopCluster(cl))
   # Appease R CMD CHECK with sliceNum declaration
   sliceNum <- NULL
-  results <- foreach::foreach (sliceNum = seq_along(slices), .packages = "forecastHybrid") %dopar% {
+  results <- foreach(sliceNum = seq_along(slices),
+                     .packages = "forecastHybrid") %dopar% {
     if(verbose){
       cat("Fitting fold", sliceNum, "of", nrow(results), "\n")
     }
