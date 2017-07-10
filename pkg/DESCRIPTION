@@ -14,9 +14,10 @@ Description: Convenient functions for ensemble forecasts in R combining
 Depends:
     R (>= 3.1.1),
     doParallel(>= 1.0.10),
+    forecast (>= 8.1),
     ggplot2 (>= 2.2.0),
-    forecast (>= 8.1)
 Imports:
+    foreach(>= 1.4.3),
     reshape2 (>= 1.4.2),
     zoo (>= 1.7)
 Suggests:
