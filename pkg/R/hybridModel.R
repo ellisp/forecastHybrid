@@ -603,7 +603,7 @@ print.hybridModel <- function(x, ...){
 #' @export
 #'
 #' @author David Shaub
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot aes autoplot geom_line scale_y_continuous
 #'
 plot.hybridModel <- function(x,
                              type = c("fit", "models"),

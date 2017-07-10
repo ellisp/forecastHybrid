@@ -3,6 +3,7 @@
 #' Perform cross validation on a time series.
 #'
 #' @import doParallel
+#' @import foreach
 #' @export
 #' @param x the input time series.
 #' @param FUN the model function used. Custom functions are allowed. See details and examples.
