@@ -55,8 +55,8 @@
 #' can be safely done if there is no need to examine individual models fit at every stage of cross validation since the
 #' forecasts from each fold and the associated residuals are always saved.
 #'
-#' External regressors are allowed via the xreg argument. It is assumed that both FUN and FCFUN accept the xreg parameter if xreg is not NULL.
-#' If FUN does not accept the xreg parameter a warning will be given. No warning is provided if FCFUN does not use the xreg parameter.
+#' External regressors are allowed via the \code{xreg} argument. It is assumed that both \code{FUN} and \code{FCFUN} accept the \code{xreg} parameter if \code{xreg} is not \code{NULL}.
+#' If \code{FUN} does not accept the \code{xreg} parameter a warning will be given. No warning is provided if \code{FCFUN} does not use the \code{xreg} parameter.
 #' @seealso \code{\link{accuracy.cvts}}
 #'
 #' @examples
