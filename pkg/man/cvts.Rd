@@ -55,16 +55,14 @@ this obstacle using two methods: 1) rolling cross validation where an initial tr
 and the initial window used for training grows by one observation each round until the training window and the forecast horizon capture the
 entire series or 2) a non-rolling approach where a fixed training length is used that is shifted forward by the forecast horizon
 after each iteration.
-\cr
-\cr
+
 For the rolling approach, training points are heavily recycled, both in terms of used for fitting
 and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}. In constrast, the models fit with
 the non-rolling approach share less overlap, and the predicted forecast values are also only compared to the actual values once.
 The former approach is similar to leave-one-out cross validation while the latter resembles k-fold cross validation. As a result,
 rolling cross validation requires far more iterations and computationally takes longer to complete, but a disadvantage of the
 non-rolling approach is the greater variance and general instability of cross-validated errors.
-\cr
-\cr
+
 The \code{FUN} and \code{FCFUN} arguments specify which function to use
 for generating a model and forecasting, respectively. While the functions
 from the "forecast" package can be used, user-defined functions can also
@@ -72,16 +70,15 @@ be tested, but the object returned by \code{FCFUN} must
 accept the argument \code{h} and contain the point forecasts out to
 this horizon \code{h} in slot \code{$mean} of the returned object. An example is given with
 a custom model and forecast.
-\cr
-\cr
+
 For small time series (default \code{length <= 500}), all of the individual fit models are included in the final
 \code{cvts} object that is returned. This can grow quite large since functions such as \code{auto.arima} will
 save fitted values, residual values, summary statistics, coefficient matrices, etc. Setting \code{saveModels = FALSE}
 can be safely done if there is no need to examine individual models fit at every stage of cross validation since the
 forecasts from each fold and the associated residuals are always saved.
 
-External regressors are allowed via the xreg argument. It is assumed that both FUN and FCFUN accept the xreg parameter if xreg is not NULL.
-If FUN does not accept the xreg parameter a warning will be given. No warning is provided if FCFUN does not use the xreg parameter.
+External regressors are allowed via the \code{xreg} argument. It is assumed that both \code{FUN} and \code{FCFUN} accept the \code{xreg} parameter if \code{xreg} is not \code{NULL}.
+If \code{FUN} does not accept the \code{xreg} parameter a warning will be given. No warning is provided if \code{FCFUN} does not use the \code{xreg} parameter.
 }
 \examples{
 cvmod1 <- cvts(AirPassengers, FUN = stlm,
