@@ -17,10 +17,10 @@ if(require(forecast) &  require(testthat)){
     expect_error(forecast.hybridModel("a"))
   })
   test_that("Testing forecasts with xreg", {
-    # # Test a simple et model
-    # inputSeries <- ts(rnorm(9), f = 4)
-    # hm <- hybridModel(inputSeries, models = "et")
-    # expect_error(forecast(hm), NA)
+    # Test a simple et model
+    inputSeries <- ts(rnorm(9), f = 4)
+    hm <- hybridModel(inputSeries, models = "et")
+    expect_error(forecast(hm), NA)
     # Test xregs
     inputSeries <- ts(wineind[1:25], f = frequency(wineind))
     mm <- matrix(runif(length(inputSeries)), nrow = length(inputSeries))
