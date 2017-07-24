@@ -53,6 +53,6 @@ if(require(forecast) &  require(testthat)){
     #expect_true(all(forecast(aa, xreg = mm,  h = nrow(mm), level = 0.9)$upper == forecast(aa, xreg = mm,  h = nrow(mm), level = 90)$upper))
     expect_error(forecast(aa, xreg = mm, level = 110))
     # Fan should generate 17 prediction intervals
-    #expect_true(ncol(forecast(aa, xreg = mm, h = nrow(mm), fan = TRUE)$upper) == 17)
+    expect_true(ncol(forecast(aa, xreg = mm, h = nrow(mm), fan = TRUE)$upper) == 17)
   })
 }
