@@ -1,5 +1,6 @@
 
 test_that("forecast nnetar prediction intervals with different levels work", {
+   set.seed(23456)
    inputSeries <- ts(rnorm(9), f = 4)
    hm2 <- hybridModel(inputSeries, models = "afn", weights = "equal")
    # forecast with nnetar and PI = TRUE is very slow, so use few npaths
