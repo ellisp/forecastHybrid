@@ -6,14 +6,14 @@ if(require(forecast) & require(testthat)){
   # Seaosnal data is required for the stlm model and will throw a warning
   expect_warning(hm <- hybridModel(y = 10 + rnorm(numObs)))
   test_that("Testing summary and print methods", {
-    # These should not fail
+    # The generic methods should not throw an error
     expect_error(summary(hm), NA)
     expect_error(print(hm), NA)
     expect_true(is.hybridModel(hm))
   })
 
   test_that("Testing fitted and residual methods", {
-    # These should not fail
+    # The generic methods should not throw an error
     expect_error(fitted(hm), NA)
     expect_error(residuals(hm), NA)
     expect_error(fitted(hm, individual = TRUE), NA)
