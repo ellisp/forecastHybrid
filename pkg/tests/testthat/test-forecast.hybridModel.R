@@ -5,8 +5,11 @@ if(require(forecast) &  require(testthat)){
     inputSeries <- ts(rnorm(15), f = 7)
     hModel <- hybridModel(inputSeries)
     expect_error(hybridModel(1:3, models = "ae"))
+    # h must be positive
     expect_error(forecast(object = hModel, h = -1L))
+    # h must be numeric
     expect_error(forecast(object = hModel, h = "a"))
+    # h should be an integer
     expect_error(forecast(object = hModel, h = 3.2))
     expect_error(forecast(object = hModel, h = 5,
                                      xreg = matrix(1:5, nrow = 5, ncol = 2)))
@@ -14,6 +17,7 @@ if(require(forecast) &  require(testthat)){
                                      xreg = matrix("a", nrow = 5, ncol = 2)))
     expect_error(forecast(object = hModel, h = 5,
                                      xreg = 1:12))
+    # s3 forecast method should take a hybridModel object only
     expect_error(forecast.hybridModel("a"))
   })
   test_that("Testing forecasts with xreg", {
