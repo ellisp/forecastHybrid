@@ -13,6 +13,7 @@ if(require(forecast) &  require(testthat)){
     expect_error(forecast(object = hModel, h = 3.2))
     expect_error(forecast(object = hModel, h = 5,
                                      xreg = matrix(1:5, nrow = 5, ncol = 2)))
+    # matrix should be numeric
     expect_error(forecast(object = hModel, h = 5,
                                      xreg = matrix("a", nrow = 5, ncol = 2)))
     expect_error(forecast(object = hModel, h = 5,
@@ -20,11 +21,13 @@ if(require(forecast) &  require(testthat)){
     # s3 forecast method should take a hybridModel object only
     expect_error(forecast.hybridModel("a"))
   })
+
   test_that("Testing forecasts with xreg", {
     # Test a simple et model
     inputSeries <- ts(rnorm(9), f = 4)
     hm <- hybridModel(inputSeries, models = "et")
     expect_error(forecast(hm), NA)
+
     # Test xregs
     inputSeries <- ts(wineind[1:25], f = frequency(wineind))
     mm <- matrix(runif(length(inputSeries)), nrow = length(inputSeries))
@@ -40,6 +43,8 @@ if(require(forecast) &  require(testthat)){
     # If nrow(xreg) != h, issue a warning but set h <- nrow(xreg)
     expect_warning(forecast(aa, h = 10, xreg = newXreg, PI = FALSE))
     newXreg <- matrix(rnorm(24), nrow = 24)
+
+    # Valid forecast properties
     expect_error(forecast(aa, xreg = matrix(rnorm(24), nrow = 24), PI = FALSE), NA)
     expect_true(length(forecast(aa, xreg = newXreg, PI = FALSE)$mean) == 24L)
     expect_true(class(forecast(aa, xreg = newXreg, PI = FALSE)) == "forecast")
