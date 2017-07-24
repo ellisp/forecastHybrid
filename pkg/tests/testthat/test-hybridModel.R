@@ -2,6 +2,7 @@
 if(require(forecast) & require(testthat)){
   context("Testing input for hybridModel()")
   test_that("Testing invalid inputs", {
+    # Invalid arguments for models
     expect_error(hybridModel(y = 1:10, models = "jten"))
     expect_error(hybridModel(y = 1:10, models = 5))
     expect_error(hybridModel(y = matrix(1:10, nrow = 5, ncol = 2),
@@ -10,6 +11,7 @@ if(require(forecast) & require(testthat)){
     badxreg <- data.frame(rnorm(length(wineind) - 1))
     expect_warning(expect_error(hybridModel(y = wineind,
                                             a.args = list(xreg = badxreg))))
+    # More invalid inputs
     expect_error(hybridModel(y = "hello world"))
     expect_error(hybridModel())
     expect_error(hybridModel(y = numeric()))
@@ -26,17 +28,19 @@ if(require(forecast) & require(testthat)){
 
   })
   test_that("Testing for warnings", {
+    # hybridModel creates a warning when an arg list for an unused model is passed
     expect_warning(hybridModel(wineind, models = "fs", a.args = list()))
     expect_warning(hybridModel(wineind, models = "fs", e.args = list()))
     expect_warning(hybridModel(wineind, models = "fs", n.args = list()))
     expect_warning(hybridModel(wineind, models = "fn", s.args = list()))
     expect_warning(hybridModel(wineind, models = "fs", t.args = list()))
-    # nnetar() with 2 * frequency(y) >= length(y)
+    # ts is too short: nnetar() with 2 * frequency(y) >= length(y)
     expect_warning(hybridModel(ts(rnorm(50), f = 24), models = "fsn"))
-    # stlm() with 2 * frequency(y) >= length(y)
+    # ts is too short: stlm() with 2 * frequency(y) >= length(y)
     expect_warning(hybridModel(ts(rnorm(20), f = 12), models = "efs"))
     # ets with frequency(y) > 24
     expect_warning(hybridModel(ts(rnorm(100), f = 25), models = "ens"))
+    # Parallel is not yet implemented in hybridModel
     expect_warning(hybridModel(wineind, models = "fs", parallel = TRUE))
   })
   test_that("Testing valid inputs", {
