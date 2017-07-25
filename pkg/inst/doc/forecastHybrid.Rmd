@@ -169,7 +169,7 @@ testXreg <- data.frame(testSet$activ)
 
 # Create the model
 beaverhm <- hybridModel(ts(trainSet$temp, f = 6),
-                        models = "aenst",
+                        models = "aefnst",
                         a.args = list(xreg = trainXreg),
                         n.args = list(xreg = trainXreg),
                         s.args = list(xreg = trainXreg, method = "arima"))

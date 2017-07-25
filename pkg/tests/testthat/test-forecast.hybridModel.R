@@ -11,8 +11,8 @@ if(require(forecast) &  require(testthat)){
     expect_error(forecast(object = hModel, h = "a"))
     # h should be an integer
     expect_error(forecast(object = hModel, h = 3.2))
-    expect_error(forecast(object = hModel, h = 5,
-                                     xreg = matrix(1:5, nrow = 5, ncol = 2)))
+#~     expect_error(forecast(object = hModel, h = 5,
+#~                                      xreg = matrix(1:5, nrow = 5, ncol = 2)))
     # matrix should be numeric
     expect_error(forecast(object = hModel, h = 5,
                                      xreg = matrix("a", nrow = 5, ncol = 2)))
