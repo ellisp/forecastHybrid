@@ -106,7 +106,9 @@ forecast.hybridModel <- function(object,
   forecasts$pointForecasts <- matrix(numeric(), nrow = h, ncol = length(includedModels))
   colnames(forecasts$pointForecasts) <- includedModels
   if("auto.arima" %in% includedModels){
-    forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xreg, level = level, ...)
+    # Only apply the xreg if it was used in the original model
+    xregA <- ifelse("xreg" %in% names(object$auto.arima), xreg, NULL)
+    forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xregA, level = level, ...)
     forecasts$pointForecasts[, "auto.arima"] <- forecasts$auto.arima$mean
   }
   if("ets" %in% includedModels){
@@ -118,11 +120,15 @@ forecast.hybridModel <- function(object,
      forecasts$pointForecasts[, "thetam"] <- forecasts$thetam$mean
   }
   if("nnetar" %in% includedModels){
-    forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xreg, PI = PI, level = level, ...)
+    # Only apply the xreg if it was used in the original model
+    xregN <- ifelse("xreg" %in% names(object$nnetar), xreg, NULL)
+    forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xregN, PI = PI, level = level, ...)
     forecasts$pointForecasts[, "nnetar"] <- forecasts$nnetar$mean
   }
   if("stlm" %in% includedModels){
-    forecasts$stlm <- forecast(object$stlm, h = h, xreg = xreg, level = level, ...)
+    # Only apply the xreg if it was used in the original model
+    xregS <- ifelse("xreg" %in% names(object$stlm), xreg, NULL)
+    forecasts$stlm <- forecast(object$stlm, h = h, xreg = xregS, level = level, ...)
     forecasts$pointForecasts[, "stlm"] <- forecasts$stlm$mean
   }
   if("tbats" %in% includedModels){

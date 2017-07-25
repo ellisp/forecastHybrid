@@ -1,3 +1,7 @@
+# Version 1.1.9 [unreleased]
+* Fixed a bug in `forecast.hybridModel()` when for models where `xreg` was not supplied to all of arima/nnetar models
+* Fixes in unit tests and better documentation of unit tests
+
 # Version 1.0.8 [2017-07-10]
 * `cvts()` now supports parallel fitting through the `num.cores` argument.
 Note that if the model that you are fitting also utilizes parallelization,

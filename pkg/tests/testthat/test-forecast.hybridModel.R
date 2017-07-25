@@ -43,6 +43,15 @@ if(require(forecast) &  require(testthat)){
     # If nrow(xreg) != h, issue a warning but set h <- nrow(xreg)
     expect_warning(forecast(aa, h = 10, xreg = newXreg, PI = FALSE))
     newXreg <- matrix(rnorm(24), nrow = 24)
+    
+    # Fit the model using xreg for only one individual component
+    # Forecast should still work (previous bug)
+    mod <- hybridModel(inputSeries, models = "af", a.args = list(xreg = mm))
+    expect_error(forecast(mod, xreg = newXreg), NA)
+    mod <- hybridModel(inputSeries, models = "nf", n.args = list(xreg = mm))
+    expect_error(forecast(mod, xreg = newXreg), NA)
+    mod <- hybridModel(inputSeries, models = "sf", s.args = list(xreg = mm, method = "arima"))
+    expect_error(forecast(mod, xreg = newXreg), NA)
 
     # Valid forecast properties
     expect_error(forecast(aa, xreg = matrix(rnorm(24), nrow = 24), PI = FALSE), NA)
