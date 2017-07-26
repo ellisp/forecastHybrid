@@ -109,9 +109,6 @@ hybridModel <- function(y, models = "aefnst",
                         horizonAverage = FALSE,
                         parallel = FALSE, num.cores = 2L,
                         verbose = TRUE){
-  # Weights could be set to equal (the default), based on in-sample errors, or based on cv errors
-  # errorMethod will determine which type of errors to use for weights. Some choices from accuracy()
-  # are not appropriate. If weights = "equal", this would be ignored.
 
   # The dependent variable must be numeric and not a matrix/dataframe
   if(!is.numeric(y) || !is.null(dim(y))){
@@ -212,10 +209,7 @@ hybridModel <- function(y, models = "aefnst",
   if(parallel){
     warning("The 'parallel' argument is currently unimplemented. Ignoring for now.")
   }
-  # if(weights == "cv.errors"){
-  #   warning("Cross validated error weights are currently unimplemented. Ignoring for now.")
-  #   weights <- "equal"
-  # }
+
   if(weights == "cv.errors" && errorMethod == "MASE"){
     warning("cv errors currently do not support MASE. Reverting to RMSE.")
     errorMethod <- "RMSE"
@@ -407,10 +401,33 @@ hybridModel <- function(y, models = "aefnst",
     tsp(fits) <- tsp(resid) <- tsp(y)
   }
 
+  # Save which models used xreg
+  xregs <- list()
+  if("a" %in% expandedModels){
+      xregs$auto.arima <- FALSE
+      if("xreg" %in% names(a.args) && !is.null(a.args$xreg)){
+        xregs$auto.arima <- TRUE
+      }
+  }
+  if("n" %in% expandedModels){
+      xregs$nnetar <- FALSE
+      if("xreg" %in% names(n.args) && !is.null(n.args$xreg)){
+        xregs$nnetar <- TRUE
+      }
+  }
+  if("s" %in% expandedModels){
+      xregs$stlm <- FALSE
+      methodArima <- "method" %in% names(s.args) && s.args$method == "arima"
+      if("xreg" %in% names(s.args) && !is.null(s.args$xreg) && methodArima){
+        xregs$stlm <- TRUE
+      }
+  }
+
   # Prepare the hybridModel object
   class(modelResults) <- "hybridModel"
   modelResults$frequency <- frequency(y)
   modelResults$x <- y
+  modelResults$xreg <- xregs
   modelResults$models <- includedModels
   modelResults$fitted <- fits
   modelResults$residuals <- resid

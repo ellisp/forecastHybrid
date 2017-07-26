@@ -108,7 +108,7 @@ forecast.hybridModel <- function(object,
   if("auto.arima" %in% includedModels){
     # Only apply the xreg if it was used in the original model
     xregA <- xreg
-    if(is.null(object$auto.arima$xreg)){
+    if(!object$xreg$auto.arima){
       xregA <- NULL
       }
     forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xregA, level = level, ...)
@@ -125,7 +125,7 @@ forecast.hybridModel <- function(object,
   if("nnetar" %in% includedModels){
     # Only apply the xreg if it was used in the original model
     xregN <- xreg
-    if(is.null(object$nnetar$xreg)){
+    if(!object$xreg$nnetar){
       xregN <- NULL
       }
     forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xregN, PI = PI, level = level, ...)
@@ -135,7 +135,7 @@ forecast.hybridModel <- function(object,
     # Only apply the xreg if it was used in the original model
     xregS <- xreg
     # xreg is only used in stlm if method = "arima", and it is stored in slot $model$xreg
-    if(is.null(object$stlm$model$xreg)){
+    if(!object$xreg$stlm){
       xregS <- NULL
       }
     forecasts$stlm <- forecast(object$stlm, h = h, xreg = xregS, level = level, ...)

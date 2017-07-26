@@ -11,8 +11,6 @@ if(require(forecast) &  require(testthat)){
     expect_error(forecast(object = hModel, h = "a"))
     # h should be an integer
     expect_error(forecast(object = hModel, h = 3.2))
-#~     expect_error(forecast(object = hModel, h = 5,
-#~                                      xreg = matrix(1:5, nrow = 5, ncol = 2)))
     # matrix should be numeric
     expect_error(forecast(object = hModel, h = 5,
                                      xreg = matrix("a", nrow = 5, ncol = 2)))
@@ -32,14 +30,16 @@ if(require(forecast) &  require(testthat)){
     inputSeries <- ts(wineind[1:25], f = frequency(wineind))
     mm <- matrix(runif(length(inputSeries)), nrow = length(inputSeries))
     # stlm only works with xreg when method = "arima" is passed in s.args
-    expect_error(aa <- hybridModel(inputSeries, models = "afns", a.args = list(xreg = mm), s.args = list(xreg = mm)))
+    expect_error(aa <- hybridModel(inputSeries, models = "afns",
+                                   a.args = list(xreg = mm),
+                                   s.args = list(xreg = mm)))
     aa <- hybridModel(inputSeries, models = "aefnst",
                       a.args = list(xreg = mm),
                       n.args = list (xreg = mm),
                       s.args = list(xreg = mm, method = "arima"))
     # If xreg is used and no h is provided, overwrite h
     newXreg <- matrix(rnorm(20), nrow = 20)
-    expect_error(tmp <- forecast(aa, xreg = newXreg, npaths = 50), NA)
+    expect_error(tmp <- forecast(aa, xreg = newXreg, npaths = 5), NA)
     # If nrow(xreg) != h, issue a warning but set h <- nrow(xreg)
     expect_warning(forecast(aa, h = 10, xreg = newXreg, PI = FALSE))
     newXreg <- matrix(rnorm(24), nrow = 24)
@@ -49,7 +49,7 @@ if(require(forecast) &  require(testthat)){
     mod <- hybridModel(inputSeries, models = "af", a.args = list(xreg = mm))
     expect_error(forecast(mod, xreg = newXreg), NA)
     mod <- hybridModel(inputSeries, models = "nf", n.args = list(xreg = mm))
-    expect_error(forecast(mod, xreg = newXreg), NA)
+    expect_error(forecast(mod, xreg = newXreg, PI = FALSE), NA)
     mod <- hybridModel(inputSeries, models = "sf", s.args = list(xreg = mm, method = "arima"))
     expect_error(forecast(mod, xreg = newXreg), NA)
 
