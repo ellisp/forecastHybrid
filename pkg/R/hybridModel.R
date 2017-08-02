@@ -111,7 +111,8 @@ hybridModel <- function(y, models = "aefnst",
                         verbose = TRUE){
 
   # The dependent variable must be numeric and not a matrix/dataframe
-  if(!is.numeric(y) || !is.null(dim(y))){
+  forbiddenTypes <- c("data.frame", "data.table", "matrix")
+  if(!is.numeric(y) || all(class(y) %in% forbiddenTypes)){
     stop("The time series must be numeric and may not be a matrix or dataframe object.")
   }
   if(!length(y)){
