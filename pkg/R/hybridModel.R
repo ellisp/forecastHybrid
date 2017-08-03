@@ -553,9 +553,9 @@ accuracy.cvts <- function(f, ...){
   MAE <- colMeans(abs(f$residuals))
   results <- data.frame(ME, RMSE, MAE)
   rownames(results) <- paste("Forecast Horizon ", rownames(results))
-  return(results)
   # MASE TODO
   # Will require actual/fitted/residuals
+  return(results)
 }
 
 
@@ -586,7 +586,6 @@ print.hybridModel <- function(x, ...){
   for(i in x$models){
     cat("############\n")
     cat(i, "with weight", round(x$weights[i], 3), "\n")
-    #cat("############\n")
   }
 }
 
@@ -640,13 +639,13 @@ plot.hybridModel <- function(x,
          }
          names(plotFrame) <- plotModels
          plotFrame$date <- as.Date(time(x$x))
-         # Appease R CMD check for undeclared variable, value
+         # Appease R CMD check for undeclared variable
          variable <- NULL
          value <- NULL
          plotFrame <- reshape2::melt(plotFrame, id = "date")
          ggplot(data = plotFrame, 
                 aes(x = date, y = as.numeric(value), col = variable)) +
-            geom_line() + scale_y_continuous(name = "y")
+                geom_line() + scale_y_continuous(name = "y")
          
       } else{
          # Set the highest and lowest axis scale
@@ -663,7 +662,7 @@ plot.hybridModel <- function(x,
    } else if(type == "models"){
       plotModels <- x$models[x$models != "stlm" & x$models != "nnetar"]
       for(i in seq_along(plotModels)){
-         # tbats isn't supported by autoplot
+         # bats, tbats, and nnetar aren't supported by autoplot
          if(ggplot && !(plotModels[i] %in% c("tbats", "bats", "nnetar"))){
             autoplot(x[[plotModels[i]]])
          } else if(!ggplot){
