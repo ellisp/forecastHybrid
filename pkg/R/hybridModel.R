@@ -119,16 +119,16 @@ hybridModel <- function(y, models = "aefnst",
     stop("The time series must have observations")
   }
 
-   if(length(y) < 4){
-      stop("The time series must have at least four observations")
-   }
+  if(length(y) < 4){
+    stop("The time series must have at least four observations")
+  }
 
   y <- as.ts(y)
 
   # Match arguments to ensure validity
   weights <- match.arg(weights)
   if(weights == "insample.errors"){
-     warning("Using insample.error weights is not recommended for accuracy and may be deprecated in the future.")
+    warning("Using insample.error weights is not recommended for accuracy and may be deprecated in the future.")
   }
   errorMethod <- match.arg(errorMethod)
 
@@ -138,7 +138,8 @@ hybridModel <- function(y, models = "aefnst",
     stop("Invalid models specified.")
   }
   # All characters must be valid
-  if(!(all(expandedModels %in% c("a", "e", "f", "n", "s", "t")))){
+  validModels <- c("a", "e", "f", "n", "s", "t")
+  if(!all(expandedModels %in% validModels)){
     stop("Invalid models specified.")
   }
   if(!length(expandedModels)){
@@ -286,16 +287,16 @@ hybridModel <- function(y, models = "aefnst",
 
   # Set the model weights
   includedModels <- names(modelResults)
-  # Weighting methods would go here, equal weighting for now
+  numModels <- length(expandedModels)
   if(weights == "equal"){
-    modelResults$weights <- rep(1 / length(expandedModels), length(expandedModels))
+    modelResults$weights <- rep(1 / numModels, numModels)
   } else if(weights %in% c("insample.errors", "cv.errors")){
 
     # There is probably a better way of accomplishing this
     # But this ugly approach will work for now
     # These loops and if statements can be replace
     # with do.call and/or map
-    modelResults$weights <- rep(0, length(expandedModels))
+    modelResults$weights <- rep(0, numModels)
     index <- 1
     modResults <- modelResults
 
@@ -396,6 +397,7 @@ hybridModel <- function(y, models = "aefnst",
                               nrow = nrow(fits), byrow = TRUE)
   fits <- rowSums(fits * fitsWeightsMatrix)
   resid <- y - fits
+  # If y is a ts, make fits and resid a ts too
   if (!is.null(tsp(y))){
     fits <- ts(fits)
     resid <- ts(fits)
