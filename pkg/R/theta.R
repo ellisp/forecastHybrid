@@ -24,7 +24,7 @@ thetam <- function(y){
       stop("y should be numeric")
    }
    y <- as.ts(y)
-   
+
    n <- length(y)
    m <- frequency(y)
    if (m > 1) {
@@ -34,27 +34,27 @@ thetam <- function(y){
    }  else {
       seasonal <- FALSE
    }
-   
+
    origy <- y
-   
+
    if (seasonal) {
       decomp <- stats::decompose(y, type = "multiplicative")
       y <- forecast::seasadj(decomp)
    }
-   
+
    object <- forecast::ets(y, model = "ANN", opt.crit = "mse")
-   
+
    if(seasonal) {
       object$seasadj <- utils::tail(decomp$seasonal, m)
       object$seasadjhist <- decomp$seasona
    }
-   
+
    object$seasonal <- seasonal
    object$x <- origy
    object$drift <- stats::lsfit(0:(n - 1), y)$coef[2] / 2
    object$method <- "Theta"
    class(object) <- c("thetam", "ets")
-   
+
    return(object)
 }
 
@@ -139,7 +139,6 @@ plot.thetam <- function(x, ...){
       )
    }
    plot(plotdata, main = paste("Decomposition by Theta method"), ...)
-   
 }
 
 
