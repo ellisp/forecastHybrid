@@ -93,7 +93,7 @@ forecast.hybridModel <- function(object,
     if(min(level) > 0 && max(level) < 1){
       level <- 100 * level
     } else if(min(level) < 0 || max(level) > 99.99){
-      stop("Confidence limit out of range")
+      stop("Prediction interval out of range")
     }
   }
 
@@ -134,7 +134,7 @@ forecast.hybridModel <- function(object,
   if("stlm" %in% includedModels){
     # Only apply the xreg if it was used in the original model
     xregS <- xreg
-    # xreg is only used in stlm if method = "arima", and it is stored in slot $model$xreg
+    # xreg is only used in stlm if method = "arima"
     if(!object$xreg$stlm){
       xregS <- NULL
       }
