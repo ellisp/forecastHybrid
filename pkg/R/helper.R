@@ -27,11 +27,8 @@
 tsCombine <- function(...) {
   combined_df <- ts.union(..., dframe = TRUE)
   combined_ts <- ts.union(..., dframe = FALSE)
-  coalesced <- apply(combined_df, 1, function(x) {
-    if (all(is.na(x))) 
-      return(NA)
-    else return(x[min(which(!is.na(x)))])
-  })
+  coalesced <- apply(combined_df, 1,
+                     function(x) {ifelse(all(is.na(x)), NA, x[min(which(!is.na(x)))])})
   ret <- ts(coalesced, start = start(combined_ts), frequency = frequency(combined_ts))
   return(ret)
 }
@@ -53,7 +50,11 @@ tsSubsetWithIndices <- function(x, indices) {
   minIndex <- min(indices)
   maxIndex <- max(indices)
 
-  if (maxIndex > length(xtime)) stop("Max subset index cannot exceed time series length")
-  if (all(seq(minIndex, maxIndex, 1) != indices)) stop("Time series can only be subset with continuous indices")
+  if (maxIndex > length(xtime)){
+    stop("Max subset index cannot exceed time series length")
+    }
+  if (all(seq(minIndex, maxIndex, 1) != indices)){
+    stop("Time series can only be subset with continuous indices")
+    }
   return(window(x, start = xtime[minIndex], end = xtime[maxIndex]))
 }
