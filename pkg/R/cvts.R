@@ -104,6 +104,9 @@
 #' }
 #'
 #' @author David Shaub
+#' from doParallel import registerDoParallel
+#' from parallel import stopCluster
+#' from foreach import foreach
 cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
                  maxHorizon = 5,
@@ -127,7 +130,6 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   if(is.null(FCFUN)){
     FCFUN <- forecast
   }
-  #f <- frequency(x)
   f = frequency(x)
   tspx <- tsp(x)
   if(is.null(tspx)){
@@ -163,9 +165,9 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   }
 
   # Combined code for rolling/nonrolling CV
-  results <- matrix(NA,
-                    nrow = ifelse(rolling, length(x) - windowSize - maxHorizon + 1, as.integer((length(x) - windowSize) / maxHorizon)),
-                    ncol = maxHorizon)
+  nrow = ifelse(rolling, length(x) - windowSize - maxHorizon + 1,
+                as.integer((length(x) - windowSize) / maxHorizon))
+  results <- matrix(NA, nrow = nrow, ncol = maxHorizon)
 
   forecasts <- fits <- vector("list", nrow(results))
   slices <- tsPartition(x, rolling, windowSize, maxHorizon)
@@ -179,12 +181,12 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   on.exit(parallel::stopCluster(cl))
   # Appease R CMD CHECK with sliceNum declaration
   sliceNum <- NULL
-  results <- foreach(sliceNum = seq_along(slices),
-                     .packages = c("forecastHybrid", "forecast")) %dopar% {
+  results <- foreach::foreach(sliceNum = seq_along(slices),
+                              .packages = c("forecastHybrid", "forecast")) %dopar% {
     if(verbose){
       cat("Fitting fold", sliceNum, "of", nrow(results), "\n")
     }
-     results <- list()
+    results <- list()
 
     trainIndices <- slices[[sliceNum]]$trainIndices
     testIndices <- slices[[sliceNum]]$testIndices
@@ -192,12 +194,12 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     tsTrain <- tsSubsetWithIndices(x, trainIndices)
     tsTest <- tsSubsetWithIndices(x, testIndices)
 
-    if (xregUse) {
-      xregTrain <- xreg[trainIndices,,drop = FALSE]
-      xregTest <- xreg[testIndices,,drop = FALSE]
+    if(xregUse){
+      xregTrain <- xreg[trainIndices, ,drop = FALSE]
+      xregTest <- xreg[testIndices, ,drop = FALSE]
       mod <- do.call(FUN, list(tsTrain, xreg = xregTrain, ...))
       fc <- do.call(FCFUN, list(mod, xreg = xregTest, h = maxHorizon))
-    } else {
+    }else{
       mod <- do.call(FUN, list(tsTrain, ...))
       fc <- do.call(FCFUN, list(mod, h = maxHorizon))
     }
@@ -210,7 +212,6 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
       results$forecasts <- fc
     }
 
-    #results[sliceNum, ] <- tsTest - fc$mean
     results$resids <- tsTest - fc$mean
     results
   }

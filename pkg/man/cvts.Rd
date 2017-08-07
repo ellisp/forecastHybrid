@@ -130,4 +130,7 @@ rwcv <- cvts(AirPassengers, FCFUN = rwf)
 }
 \author{
 David Shaub
+from doParallel import registerDoParallel
+from parallel import stopCluster
+from foreach import foreach
 }
