@@ -13,11 +13,11 @@ Description: Convenient functions for ensemble forecasts in R combining
     and user-supplied models and forecasting functions is also supported to evaluate model accuracy.
 Depends:
     R (>= 3.1.1),
-    doParallel (>= 1.0.10),
     forecast (>= 8.1),
-    foreach (>= 1.4.3),
-    ggplot2 (>= 2.2.0)
 Imports:
+    doParallel (>= 1.0.10),
+    foreach (>= 1.4.3),
+    ggplot2 (>= 2.2.0),
     reshape2 (>= 1.4.2),
     zoo (>= 1.7)
 Suggests:
