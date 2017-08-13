@@ -2,6 +2,7 @@
 * Fixed a bug in `forecast.hybridModel()` when for models where `xreg` was not supplied to all of arima/nnetar models
 * Fixes in unit tests and better documentation of unit tests
 * `ts` objects created with the "timekt" package can now be used in `hybridModel()`
+* The `doParallel` and `forecast` packages are now imported instead of loading their entire namespaces.
 
 # Version 1.0.8 [2017-07-10]
 * `cvts()` now supports parallel fitting through the `num.cores` argument.
