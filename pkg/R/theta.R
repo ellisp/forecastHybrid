@@ -26,6 +26,9 @@ thetam <- function(y){
    y <- as.ts(y)
 
    n <- length(y)
+   if(n <= m){
+      stop("there is not enough data to run the theta model")
+   }
    m <- frequency(y)
    if (m > 1) {
       r <- as.numeric(stats::acf(y, lag.max = m, plot = FALSE)$acf)[-1]
