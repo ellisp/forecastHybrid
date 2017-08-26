@@ -104,9 +104,10 @@
 #' }
 #'
 #' @author David Shaub
-#' from doParallel import registerDoParallel
-#' from parallel import stopCluster
-#' from foreach import foreach
+#' @importFrom utils getAnywhere
+#' @importFrom doParallel registerDoParallel
+#' @importFrom parallel stopCluster
+#' @importFrom foreach foreach
 cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  rolling = FALSE, windowSize = 84,
                  maxHorizon = 5,
@@ -126,10 +127,31 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
       return(x)
     }
   }
+  #includePackages <- character("forecast")
+  # Determine which packages will need to be sent to the parallel workers
+  includePackages <- c()
+  funPackage <- getAnywhere(FUN)$where[1]
+  if(grepl("package:", funPackage)){
+    parsedPackage <- gsub("package:", "", funPackage)
+    includePackages <- c(includePackages, parsedPackage)
+  }
+
   # Default forecast function
   if(is.null(FCFUN)){
     FCFUN <- forecast
   }
+  # Determine which packages will need to be sent to the parallel workers
+  fcfunPackage <- getAnywhere(FCFUN)$where[1]
+  if(grepl("package:", fcfunPackage)){
+    parsedPackage <- gsub("package:", "", fcfunPackage)
+    includePackages <- c(includePackages, parsedPackage)
+  }
+  includePackage <- unique(includePackages)
+  # Always include "forecast" if no other packages are given
+  if(!length(includePackages)){
+    includePackage <- "forecast"
+  }
+
   f = frequency(x)
   tspx <- tsp(x)
   if(is.null(tspx)){
@@ -182,7 +204,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # Appease R CMD CHECK with sliceNum declaration
   sliceNum <- NULL
   results <- foreach::foreach(sliceNum = seq_along(slices),
-                              .packages = c("forecastHybrid", "forecast")) %dopar% {
+                              .packages = includePackages) %dopar% {
     if(verbose){
       cat("Fitting fold", sliceNum, "of", nrow(results), "\n")
     }

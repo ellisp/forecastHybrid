@@ -1,5 +1,5 @@
 # Version 1.x.x [unreleased]
-* The `thetam()` function now checks for an input time series with less length than the seasonality. Similarly, `hybridModel()` detects this behavior.
+* The `thetam()` function now checks for an input time series with less length than the seasonality. Similarly, `hybridModel()` detects this behavior. Thanks to Nicholas Fong for the bugfix.
 
 # Version 1.1.9 [2017-08-23]
 * Fixed a bug in `forecast.hybridModel()` when for models where `xreg` was not supplied to all of arima/nnetar models
