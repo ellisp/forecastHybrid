@@ -78,7 +78,7 @@
 #' # We can also use custom functions, for example fcast()
 #' from the "GMDH" package
 #' library(GMDH)
-#' GMDHForecast <- function(x, h){fcast(x, f.number = h)}
+#' GMDHForecast <- function(x, h){GMDH::fcast(x, f.number = h)}
 #' gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
 #'
 #' # Example with custom model function and forecast function
