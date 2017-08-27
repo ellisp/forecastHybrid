@@ -131,7 +131,6 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   #includePackages <- character("forecast")
   # Determine which packages will need to be sent to the parallel workers
   includePackages <- c("forecast", "forecastHybrid")
-  funPackage <- getAnywhere(FUN)$where[1]
   funPackage <- environmentName(environment(FUN))
   print(funPackage)
   if(grepl("package:", funPackage)){
@@ -144,7 +143,6 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     FCFUN <- forecast
   }
   # Determine which packages will need to be sent to the parallel workers
-  fcfunPackage <- getAnywhere(FCFUN)$where[1]
   fcfunPackage <- environmentName(environment(FCFUN))
   print(fcfunPackage)
   if(grepl("package:", fcfunPackage)){
