@@ -8,7 +8,7 @@ cvts(x, FUN = NULL, FCFUN = NULL, rolling = FALSE, windowSize = 84,
   maxHorizon = 5, horizonAverage = FALSE, xreg = NULL,
   saveModels = ifelse(length(x) > 500, FALSE, TRUE),
   saveForecasts = ifelse(length(x) > 500, FALSE, TRUE), verbose = TRUE,
-  num.cores = 1, ...)
+  num.cores = 1, extraPackages = NULL, ...)
 }
 \arguments{
 \item{x}{the input time series.}
@@ -98,7 +98,6 @@ cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
 from the "GMDH" package
 library(GMDH)
 GMDHForecast <- function(x, h){fcast(x, f.number = h)}
-gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
 gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
 
 # Example with custom model function and forecast function

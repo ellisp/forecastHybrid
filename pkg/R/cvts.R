@@ -25,6 +25,8 @@
 #' @param num.cores the number of cores to use for parallel fitting. If the underlying model
 #' that is being fit also utilizes parallelization, the number of cores it is using multiplied
 #' by `num.cores` should not exceed the number of cores avaialble on your machine.
+#' @param extraPackages if a custom `FUN` or `FCFUN` is being used that requires packages to be
+#' loaded, these can be passed here
 #' @param ... Other arguments to be passed to the model function FUN
 #'
 #' @details Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
@@ -78,7 +80,6 @@
 #' library(GMDH)
 #' GMDHForecast <- function(x, h){fcast(x, f.number = h)}
 #' gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
-#' gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
 #'
 #' # Example with custom model function and forecast function
 #' customMod <- function(x){
@@ -115,7 +116,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  xreg = NULL,
                  saveModels = ifelse(length(x) > 500, FALSE, TRUE),
                  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
-                 verbose = TRUE, num.cores = 1,
+                 verbose = TRUE, num.cores = 1, extraPackages = NULL,
                  ...){
   # Default model function
   # This can be useful for methods that estimate the model and forecasts in one step
@@ -129,8 +130,10 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   }
   #includePackages <- character("forecast")
   # Determine which packages will need to be sent to the parallel workers
-  includePackages <- c()
+  includePackages <- c("forecast", "forecastHybrid")
   funPackage <- getAnywhere(FUN)$where[1]
+  funPackage <- environmentName(environment(FUN))
+  print(funPackage)
   if(grepl("package:", funPackage)){
     parsedPackage <- gsub("package:", "", funPackage)
     includePackages <- c(includePackages, parsedPackage)
@@ -142,15 +145,16 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   }
   # Determine which packages will need to be sent to the parallel workers
   fcfunPackage <- getAnywhere(FCFUN)$where[1]
+  fcfunPackage <- environmentName(environment(FCFUN))
+  print(fcfunPackage)
   if(grepl("package:", fcfunPackage)){
     parsedPackage <- gsub("package:", "", fcfunPackage)
     includePackages <- c(includePackages, parsedPackage)
   }
-  includePackage <- unique(includePackages)
-  # Always include "forecast" if no other packages are given
-  if(!length(includePackages)){
-    includePackage <- "forecast"
+  if(!is.null(extraPackages)){
+    includePackages <- c(includePackages, extraPackages)
   }
+  includePackage <- unique(includePackages)
 
   f = frequency(x)
   tspx <- tsp(x)
