@@ -130,12 +130,12 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   }
   #includePackages <- character("forecast")
   # Determine which packages will need to be sent to the parallel workers
+  excludePackages <- c("", "R_GlobalEnv")
   includePackages <- c("forecast", "forecastHybrid")
   funPackage <- environmentName(environment(FUN))
   print(funPackage)
-  if(grepl("package:", funPackage)){
-    parsedPackage <- gsub("package:", "", funPackage)
-    includePackages <- c(includePackages, parsedPackage)
+  if(!is.element(funPackage, excludePackages)){
+    includePackages <- c(includePackages, funPackage)
   }
 
   # Default forecast function
@@ -145,14 +145,14 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # Determine which packages will need to be sent to the parallel workers
   fcfunPackage <- environmentName(environment(FCFUN))
   print(fcfunPackage)
-  if(grepl("package:", fcfunPackage)){
-    parsedPackage <- gsub("package:", "", fcfunPackage)
-    includePackages <- c(includePackages, parsedPackage)
+  if(!is.element(fcfunPackage, excludePackages)){
+    includePackages <- c(includePackages, fcfunPackage)
   }
   if(!is.null(extraPackages)){
     includePackages <- c(includePackages, extraPackages)
   }
   includePackage <- unique(includePackages)
+  print(includePackage)
 
   f = frequency(x)
   tspx <- tsp(x)
@@ -191,9 +191,9 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # Combined code for rolling/nonrolling CV
   nrow = ifelse(rolling, length(x) - windowSize - maxHorizon + 1,
                 as.integer((length(x) - windowSize) / maxHorizon))
-  results <- matrix(NA, nrow = nrow, ncol = maxHorizon)
+  resultsMat <- matrix(NA, nrow = nrow, ncol = maxHorizon)
 
-  forecasts <- fits <- vector("list", nrow(results))
+  forecasts <- fits <- vector("list", nrow(resultsMat))
   slices <- tsPartition(x, rolling, windowSize, maxHorizon)
 
   # Perform the cv fits
@@ -206,9 +206,9 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # Appease R CMD CHECK with sliceNum declaration
   sliceNum <- NULL
   results <- foreach::foreach(sliceNum = seq_along(slices),
-                              .packages = includePackages) %dopar% {
+                              .packages = includePackage) %do% {
     if(verbose){
-      cat("Fitting fold", sliceNum, "of", nrow(results), "\n")
+      cat("Fitting fold", sliceNum, "of", nrow(resultsMat), "\n")
     }
     results <- list()
 
