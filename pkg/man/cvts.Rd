@@ -43,6 +43,9 @@ metrics for each individual horizon?}
 that is being fit also utilizes parallelization, the number of cores it is using multiplied
 by `num.cores` should not exceed the number of cores avaialble on your machine.}
 
+\item{extraPackages}{if a custom `FUN` or `FCFUN` is being used that requires packages to be
+loaded, these can be passed here}
+
 \item{...}{Other arguments to be passed to the model function FUN}
 }
 \description{
@@ -97,7 +100,7 @@ cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
 # We can also use custom functions, for example fcast()
 from the "GMDH" package
 library(GMDH)
-GMDHForecast <- function(x, h){fcast(x, f.number = h)}
+GMDHForecast <- function(x, h){GMDH::fcast(x, f.number = h)}
 gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
 
 # Example with custom model function and forecast function

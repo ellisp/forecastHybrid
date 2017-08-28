@@ -151,8 +151,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   if(!is.null(extraPackages)){
     includePackages <- c(includePackages, extraPackages)
   }
-  includePackage <- unique(includePackages)
-  print(includePackage)
+  includePackages <- unique(includePackages)
+  print(includePackages)
 
   f = frequency(x)
   tspx <- tsp(x)
@@ -206,7 +206,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # Appease R CMD CHECK with sliceNum declaration
   sliceNum <- NULL
   results <- foreach::foreach(sliceNum = seq_along(slices),
-                              .packages = includePackage) %do% {
+                              .packages = includePackages) %dopar% {
     if(verbose){
       cat("Fitting fold", sliceNum, "of", nrow(resultsMat), "\n")
     }
