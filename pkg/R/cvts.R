@@ -66,6 +66,16 @@
 #'                windowSize = 48, maxHorizon = 12)
 #' accuracy(cvmod1)
 #'
+#' # We can also use custom model functions for modeling/forecasting
+#' stlmClean <- function(x){stlm(tsclean(x))}
+#' cvmodCustom <- cvts(AirPassengers, FUN = stlmClean)
+#' accuracy(cvmodCustom)
+#'
+#' # If the custom function for `FUN` or `FCFUN` requires packages
+#' # other than "forecast" or "forecastHybrid", these must be passed
+#' # in the `extraPackages` argument
+#'
+#'
 #' \dontrun{
 #' cvmod2 <- cvts(USAccDeaths, FUN = ets,
 #'                saveModels = FALSE, saveForecasts = FALSE,
@@ -80,6 +90,7 @@
 #' library(GMDH)
 #' GMDHForecast <- function(x, h){GMDH::fcast(x, f.number = h)}
 #' gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
+#'
 #'
 #' # Example with custom model function and forecast function
 #' customMod <- function(x){
