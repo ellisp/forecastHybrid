@@ -111,4 +111,21 @@ if(require(forecast) & require(testthat)){
        xregsLast <- xregsAllModels[[length(xregsAllModels)]]
        expect_equal(xreg[1:(length(AirPassengers) - maxHorizon)], as.numeric(xregsLast))
    })
+   test_that("custom FUN and FCFUN", {
+     FUN <- function(x){forecast::stlm(x)}
+     FCFUN <- function(x, h){forecast::forecast(x, h = h)}
+     expect_error(cvts(wineind), FUN = FUN, FCFUN = FCFUN, NA)
+     library(GMDH)
+     GMDHForecast <- function(x, h){GMDH::fcast(x, f.number = h)}
+     expect_error(cvts(AirPassengers, FCFUN = GMDHForecast, extraPackages = "GMDH"), NA)
+
+     modfun <- function(x){
+       dat <- data.frame(y = x, y = 1:length(x))
+       lm(y ~ x, data = dat)
+       }
+     predfun <- function(x, h){
+       dat = data.frame(x = rep(x, h))
+       predict(x)
+       }
+   })
  }

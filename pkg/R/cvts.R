@@ -144,7 +144,6 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   excludePackages <- c("", "R_GlobalEnv")
   includePackages <- c("forecast", "forecastHybrid")
   funPackage <- environmentName(environment(FUN))
-  print(funPackage)
   if(!is.element(funPackage, excludePackages)){
     includePackages <- c(includePackages, funPackage)
   }
@@ -155,7 +154,6 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   }
   # Determine which packages will need to be sent to the parallel workers
   fcfunPackage <- environmentName(environment(FCFUN))
-  print(fcfunPackage)
   if(!is.element(fcfunPackage, excludePackages)){
     includePackages <- c(includePackages, fcfunPackage)
   }
@@ -163,7 +161,6 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
     includePackages <- c(includePackages, extraPackages)
   }
   includePackages <- unique(includePackages)
-  print(includePackages)
 
   f = frequency(x)
   tspx <- tsp(x)
