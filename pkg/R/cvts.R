@@ -132,17 +132,15 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # Default model function
   # This can be useful for methods that estimate the model and forecasts in one step
   # e.g. GMDH() from the "GMDH" package or thetaf()/meanf()/rwf() from "forecast". In this case,
-  # no model function is entered but the forecast function is entered for
-  # FCFUN
+  # no model function is used but the forecast function is applied in FCFUN
   if(is.null(FUN)){
     FUN <- function(x){
       return(x)
     }
   }
-  #includePackages <- character("forecast")
   # Determine which packages will need to be sent to the parallel workers
   excludePackages <- c("", "R_GlobalEnv")
-  includePackages <- c("forecast", "forecastHybrid")
+  includePackages <- "forecast"
   funPackage <- environmentName(environment(FUN))
   if(!is.element(funPackage, excludePackages)){
     includePackages <- c(includePackages, funPackage)
