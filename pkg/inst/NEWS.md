@@ -1,4 +1,4 @@
-# Version 1.x.x [unreleased]
+# Version 1.1.10 [2017-12-26]
 * Fixed a bug in `cvts()` introduced in version 1.0.8 when a custom `FUN` or `FCFUN` is used that requires packages other than "forecast" or "forecastHybrid"
 * The `thetam()` function now checks for an input time series with less length than the seasonality. Similarly, `hybridModel()` detects this behavior. Thanks to Nicholas Fong for the bugfix.
 
