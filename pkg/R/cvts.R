@@ -348,12 +348,11 @@ tsPartition <- function(x, rolling, windowSize, maxHorizon) {
 #' 
 #' @author Ganesh Krishnan
 #' @examples 
-#' \dontrun{
-#' cv <- cvts(AirPassengers, FUN = "ets", FCFUN = "forecast", 
-#'         rolling = TRUE, windowSize = 12, horizon = 2)
+#' cv <- cvts(AirPassengers, FUN = stlm, FCFUN = forecast, 
+#'         rolling = TRUE, windowSize = 48, horizon = 2)
 #' 
-#' extractRollingForecasts(cv)
-#' }
+#' extractForecasts(cv)
+#'
 extractForecasts <- function(cv, horizon = 1) {
       if (horizon > cv$params$maxHorizon) 
          stop("Cannot extract forecasts with a horizon greater than the model maxHorizon")
