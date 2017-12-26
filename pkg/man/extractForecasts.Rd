@@ -23,7 +23,7 @@ Combine the cross validated forecasts fit with a rolling origin. This may be use
 to visualize and investigate the cross validated performance of the model
 }
 \examples{
-cv <- cvts(AirPassengers, FUN = stlm, FCFUN = forecast, 
+cv <- cvts(AirPassengers, FUN = stlm, FCFUN = forecast,
         rolling = TRUE, windowSize = 48, horizon = 2)
 
 extractForecasts(cv)
