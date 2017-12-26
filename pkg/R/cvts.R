@@ -304,9 +304,8 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 #' 
 #' @author Ganesh Krishnan
 #' @examples 
-#' \dontrun{
 #' tsPartition(AirPassengers, rolling = TRUE, windowSize = 10, maxHorizon = 2)
-#' }
+#'
 
 tsPartition <- function(x, rolling, windowSize, maxHorizon) {
   numPartitions <- ifelse(rolling, length(x) - windowSize - maxHorizon + 1, as.integer((length(x) - windowSize) / maxHorizon))

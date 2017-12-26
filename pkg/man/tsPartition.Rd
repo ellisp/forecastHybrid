@@ -24,9 +24,8 @@ Generated indices are based on the training windowSize, forecast horizons
 and whether a rolling or non-rolling cross validation procedure is desired.
 }
 \examples{
-\dontrun{
 tsPartition(AirPassengers, rolling = TRUE, windowSize = 10, maxHorizon = 2)
-}
+
 }
 \author{
 Ganesh Krishnan

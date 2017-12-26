@@ -23,12 +23,11 @@ Combine the cross validated forecasts fit with a rolling origin. This may be use
 to visualize and investigate the cross validated performance of the model
 }
 \examples{
-\dontrun{
-cv <- cvts(AirPassengers, FUN = "ets", FCFUN = "forecast", 
-        rolling = TRUE, windowSize = 12, horizon = 2)
+cv <- cvts(AirPassengers, FUN = stlm, FCFUN = forecast, 
+        rolling = TRUE, windowSize = 48, horizon = 2)
 
-extractRollingForecasts(cv)
-}
+extractForecasts(cv)
+
 }
 \author{
 Ganesh Krishnan
