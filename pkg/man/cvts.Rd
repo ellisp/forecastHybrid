@@ -108,9 +108,24 @@ cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
                maxHorizon = 12)
 
 # We can also use custom functions, for example fcast()
-from the "GMDH" package
+# from the "GMDH" package. We must be very careful that
+# our custom forecast function still produces an expected "forecast"
+# S3 class object and that the tsp properties are preserved.
 library(GMDH)
-GMDHForecast <- function(x, h){GMDH::fcast(x, f.number = h)}
+GMDHForecast <- function(x, h){
+  fc <- GMDH::fcast(x, f.number = h)
+  # GMDH doesn't produce a ts object with correct attributes, so we build it
+  start <- tsp(x)[1]
+  end <- tsp(x)[2]
+  frequency <- tsp(x)[3]
+  # Set the correct start, end, and frequency for the ts forecast object
+  fc <- ts(fc, start = end + frequency, end = end + h * frequency,
+           frequency = frequency)
+  fcreturn <- list()
+  fcreturn$mean <- fc
+  class(fcreturn) <- "forecast"
+  return(fcreturn)
+}
 gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
 
 
