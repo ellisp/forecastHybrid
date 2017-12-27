@@ -126,10 +126,14 @@ GMDHForecast <- function(x, h){
   class(fc) <- "forecast"
   return(fc)
 }
-gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
+series <- subset(wollyrnq, end = 34)
+gmdhcv <- cvts(series, FCFUN = GMDHForecast, windowSize = 24)
 
 
 # Example with custom model function and forecast function
+# This model is a naive forecast. If you were actually wishing to produce
+# a naive forecast, it would be better to use the naive() forecast function from
+# the "forecast package directly
 customMod <- function(x){
  result <- list()
  result$series <- x
