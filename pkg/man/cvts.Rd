@@ -116,17 +116,15 @@ library(GMDH)
 GMDHForecast <- function(x, h){
   fc <- GMDH::fcast(x, f.number = h)
   # GMDH doesn't produce a ts object with correct attributes, so we build it
-  start <- tsp(x)[1]
   end <- tsp(x)[2]
-  frequency <- tsp(x)[3]
+  freq <- frequency(x)
   # Set the correct start, end, and frequency for the ts forecast object
-  fc <- ts(fc, start = end + frequency, end = end + h * frequency,
-           frequency = frequency)
-  # Return the point forecasts in an S3 "forecast" class object
-  fcreturn <- list()
-  fcreturn$mean <- fc
-  class(fcreturn) <- "forecast"
-  return(fcreturn)
+  tsProperties <- c(end + 1 / freq, end + h / freq, freq)
+  tsp(fc$mean) <- tsProperties
+  tsp(fc$upper) <- tsProperties
+  tsp(fc$lower) <- tsProperties
+  class(fc) <- "forecast"
+  return(fc)
 }
 gmdhcv <- cvts(AirPassengers, FCFUN = GMDHForecast)
 
