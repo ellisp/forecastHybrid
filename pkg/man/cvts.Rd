@@ -126,7 +126,7 @@ GMDHForecast <- function(x, h){
   class(fc) <- "forecast"
   return(fc)
 }
-series <- subset(wollyrnq, end = 34)
+series <- subset(woolyrnq, end = 34)
 gmdhcv <- cvts(series, FCFUN = GMDHForecast, windowSize = 24)
 
 
