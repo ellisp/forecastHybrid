@@ -153,7 +153,8 @@ cvobj <- cvts(AirPassengers, FUN = customMod, FCFUN = forecast.customMod)
 # Use the rwf() function from the "forecast" package.
 # This function does not have a modeling function and
 # instead calculates a forecast on the time series directly
-rwcv <- cvts(AirPassengers, FCFUN = rwf)
+series <- subset(AirPassengers, end = 96)
+rwcv <- cvts(series, FCFUN = rwf)
 
 
 }
