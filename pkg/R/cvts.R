@@ -105,8 +105,8 @@
 #'   class(fc) <- "forecast"
 #'   return(fc)
 #' }
-#' series <- subset(woolyrnq, end = 34)
-#' gmdhcv <- cvts(series, FCFUN = GMDHForecast, windowSize = 24)
+#' series <- subset(woolyrnq, end = 12)
+#' gmdhcv <- cvts(series, FCFUN = GMDHForecast, windowSize = 10, maxHorizon = 1)
 #'
 #'
 #' # Example with custom model function and forecast function
@@ -132,8 +132,8 @@
 #' # Use the rwf() function from the "forecast" package.
 #' # This function does not have a modeling function and
 #' # instead calculates a forecast on the time series directly
-#' series <- subset(AirPassengers, end = 96)
-#' rwcv <- cvts(series, FCFUN = rwf)
+#' series <- subset(AirPassengers, end = 26)
+#' rwcv <- cvts(series, FCFUN = rwf, windowSize = 24, maxHorizon = 2)
 #'
 #'
 #' @author David Shaub
