@@ -63,12 +63,13 @@
 #'
 #' @examples
 #' cvmod1 <- cvts(AirPassengers, FUN = stlm,
-#'                windowSize = 48, maxHorizon = 12)
+#'                windowSize = 112, maxHorizon = 12)
 #' accuracy(cvmod1)
 #'
 #' # We can also use custom model functions for modeling/forecasting
 #' stlmClean <- function(x){stlm(tsclean(x))}
-#' cvmodCustom <- cvts(AirPassengers, FUN = stlmClean)
+#' series <- subset(austres, end = 38)
+#' cvmodCustom <- cvts(series, FUN = stlmClean, windowSize = 26, maxHorizon = 6)
 #' accuracy(cvmodCustom)
 #'
 #' # If the custom function for `FUN` or `FCFUN` requires packages
@@ -368,7 +369,7 @@ tsPartition <- function(x, rolling, windowSize, maxHorizon) {
 #' @author Ganesh Krishnan
 #' @examples 
 #' cv <- cvts(AirPassengers, FUN = stlm, FCFUN = forecast,
-#'         rolling = TRUE, windowSize = 48, horizon = 2)
+#'         rolling = TRUE, windowSize = 134, horizon = 2)
 #' 
 #' extractForecasts(cv)
 #'

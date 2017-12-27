@@ -24,7 +24,7 @@ to visualize and investigate the cross validated performance of the model
 }
 \examples{
 cv <- cvts(AirPassengers, FUN = stlm, FCFUN = forecast,
-        rolling = TRUE, windowSize = 48, horizon = 2)
+        rolling = TRUE, windowSize = 134, horizon = 2)
 
 extractForecasts(cv)
 
