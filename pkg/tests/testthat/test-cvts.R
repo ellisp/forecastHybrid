@@ -28,11 +28,11 @@ if(require(forecast) & require(testthat)){
                       maxHorizon = 12))
   })
   test_that("Testing valid inputs", {
-     expect_error(cvts(AirPassengers, FUN = thetam, FCFUN = forecast, rolling = FALSE,
-                       windowSize = 60, maxHorizon = 12), NA)
-     expect_error(cvts(AirPassengers, FUN = thetam, FCFUN = forecast, rolling = TRUE,
-                       windowSize = 60, maxHorizon = 12, verbose = FALSE), NA)
-     expect_error(cvts(rnorm(100), saveModels = FALSE, saveForecasts = FALSE), NA)
+     expect_error(cvts(USAccDeaths, FUN = thetam, FCFUN = forecast, rolling = FALSE,
+                       windowSize = 48, maxHorizon = 12), NA)
+     expect_error(cvts(USAccDeaths, FUN = thetam, FCFUN = forecast, rolling = TRUE,
+                       windowSize = 48, maxHorizon = 12, verbose = FALSE), NA)
+     expect_error(cvts(rnorm(94), saveModels = FALSE, saveForecasts = FALSE), NA)
   })
   test_that("Testing accuracy.cvts()", {
     inputSeries <- ts(rnorm(30), f = 4)
@@ -64,7 +64,7 @@ if(require(forecast) & require(testthat)){
 
       #expect_identical(ets_without_call, fc_last_without_call)
       # use a more relaxed test for now
-      expect_true(all(fc_last_without_call$mean == ets_without_call$mean))
+      expect_true(all.equal(fc_last_without_call$mean, ets_without_call$mean))
    })
 
    test_that("Extract forecasts works", {
@@ -92,11 +92,13 @@ if(require(forecast) & require(testthat)){
 
    test_that("xreg is properly used", {
        ## Ensure xreg is ignored when a model that does not accept xreg is used
-       expect_warning(cvts(AirPassengers, ets, xreg = data.frame(x = rnorm(AirPassengers))),
+       series <- subset(AirPassengers, end = 29)
+       expect_warning(cvts(series, FUN = ets, windowSize = 25, maxHorizon = 2,
+                           xreg = data.frame(x = rnorm(series))),
                       "Ignoring xreg parameter since fitting function does not accept xreg")
 
        ## Ensure xreg is ignored when NULL
-       cv <- cvts(AirPassengers, nnetar, xreg = NULL, windowSize = 100)
+       cv <- cvts(series, nnetar, xreg = NULL, windowSize = 25, maxHorizon = 2)
        xregForEachModel <- Map(function (x) x$xreg, cv$models)
        xregAllModels <- Reduce(c, xregForEachModel)
        expect_identical(xregAllModels, NULL)
@@ -105,7 +107,7 @@ if(require(forecast) & require(testthat)){
        xreg <-  rnorm(length(AirPassengers))
        maxHorizon <- 2
        cv <- cvts(AirPassengers, nnetar, maxHorizon = maxHorizon,
-                  xreg = xreg, windowSize = 100)
+                  xreg = xreg, windowSize = 136)
 
        xregsAllModels <- Map(function(x) x$xreg, cv$models)
        xregsLast <- xregsAllModels[[length(xregsAllModels)]]
@@ -126,6 +128,7 @@ if(require(forecast) & require(testthat)){
        result$mean <- pred
        return(result)
        }
-     expect_error(cvts(AirPassengers, FCFUN = FCFUN), NA)
+     series <- subset(woolyrnq, end = 14)
+     expect_error(cvts(series, FCFUN = FCFUN, windowSize = 8, maxHorizon = 2), NA)
    })
  }
