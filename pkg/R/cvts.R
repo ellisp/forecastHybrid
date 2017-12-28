@@ -133,7 +133,6 @@
 #' series <- subset(AirPassengers, end = 26)
 #' rwcv <- cvts(series, FCFUN = rwf, windowSize = 24, maxHorizon = 1)
 #'
-#'
 #' @author David Shaub
 #' @importFrom utils getAnywhere
 #' @importFrom doParallel registerDoParallel
