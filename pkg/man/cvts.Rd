@@ -84,8 +84,9 @@ External regressors are allowed via the \code{xreg} argument. It is assumed that
 If \code{FUN} does not accept the \code{xreg} parameter a warning will be given. No warning is provided if \code{FCFUN} does not use the \code{xreg} parameter.
 }
 \examples{
+series <- subset(AirPassengers, end = 50)
 cvmod1 <- cvts(AirPassengers, FUN = stlm,
-               windowSize = 112, maxHorizon = 12)
+               windowSize = 25, maxHorizon = 12)
 accuracy(cvmod1)
 
 # We can also use custom model functions for modeling/forecasting
@@ -128,7 +129,7 @@ GMDHForecast <- function(x, h){
   return(fc)
 }
 series <- subset(woolyrnq, end = 12)
-gmdhcv <- cvts(series, FCFUN = GMDHForecast, windowSize = 8, maxHorizon = 2)
+gmdhcv <- cvts(series, FCFUN = GMDHForecast, windowSize = 10, maxHorizon = 1)
 
 
 # Example with custom model function and forecast function

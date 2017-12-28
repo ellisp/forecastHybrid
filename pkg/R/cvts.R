@@ -62,8 +62,9 @@
 #' @seealso \code{\link{accuracy.cvts}}
 #'
 #' @examples
+#' series <- subset(AirPassengers, end = 50)
 #' cvmod1 <- cvts(AirPassengers, FUN = stlm,
-#'                windowSize = 112, maxHorizon = 12)
+#'                windowSize = 25, maxHorizon = 12)
 #' accuracy(cvmod1)
 #'
 #' # We can also use custom model functions for modeling/forecasting
