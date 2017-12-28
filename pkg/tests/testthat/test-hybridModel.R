@@ -35,24 +35,28 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(wineind, models = "fn", s.args = list()))
     expect_warning(hybridModel(wineind, models = "fs", t.args = list()))
     # ts is too short: nnetar() with 2 * frequency(y) >= length(y)
-    expect_warning(hybridModel(ts(rnorm(50), f = 24), models = "fsn"))
+    inputSeries <- ts(rnorm(50), f = 24)
+    expect_warning(hybridModel(inputSeries, models = "fsn"))
     # ts is too short: stlm() with 2 * frequency(y) >= length(y)
-    expect_warning(hybridModel(ts(rnorm(20), f = 12), models = "efs"))
+    inputSeries <- ts(rnorm(7), f = 4)
+    expect_warning(hybridModel(inputSeries, models = "efs"))
     # ets with frequency(y) > 24
-    expect_warning(hybridModel(ts(rnorm(100), f = 25), models = "ens"))
+    inputSeries <- ts(rnorm(75), f = 25)
+    expect_warning(hybridModel(inputSeries, models = "ens"))
     # Parallel is not yet implemented in hybridModel
-    expect_warning(hybridModel(wineind, models = "fs", parallel = TRUE))
+    inputSeries <- ts(rnorm(8), f = 2)
+    expect_warning(hybridModel(inputSeries, models = "fs", parallel = TRUE))
   })
   test_that("Testing valid inputs", {
     set.seed(54321)
     expect_error(hybridModel(wineind, models = "an", f.args = list()))
-    expect_error(hybridModel(y = rnorm(100), models = "ae",
-                             a.args = list(xreg = matrix(runif(100), nrow = 100))), NA)
+    expect_error(hybridModel(y = rnorm(10), models = "ae",
+                             a.args = list(xreg = matrix(runif(10), nrow = 10))), NA)
     expect_warning(hybridModel(y = rnorm(10), models = "en",
                                a.args = list(lambda = 0.5)))
     inputSeries <- ts(rnorm(9), f = 4)
-    expect_error(hybridModel(inputSeries, models = "aensft",
-                             weights = "insample.errors"), NA)
+    expect_warning(hybridModel(inputSeries, models = "aensft",
+                               weights = "insample.errors"))
     # soft deprecated insample.errors
     expect_warning(hybridModel(wineind, models = "fs", weights = "insample.errors"))
     expect_error(hybridModel(inputSeries, models = "ae",
@@ -66,11 +70,13 @@ if(require(forecast) & require(testthat)){
   })
   context("Testing generic functions")
   test_that("Testing is.hybridModel(), fitted.hybridModel(), residuals.hybridModel(), and accuracy.hybridModel()", {
-    inputSeries <- wineind
+    inputSeries <- subset(USAccDeaths, end = 25)
     exampleModel <- hybridModel(inputSeries)
     expect_true(is.hybridModel(exampleModel))
-    expect_true(length(fitted(exampleModel)) == length(residuals(exampleModel)))
-    expect_true(length(fitted(exampleModel, individual = TRUE)) == length(residuals(exampleModel, individual = TRUE)))
+    expect_equal(length(fitted(exampleModel)),
+                 length(residuals(exampleModel)))
+    expect_equal(length(fitted(exampleModel, individual = TRUE)),
+                 length(residuals(exampleModel, individual = TRUE)))
     expect_error(accuracy(exampleModel), NA)
     expect_error(accuracy(exampleModel, individual = TRUE), NA)
     expect_error(plot(exampleModel, type = "fit", ggplot = FALSE), NA)
@@ -80,8 +86,11 @@ if(require(forecast) & require(testthat)){
   })
   context("Testing cv.errors")
     test_that("Testing hybridModel(weights = \"cv.errors\")", {
-      inputSeries <- ts(rnorm(20), f = 4)
-      expect_error(cvMod <- hybridModel(inputSeries, weights = "cv.errors", windowSize = 14, cvHorizon = 3), NA)
-      expect_true(length(cvMod$weights) == length(unique(cvMod$weights)))
+      set.seed(33)
+      inputSeries <- ts(rnorm(12), f = 2)
+      expect_error(cvMod <- hybridModel(inputSeries, weights = "cv.errors",
+                                        windowSize = 8, cvHorizon = 2), NA)
+      expect_equal(length(cvMod$weights),
+                   length(unique(cvMod$weights)))
     })
 }

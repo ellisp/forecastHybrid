@@ -35,21 +35,23 @@ library(forecastHybrid)
 ```
 
 ## Quick start
-If you don't have time to read the whole guide and want to get started immediatly with sane default settings to forecast the ```AirPassengers``` timeseries, run the following:
+If you don't have time to read the whole guide and want to get started immediatly with sane default settings to forecast the ```USAccDeaths``` timeseries, run the following:
 ```{r quickstart, cache = TRUE}
-quickModel <- hybridModel(AirPassengers)
+quickModel <- hybridModel(USAccDeaths)
 forecast(quickModel)
 plot(forecast(quickModel), main = "Forecast from auto.arima, ets, thetam, nnetar, stlm, and tbats model")
 ```
 
 ## Fitting a model
-The workhorse function of the package is ```hybridModel()```, a function that combines several component models from the "forecast" package. At a minimum, the user must supply a ```ts``` or ```numeric``` vector for ```y```. In this case, the ensemble will include all six component models: ```auto.arima()```, ```ets()```, ```thetam()```, ```nnetar()```, ```stlm()```, and ```tbats()```. To instead use only a subset of these models, pass a character string to the ```models``` argument with the first letter of each model to include. For example, to build an ensemble model on the ```gas``` dataset with ```auto.arima()```, ```ets()```, and ```tbats()``` components, run
+The workhorse function of the package is ```hybridModel()```, a function that combines several component models from the "forecast" package. At a minimum, the user must supply a ```ts``` or ```numeric``` vector for ```y```. In this case, the ensemble will include all six component models: ```auto.arima()```, ```ets()```, ```thetam()```, ```nnetar()```, ```stlm()```, and ```tbats()```. To instead use only a subset of these models, pass a character string to the ```models``` argument with the first letter of each model to include. For example, to build an ensemble model on a simulated dataset with ```auto.arima()```, ```ets()```, and ```tbats()``` components, run
 
 ```{r basic_model, cache = TRUE}
 
-# Build a hybrid forecast on the gas dataset using auto.arima, ets, and tbats models.
+# Build a hybrid forecast on a simulated dataset using auto.arima, ets, and tbats models.
 # Each model is given equal weight 
-hm1 <- hybridModel(y = gas, models = "aet", weights = "equal")
+set.seed(12345)
+series <- ts(rnorm(18), f = 2)
+hm1 <- hybridModel(y = series, models = "aet", weights = "equal")
 ```
 
 The individual component models are stored inside the ```hybridModel``` objects and can viewed in their respective slots, and all the regular methods from the "forecast" package could be applied to these individual component models.
@@ -92,7 +94,7 @@ plot(hm1, type = "models", ggplot = TRUE)
 
 By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles [see @Armstrong2001], but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass this value to the ```errorMethod``` argument and pass either ```"insample.errors"``` or ```"cv.errors"``` to the ```weights``` argument.
 ```{r errorMethod, cache = TRUE}
-hm2 <- hybridModel(wineind, weights = "insample.errors", errorMethod = "MASE", models = "aenst")
+hm2 <- hybridModel(series, weights = "insample.errors", errorMethod = "MASE", models = "aenst")
 hm2 
 ```
 After the model is fit, these weights are stored in the ```weights``` attribute of the model. The user can view and manipulated these weights after the fit is complete. Note that the ```hybridModel()``` function automatically scales weights to sum to one, so a user should similar scale the weights to ensure the forecasts remain unbiased. Furthermore, the vector that replaces ```weights``` must retain names specifying the component model it corresponds to since weights are not assigned by position but rather by component name. Similarly, indiviudal components may also be replaced
@@ -137,7 +139,7 @@ plot(hForecast)
 # Advanced usage
 The package aims to make fitting ensembles easy and quick, but it still allows advanced tuning of all the parameters available in the "forecast" package. This is possible through usage of the ```a.args```, ```e.args```, ```n.args```, ```s.args```, and ```t.args``` lists. These optional list arguments may be applied to one, none, all, or any combination of the included individual component models. Consult the documentation in the "forecast" package for acceptable arguments to pass in the ```auto.arima```, ```ets```, ```nnetar```, ```stlm```, and ```tbats``` functions.
 ```{r advanced_fit, cache = TRUE}
-hm2 <- hybridModel(y = gas, models = "aefnst",
+hm3 <- hybridModel(y = series, models = "aefnst",
                    a.args = list(max.p = 12, max.q = 12, approximation = FALSE),
                    n.args = list(repeats = 50),
                    s.args = list(robust = TRUE),
@@ -147,20 +149,20 @@ hm2 <- hybridModel(y = gas, models = "aefnst",
 Since the ```lambda``` argument is shared between most of the models in the "forecast" framework, it is included as a special paramemeter that can be used to set the Box-Cox transform in all models instead of settings this individually. For example,
 
 ```{r lambda, cache = TRUE}
-hm3 <- hybridModel(y = wineind, models = "ae", lambda = 0.15)
-hm3$auto.arima$lambda 
-hm3$ets$lambda
+hm4 <- hybridModel(y = wineind, models = "ae", lambda = 0.15)
+hm4$auto.arima$lambda 
+hm4$ets$lambda
 ```
 
 Users can still apply the ```lambda``` argument through the tuning lists, but in this case the list-supplied argument overwrites the default used across all models. Compare the following two results.
 ```{r advancedLambda, cache = TRUE}
-hm4 <- hybridModel(y = wineind, models = "aens", lambda = 0.2,
+hm5 <- hybridModel(y = USAccDeaths, models = "aens", lambda = 0.2,
                    a.args = list(lambda = 0.5),
                    n.args = list(lambda = 0.6)) 
-hm4$auto.arima$lambda
-hm4$ets$lambda
-hm4$nnetar$lambda
-hm4$stlm$lambda
+hm5$auto.arima$lambda
+hm5$ets$lambda
+hm5$nnetar$lambda
+hm5$stlm$lambda
 
 ```
 
@@ -187,4 +189,3 @@ beaverfc <- forecast(beaverhm, xreg = testXreg)
 # View the accuracy of the model
 accuracy(beaverfc, testSet$temp)
 ```
-
