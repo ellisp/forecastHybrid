@@ -73,10 +73,6 @@
 #' cvmodCustom <- cvts(series, FUN = stlmClean, windowSize = 26, maxHorizon = 6)
 #' accuracy(cvmodCustom)
 #'
-#' # If the custom function for `FUN` or `FCFUN` requires packages
-#' # other than "forecast" or "forecastHybrid", these must be passed
-#' # in the `extraPackages` argument
-#'
 #'
 #' \dontrun{
 #' cvmod2 <- cvts(USAccDeaths, FUN = ets,
@@ -128,13 +124,14 @@
 #'  class(result) <- "forecast"
 #'  return(result)
 #' }
-#' cvobj <- cvts(AirPassengers, FUN = customMod, FCFUN = forecast.customMod)
+#' series <- subset(AirPassengers, end = 94)
+#' cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)
 #'
 #' # Use the rwf() function from the "forecast" package.
 #' # This function does not have a modeling function and
 #' # instead calculates a forecast on the time series directly
 #' series <- subset(AirPassengers, end = 26)
-#' rwcv <- cvts(series, FCFUN = rwf, windowSize = 24, maxHorizon = 2)
+#' rwcv <- cvts(series, FCFUN = rwf, windowSize = 24, maxHorizon = 1)
 #'
 #'
 #' @author David Shaub
