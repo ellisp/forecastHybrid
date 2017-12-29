@@ -155,7 +155,6 @@ cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)
 series <- subset(AirPassengers, end = 26)
 rwcv <- cvts(series, FCFUN = rwf, windowSize = 24, maxHorizon = 1)
 
-
 }
 \seealso{
 \code{\link{accuracy.cvts}}

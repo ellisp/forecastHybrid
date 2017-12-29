@@ -1,9 +1,10 @@
-# Version 2.0.10 [2017-12-27]
+# Version 2.0.10 [2017-12-29]
 * API change in `cvts()` for the `FCFUN` argument: custom forecasting functions should now return a S3 "forecast" object with the point forecast in `$mean`, and the `ts` properties should be properly set.
 * Add "GMDH" to suggested packages.
 * Fixed a bug in `cvts()` introduced in version 1.0.8 when a custom `FUN` or `FCFUN` is used that requires packages other than "forecast" or "forecastHybrid".
 * The `thetam()` function now checks for an input time series with less length than the seasonality. Similarly, `hybridModel()` detects this behavior. Thanks to Nicholas Fong for the bugfix.
 * Updated `cvts()` usage example in documentation for "GMDH".
+* Refactored many unit tests and the vignette for quicker examples.
 
 # Version 1.1.9 [2017-08-23]
 * Fixed a bug in `forecast.hybridModel()` when for models where `xreg` was not supplied to all of arima/nnetar models

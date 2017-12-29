@@ -61,7 +61,6 @@ hm1$auto.arima
 
 # See forecasts from the auto.arima model
 plot(forecast(hm1$auto.arima))
-
 ```
 
 
@@ -79,17 +78,15 @@ summary(hm1)
 
 Two types of plots can be created for the created ensemble model: either a plot showing the actual and fitted value of each component model on the data or individual plots of the component models as created by their regular S3 ```plot()``` methods. Note that a ```plot()``` method does not exist in the "forecast" package for objects generated with ```stlm()```, so this component model will be ignored when ```type = "models"```, but the other component models will be plotted regardless.
 ```{r plots, cache = TRUE}
-plot(hm1, type = "fit") 
-plot(hm1, type = "models")
-
+plot(quickModel, type = "fit")
+plot(quickModel, type = "models")
 ```
 
 Since version 0.4.0, `ggplot` graphs are available. Note, however, that the `nnetar`, and `tbats` models do not have `ggplot::autoplot()` methods, so these are not plotted.
 
 ```{r plots_ggplot, cache = TRUE}
-plot(hm1, type = "fit", ggplot = TRUE) 
-plot(hm1, type = "models", ggplot = TRUE)
-
+plot(quickModel, type = "fit", ggplot = TRUE)
+plot(quickModel, type = "models", ggplot = TRUE)
 ```
 
 By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles [see @Armstrong2001], but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass this value to the ```errorMethod``` argument and pass either ```"insample.errors"``` or ```"cv.errors"``` to the ```weights``` argument.
