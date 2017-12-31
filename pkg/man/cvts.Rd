@@ -105,28 +105,6 @@ cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
                FCFUN = forecast, rolling = TRUE, windowSize = 48,
                maxHorizon = 12)
 }
-# We can also use custom functions, for example fcast()
-# from the "GMDH" package. We must be very careful that
-# our custom forecast function still produces an expected "forecast"
-# S3 class object and that the ts object start, end, and frequency
-# properties are preserved.
-library(GMDH)
-GMDHForecast <- function(x, h){
-  fc <- GMDH::fcast(x, f.number = h)
-  # GMDH doesn't produce a ts object with correct attributes, so we build it
-  end <- tsp(x)[2]
-  freq <- frequency(x)
-  # Set the correct start, end, and frequency for the ts forecast object
-  tsProperties <- c(end + 1 / freq, end + h / freq, freq)
-  tsp(fc$mean) <- tsProperties
-  tsp(fc$upper) <- tsProperties
-  tsp(fc$lower) <- tsProperties
-  class(fc) <- "forecast"
-  return(fc)
-}
-series <- subset(woolyrnq, end = 12)
-gmdhcv <- cvts(series, FCFUN = GMDHForecast, windowSize = 10, maxHorizon = 1)
-
 
 # Example with custom model function and forecast function
 # This model is a naive forecast. If you were actually wishing to produce
