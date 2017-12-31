@@ -193,7 +193,7 @@ It can be useful to perform cross validation on a timeseries to model to estimat
 stlmMod <- cvts(woolyrnq, FUN = stlm, windowSize = 100)
 naiveMod <- cvts(woolyrnq, FUN = naive, windowSize = 100)
 accuracy(stlmMod)
-accuracy(nnetarMod)
+accuracy(naiveMod)
 ```
 We see from looking at the accuracy measure--in particular the smaller RMSE--the the `stlm()` model unsurprisingly performs better and will likely give us better future forecasts.
 
@@ -216,3 +216,22 @@ GMDHForecast <- function(x, h){
 series <- subset(woolyrnq, end = 12)
 gmdhcv <- cvts(series, FCFUN = GMDHForecast, windowSize = 10, maxHorizon = 1)
 ```
+As a final example, suppose we foolish want to implement our own version of `naive()` for performing cross validation. The `FUN` and `FCFUN` could then look like
+```{r, custom_naive_cvts, cache=TRUE}
+customMod <- function(x){
+ result <- list()
+ result$series <- x
+ result$last <- tail(x, n = 1)
+ class(result) <- "customMod"
+ return(result)
+}
+forecast.customMod <- function(x, h = 12){
+ result <- list()
+ result$model <- x
+ result$mean <- rep(x$last, h)
+ class(result) <- "forecast"
+ return(result)
+}
+series <- subset(AirPassengers, end = 94)
+```
+cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)

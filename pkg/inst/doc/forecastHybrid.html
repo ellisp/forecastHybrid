@@ -437,9 +437,9 @@ accuracy(beaverfc, testSet$temp)</code></pre>
 ## Test set     1.4144526        NA</code></pre>
 <div id="cross-validation" class="section level2">
 <h2>Cross Validation</h2>
-<p>It can be useful to perform cross validation on a timeseries to model to estimate a model’s out-of-sample forecasting performance. The <code>cvts()</code> function allows us to do this. For example, let’s perform cross validation for a <code>stlm</code> model and a <code>nnetar</code> model on the <code>woolyrnq</code> timeseries. The main important arguments that commonly need adjusting are <code>rolling</code> (if <code>TRUE</code>, the model will always be fit on a fixed <code>windowSize</code> instead of growing by one new observation for each new model fit), <code>windowSize</code> (starting length of time series to fit a model), and <code>maxHorizon</code> (the forecast horizon for predictions from each model)</p>
+<p>It can be useful to perform cross validation on a timeseries to model to estimate a model’s out-of-sample forecasting performance. The <code>cvts()</code> function allows us to do this. For example, let’s perform cross validation for a <code>stlm()</code> model and a <code>naive()</code> model on the <code>woolyrnq</code> timeseries. The main important arguments that commonly need adjusting are <code>rolling</code> (if <code>TRUE</code>, the model will always be fit on a fixed <code>windowSize</code> instead of growing by one new observation for each new model fit), <code>windowSize</code> (starting length of time series to fit a model), and <code>maxHorizon</code> (the forecast horizon for predictions from each model)</p>
 <pre class="r"><code>stlmMod &lt;- cvts(woolyrnq, FUN = stlm, windowSize = 100)
-nnetarMod &lt;- cvts(woolyrnq, FUN = nnetar, windowSize = 100)
+naiveMod &lt;- cvts(woolyrnq, FUN = naive, windowSize = 100)
 accuracy(stlmMod)</code></pre>
 <pre><code>##                            ME      RMSE       MAE
 ## Forecast Horizon  1 298.98618 328.03647 298.98618
@@ -447,13 +447,14 @@ accuracy(stlmMod)</code></pre>
 ## Forecast Horizon  3 122.73853 195.32197 182.87230
 ## Forecast Horizon  4  69.92221  85.09429  69.92221
 ## Forecast Horizon  5  77.31951 318.54228 254.56377</code></pre>
-<pre class="r"><code>accuracy(nnetarMod)</code></pre>
-<pre><code>##                            ME     RMSE      MAE
-## Forecast Horizon  1  135.1517 314.7418 274.1588
-## Forecast Horizon  2 -115.6459 226.3149 203.4105
-## Forecast Horizon  3 -240.5548 314.0909 240.5548
-## Forecast Horizon  4 -224.0394 331.2814 224.0394
-## Forecast Horizon  5 -290.9151 422.4725 378.3048</code></pre>
+<pre class="r"><code>accuracy(naiveMod)</code></pre>
+<pre><code>##                           ME     RMSE      MAE
+## Forecast Horizon  1 368.6667 789.7987 728.0000
+## Forecast Horizon  2 559.6667 821.8100 559.6667
+## Forecast Horizon  3 259.6667 734.1306 647.0000
+## Forecast Horizon  4  74.0000  90.8662  74.0000
+## Forecast Horizon  5 147.0000 856.6300 841.0000</code></pre>
+<p>We see from looking at the accuracy measure–in particular the smaller RMSE–the the <code>stlm()</code> model unsurprisingly performs better and will likely give us better future forecasts.</p>
 <p>We can also use custom functions, for example <code>fcast()</code> from the “GMDH” package. We must be very careful that our custom forecast function still produces an expected “forecast” S3 class object and that the ts object start, end, and frequency properties are preserved.</p>
 <pre class="r"><code>library(GMDH)
 GMDHForecast &lt;- function(x, h){

@@ -84,27 +84,6 @@
 #'                maxHorizon = 12)
 #' }
 #'
-#' # Example with custom model function and forecast function
-#' # This model is a naive forecast. If you were actually wishing to produce
-#' # a naive forecast, it would be better to use the naive() forecast function from
-#' # the "forecast package directly
-#' customMod <- function(x){
-#'  result <- list()
-#'  result$series <- x
-#'  result$last <- tail(x, n = 1)
-#'  class(result) <- "customMod"
-#'  return(result)
-#' }
-#' forecast.customMod <- function(x, h = 12){
-#'  result <- list()
-#'  result$model <- x
-#'  result$mean <- rep(x$last, h)
-#'  class(result) <- "forecast"
-#'  return(result)
-#' }
-#' series <- subset(AirPassengers, end = 94)
-#' cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)
-#'
 #' # Use the rwf() function from the "forecast" package.
 #' # This function does not have a modeling function and
 #' # instead calculates a forecast on the time series directly
