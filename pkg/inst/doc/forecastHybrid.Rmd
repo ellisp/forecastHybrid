@@ -188,14 +188,13 @@ accuracy(beaverfc, testSet$temp)
 ```
 
 ## Cross Validation
-It can be useful to perform cross validation on a timeseries to model to estimate a model's out-of-sample forecasting performance. The `cvts()` function allows us to do this. For example, let's perform cross validation for a `stlm()` model and a `naive()` model on the `woolyrnq` timeseries. The main important arguments that commonly need adjusting are `rolling` (if `TRUE`, the model will always be fit on a fixed `windowSize` instead of growing by one new observation for each new model fit), `windowSize` (starting length of time series to fit a model), and `maxHorizon` (the forecast horizon for predictions from each model)
+It can be useful to perform cross validation on a timeseries to model to estimate a model's out-of-sample forecasting performance. The `cvts()` function allows us to do this. For example, let's perform cross validation for a `stlm` model and a `nnetar` model on the `woolyrnq` timeseries. The main important arguments that commonly need adjusting are `rolling` (if `TRUE`, the model will always be fit on a fixed `windowSize` instead of growing by one new observation for each new model fit), `windowSize` (starting length of time series to fit a model), and `maxHorizon` (the forecast horizon for predictions from each model)
 ```{r, cvts_comparison, cache=TRUE}
 stlmMod <- cvts(woolyrnq, FUN = stlm, windowSize = 100)
-naiveMod <- cvts(woolyrnq, FUN = naive, windowSize = 100)
+nnetarMod <- cvts(woolyrnq, FUN = nnetar, windowSize = 100)
 accuracy(stlmMod)
 accuracy(nnetarMod)
 ```
-We see from looking at the accuracy measure--in particular the smaller RMSE--the the `stlm()` model unsurprisingly performs better and will likely give us better future forecasts.
 
 We can also use custom functions, for example `fcast()` from the "GMDH" package. We must be very careful that our custom forecast function still produces an expected "forecast" S3 class object and that the ts object start, end, and frequency properties are preserved.
 ```{r, custom_cvts, cache=TRUE}
