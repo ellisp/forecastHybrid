@@ -315,7 +315,7 @@ hybridModel <- function(y, models = "aefnst",
                                         maxHorizon = cvHorizon,
                                         horizonAverage = horizonAverage,
                                         verbose = FALSE,
-                                        windowSize = windowSize)
+                                        windowSize = windowSize, num.cores = num.cores)
         } else if(i == "e"){
           if(verbose){
             cat("Cross validating the ets model\n")
@@ -324,7 +324,7 @@ hybridModel <- function(y, models = "aefnst",
                                  maxHorizon = cvHorizon,
                                  horizonAverage = horizonAverage,
                                  verbose = FALSE,
-                                 windowSize = windowSize)
+                                 windowSize = windowSize, num.cores = num.cores)
         } else if(i == "f"){
            if(verbose){
               cat("Cross validating the thetam model\n")

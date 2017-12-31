@@ -102,7 +102,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  xreg = NULL,
                  saveModels = ifelse(length(x) > 500, FALSE, TRUE),
                  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
-                 verbose = TRUE, num.cores = 1, extraPackages = NULL,
+                 verbose = TRUE, num.cores = 2L, extraPackages = NULL,
                  ...){
   # Default model function
   # This can be useful for methods that estimate the model and forecasts in one step

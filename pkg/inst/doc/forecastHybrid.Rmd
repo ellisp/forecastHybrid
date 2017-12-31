@@ -197,7 +197,7 @@ naiveMod <- cvts(woolyrnq, FUN = naive, windowSize = 100, maxHorizon = 8)
 accuracy(stlmMod)
 accuracy(naiveMod)
 ```
-We see from looking at the accuracy measure--in particular the smaller RMSE and MAE--the `stlm()` model unsurprisingly performs better and will likely give us better future forecasts. We also notice that the apparent edge over the naive forecast tends to diminish or even disappear for longer forecast horizons, and a look at the original timeseries makes this result obvious: this is a relatively difficult timeseries to forecast without an obvious trend, so the naive model will not perform relatively poorly
+We see from looking at the accuracy measure--in particular the smaller RMSE and MAE--the `stlm()` model unsurprisingly performs better and will likely give us better future forecasts. We also notice that the apparent edge over the naive forecast tends to diminish or even disappear for longer forecast horizons, and a look at the original timeseries makes this result obvious: this timeseries lacks an obvious trend and is a relatively difficult timeseries to forecast past a fewer seasonal periods, so the naive model will not perform relatively poorly.
 ```{r, woolyrnq_plot}
 plot(woolyrnq)
 ```
@@ -240,3 +240,11 @@ forecast.customMod <- function(x, h = 12){
 series <- subset(AirPassengers, end = 94)
 ```
 cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)
+
+## Cross Validation Weights
+Previously we explored fitting `hybridModel()` objects with `weights = "equal"` or `weights = "insample.errors`, but we can now leverage the process conducted in `cvts()` to select the appropriate weights inteligently based on the expected out-of-sample forecast accuracy of each component model. While this is the methodologically-sound weight procedure, it also comes at significant computational cost since the cross validation procedure necessitates fitting each model several times for each cross validation fold in addition to the final fit on the whole dataset. Fortunately this process can be conducted in parallel if multiple cores are available. Some of the arguments explained above in `cvts()` such as `windowSize` and the `cvHorizon` can also be controlled here.
+```
+cvMod <- hybridModel(woolyrnq, models = "ns", weights = "cv.errors", windowSize = 100, cvHorizon = 8, num.cores = 4)
+cvMod
+```
+```

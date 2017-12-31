@@ -242,3 +242,9 @@ series <- subset(AirPassengers, end = 94)
 cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)
 
 ## Cross Validation Weights
+Previously we explored fitting `hybridModel()` objects with `weights = "equal"` or `weights = "insample.errors`, but we can now leverage the process conducted in `cvts()` to select the appropriate weights inteligently based on the expected out-of-sample forecast accuracy of each component model. While this is the methodologically-sound weight procedure, it also comes at significant computational cost since the cross validation procedure necessitates fitting each model several times for each cross validation fold in addition to the final fit on the whole dataset. Fortunately this process can be conducted in parallel if multiple cores are available. Some of the arguments explained above in `cvts()` such as `windowSize` and the `cvHorizon` can also be controlled here.
+```
+cvMod <- hybridModel(woolyrnq, models = "ns", weights = "cv.errors", windowSize = 100, cvHorizon = 8, num.cores = 4)
+cvMod
+```
+```
