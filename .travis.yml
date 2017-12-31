@@ -11,13 +11,13 @@ cache: packages
 
 before_install:
   - cd pkg
-  
+
 install:
-  - Rscript -e 'install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown"))'
-  - Rscript -e 'devtools::install_deps(); install.packages("covr")'
+  - Rscript -e 'install.packages(c("devtools", "covr"))'
+  - Rscript -e 'devtools::install_deps(dependencies = c("Depends", "Suggests"), threads = 2)'
 script:
   - Rscript -e 'devtools::check()'
-  
+
 notifications:
   email:
     on_success: change
