@@ -188,14 +188,19 @@ accuracy(beaverfc, testSet$temp)
 ```
 
 ## Cross Validation
-It can be useful to perform cross validation on a timeseries to model to estimate a model's out-of-sample forecasting performance. The `cvts()` function allows us to do this. For example, let's perform cross validation for a `stlm()` model and a `naive()` model on the `woolyrnq` timeseries. The main important arguments that commonly need adjusting are `rolling` (if `TRUE`, the model will always be fit on a fixed `windowSize` instead of growing by one new observation for each new model fit), `windowSize` (starting length of time series to fit a model), and `maxHorizon` (the forecast horizon for predictions from each model)
+It can be useful to perform cross validation on a forecasting model to estimate a model's out-of-sample forecasting performance. The `cvts()` function allows us to do this on arbitrary functions. We could do this as part of a model selection procedure to determine which models to include in our call to `hybridModel()` or merely to understand how well we expect to forecast the series during unobserved windows.
+
+For example, let's perform cross validation for a `stlm()` model and a `naive()` model on the `woolyrnq` timeseries. The most important `cvts()` arguments that commonly need adjusting are `rolling` (if `TRUE`, the model will always be fit on a fixed `windowSize` instead of growing by one new observation for each new model fit during cross validation), `windowSize` (starting length of time series to fit a model), and `maxHorizon` (the forecast horizon for predictions from each model). Since a naive forecast is a good baseline that any decent model should surpass, let's see how the `stlm()` model compares.
 ```{r, cvts_comparison, cache=TRUE}
-stlmMod <- cvts(woolyrnq, FUN = stlm, windowSize = 100)
-naiveMod <- cvts(woolyrnq, FUN = naive, windowSize = 100)
+stlmMod <- cvts(woolyrnq, FUN = stlm, windowSize = 100, maxHorizon = 8)
+naiveMod <- cvts(woolyrnq, FUN = naive, windowSize = 100, maxHorizon = 8)
 accuracy(stlmMod)
 accuracy(naiveMod)
 ```
-We see from looking at the accuracy measure--in particular the smaller RMSE--the the `stlm()` model unsurprisingly performs better and will likely give us better future forecasts.
+We see from looking at the accuracy measure--in particular the smaller RMSE and MAE--the `stlm()` model unsurprisingly performs better and will likely give us better future forecasts. We also notice that the apparent edge over the naive forecast tends to diminish or even disappear for longer forecast horizons, and a look at the original timeseries makes this result obvious: this is a relatively difficult timeseries to forecast without an obvious trend, so the naive model will not perform relatively poorly
+```{r, woolyrnq_plot}
+plot(woolyrnq)
+```
 
 We can also use custom functions, for example `fcast()` from the "GMDH" package. We must be very careful that our custom forecast function still produces an expected "forecast" S3 class object and that the ts object start, end, and frequency properties are preserved.
 ```{r, custom_cvts, cache=TRUE}
@@ -216,3 +221,22 @@ GMDHForecast <- function(x, h){
 series <- subset(woolyrnq, end = 12)
 gmdhcv <- cvts(series, FCFUN = GMDHForecast, windowSize = 10, maxHorizon = 1)
 ```
+As a final example, suppose we foolish want to implement our own version of `naive()` for performing cross validation. The `FUN` and `FCFUN` could then look like
+```{r, custom_naive_cvts, cache=TRUE}
+customMod <- function(x){
+ result <- list()
+ result$series <- x
+ result$last <- tail(x, n = 1)
+ class(result) <- "customMod"
+ return(result)
+}
+forecast.customMod <- function(x, h = 12){
+ result <- list()
+ result$model <- x
+ result$mean <- rep(x$last, h)
+ class(result) <- "forecast"
+ return(result)
+}
+series <- subset(AirPassengers, end = 94)
+```
+cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)

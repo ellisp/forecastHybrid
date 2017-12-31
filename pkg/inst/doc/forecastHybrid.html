@@ -437,24 +437,33 @@ accuracy(beaverfc, testSet$temp)</code></pre>
 ## Test set     1.4144526        NA</code></pre>
 <div id="cross-validation" class="section level2">
 <h2>Cross Validation</h2>
-<p>It can be useful to perform cross validation on a timeseries to model to estimate a model’s out-of-sample forecasting performance. The <code>cvts()</code> function allows us to do this. For example, let’s perform cross validation for a <code>stlm()</code> model and a <code>naive()</code> model on the <code>woolyrnq</code> timeseries. The main important arguments that commonly need adjusting are <code>rolling</code> (if <code>TRUE</code>, the model will always be fit on a fixed <code>windowSize</code> instead of growing by one new observation for each new model fit), <code>windowSize</code> (starting length of time series to fit a model), and <code>maxHorizon</code> (the forecast horizon for predictions from each model)</p>
-<pre class="r"><code>stlmMod &lt;- cvts(woolyrnq, FUN = stlm, windowSize = 100)
-naiveMod &lt;- cvts(woolyrnq, FUN = naive, windowSize = 100)
+<p>It can be useful to perform cross validation on a forecasting model to estimate a model’s out-of-sample forecasting performance. The <code>cvts()</code> function allows us to do this on arbitrary functions. We could do this as part of a model selection procedure to determine which models to include in our call to <code>hybridModel()</code> or merely to understand how well we expect to forecast the series during unobserved windows.</p>
+<p>For example, let’s perform cross validation for a <code>stlm()</code> model and a <code>naive()</code> model on the <code>woolyrnq</code> timeseries. The most important <code>cvts()</code> arguments that commonly need adjusting are <code>rolling</code> (if <code>TRUE</code>, the model will always be fit on a fixed <code>windowSize</code> instead of growing by one new observation for each new model fit during cross validation), <code>windowSize</code> (starting length of time series to fit a model), and <code>maxHorizon</code> (the forecast horizon for predictions from each model). Since a naive forecast is a good baseline that any decent model should surpass, let’s see how the <code>stlm()</code> model compares.</p>
+<pre class="r"><code>stlmMod &lt;- cvts(woolyrnq, FUN = stlm, windowSize = 100, maxHorizon = 8)
+naiveMod &lt;- cvts(woolyrnq, FUN = naive, windowSize = 100, maxHorizon = 8)
 accuracy(stlmMod)</code></pre>
-<pre><code>##                            ME      RMSE       MAE
-## Forecast Horizon  1 298.98618 328.03647 298.98618
-## Forecast Horizon  2 160.79554 168.56494 160.79554
-## Forecast Horizon  3 122.73853 195.32197 182.87230
-## Forecast Horizon  4  69.92221  85.09429  69.92221
-## Forecast Horizon  5  77.31951 318.54228 254.56377</code></pre>
+<pre><code>##                             ME      RMSE       MAE
+## Forecast Horizon  1  191.13714 339.82149 280.97196
+## Forecast Horizon  2 -194.44269 345.31349 285.36546
+## Forecast Horizon  3 -173.62950 192.63326 173.62950
+## Forecast Horizon  4  -87.48572 124.76727  88.95572
+## Forecast Horizon  5  -80.86286  95.58736  80.86286
+## Forecast Horizon  6  -75.94269 294.81456 284.86546
+## Forecast Horizon  7   51.37050  69.33831  51.37050
+## Forecast Horizon  8  -67.48572 145.54690 128.95572</code></pre>
 <pre class="r"><code>accuracy(naiveMod)</code></pre>
-<pre><code>##                           ME     RMSE      MAE
-## Forecast Horizon  1 368.6667 789.7987 728.0000
-## Forecast Horizon  2 559.6667 821.8100 559.6667
-## Forecast Horizon  3 259.6667 734.1306 647.0000
-## Forecast Horizon  4  74.0000  90.8662  74.0000
-## Forecast Horizon  5 147.0000 856.6300 841.0000</code></pre>
-<p>We see from looking at the accuracy measure–in particular the smaller RMSE–the the <code>stlm()</code> model unsurprisingly performs better and will likely give us better future forecasts.</p>
+<pre><code>##                          ME      RMSE    MAE
+## Forecast Horizon  1  -768.5  802.0365  768.5
+## Forecast Horizon  2  -229.0  324.5628  230.0
+## Forecast Horizon  3   142.5  184.0611  142.5
+## Forecast Horizon  4   -88.0  124.4508   88.0
+## Forecast Horizon  5 -1040.5 1040.5001 1040.5
+## Forecast Horizon  6  -110.5  254.7165  229.5
+## Forecast Horizon  7   367.5  367.7479  367.5
+## Forecast Horizon  8   -68.0  144.9414  128.0</code></pre>
+<p>We see from looking at the accuracy measure–in particular the smaller RMSE and MAE–the <code>stlm()</code> model unsurprisingly performs better and will likely give us better future forecasts. We also notice that the apparent edge over the naive forecast tends to diminish or even disappear for longer forecast horizons, and a look at the original timeseries makes this result obvious: this is a relatively difficult timeseries to forecast without an obvious trend, so the naive model will not perform relatively poorly</p>
+<pre class="r"><code>plot(woolyrnq)</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 <p>We can also use custom functions, for example <code>fcast()</code> from the “GMDH” package. We must be very careful that our custom forecast function still produces an expected “forecast” S3 class object and that the ts object start, end, and frequency properties are preserved.</p>
 <pre class="r"><code>library(GMDH)
 GMDHForecast &lt;- function(x, h){
@@ -472,6 +481,23 @@ GMDHForecast &lt;- function(x, h){
 }
 series &lt;- subset(woolyrnq, end = 12)
 gmdhcv &lt;- cvts(series, FCFUN = GMDHForecast, windowSize = 10, maxHorizon = 1)</code></pre>
+<p>As a final example, suppose we foolish want to implement our own version of <code>naive()</code> for performing cross validation. The <code>FUN</code> and <code>FCFUN</code> could then look like</p>
+<pre class="r"><code>customMod &lt;- function(x){
+ result &lt;- list()
+ result$series &lt;- x
+ result$last &lt;- tail(x, n = 1)
+ class(result) &lt;- &quot;customMod&quot;
+ return(result)
+}
+forecast.customMod &lt;- function(x, h = 12){
+ result &lt;- list()
+ result$model &lt;- x
+ result$mean &lt;- rep(x$last, h)
+ class(result) &lt;- &quot;forecast&quot;
+ return(result)
+}
+series &lt;- subset(AirPassengers, end = 94)</code></pre>
+<p>cvobj &lt;- cvts(series, FUN = customMod, FCFUN = forecast.customMod)</p>
 </div>
 </div>
 
