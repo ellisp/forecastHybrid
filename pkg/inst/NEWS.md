@@ -1,4 +1,4 @@
-# Version 2.0.10 [2017-12-29]
+# Version 2.0.10 [2018-01-03]
 * API change in `cvts()` for the `FCFUN` argument: custom forecasting functions should now return a S3 "forecast" object with the point forecast in `$mean`, and the `ts` properties should be properly set.
 * `cvts()` now defaults to 2 cores
 * Moved usage examples for `cvts()` to the vignette.
