@@ -134,11 +134,11 @@ hybridModel <- function(y, models = "aefnst",
 
   # Match the specified models
   expandedModels <- unique(tolower(unlist(strsplit(models, split = ""))))
-  if(length(expandedModels) > 6L){
+  if(length(expandedModels) > 7L){
     stop("Invalid models specified.")
   }
   # All characters must be valid
-  validModels <- c("a", "e", "f", "n", "s", "t")
+  validModels <- c("a", "e", "f", "n", "s", "t", "z")
   if(!all(expandedModels %in% validModels)){
     stop("Invalid models specified.")
   }
@@ -287,6 +287,13 @@ hybridModel <- function(y, models = "aefnst",
       cat("Fitting the tbats model\n")
     }
     modelResults$tbats <- do.call(tbats, c(list(y), t.args))
+  }
+  #snaive
+  if(is.element("z", expandedModels)){
+    if(verbose){
+      cat("Fitting the snaive model\n")
+    }
+    modelResults$snaive <- snaive(y)
   }
 
   # Set the model weights

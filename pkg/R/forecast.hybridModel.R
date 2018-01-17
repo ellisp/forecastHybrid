@@ -145,6 +145,10 @@ forecast.hybridModel <- function(object,
     forecasts$tbats <- forecast(object$tbats, h = h, level = level, ...)
     forecasts$pointForecasts[, "tbats"] <- forecasts$tbats$mean
   }
+  if("snaive" %in% includedModels){
+    forecasts$snaive <- snaive(object$x, h = h, level = level, ...)
+    forecasts$pointForecasts[, "snaive"] <- forecasts$snaive$mean
+  }
 
   # Apply the weights to the individual forecasts and create the final point forecast
   finalForecast <- rowSums(forecasts$pointForecast * weightsMatrix)
