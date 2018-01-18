@@ -14,7 +14,7 @@
 #' @param models A character string of up to six characters indicating which contributing models to use:
 #' a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}),
 #' f (\code{\link{thetam}}), n (\code{\link[forecast]{nnetar}}),
-#' s (\code{\link[forecast]{stlm}}) and t (\code{\link[forecast]{tbats}}).
+#' s (\code{\link[forecast]{stlm}}), t (\code{\link[forecast]{tbats}}), and z (\code{\link[forecast]{snaive}}).
 #' @param a.args an optional \code{list} of arguments to pass to \code{\link[forecast]{auto.arima}}. See details.
 #' @param e.args an optional \code{list} of arguments to pass to \code{\link[forecast]{ets}}. See details.
 #' @param n.args an optional \code{list} of arguments to pass to \code{\link[forecast]{nnetar}}. See details.
@@ -322,7 +322,8 @@ hybridModel <- function(y, models = "aefnst",
                                         maxHorizon = cvHorizon,
                                         horizonAverage = horizonAverage,
                                         verbose = FALSE,
-                                        windowSize = windowSize, num.cores = num.cores)
+                                        windowSize = windowSize,
+                                        num.cores = num.cores)
         } else if(i == "e"){
           if(verbose){
             cat("Cross validating the ets model\n")
@@ -331,7 +332,8 @@ hybridModel <- function(y, models = "aefnst",
                                  maxHorizon = cvHorizon,
                                  horizonAverage = horizonAverage,
                                  verbose = FALSE,
-                                 windowSize = windowSize, num.cores = num.cores)
+                                 windowSize = windowSize,
+                                 num.cores = num.cores)
         } else if(i == "f"){
            if(verbose){
               cat("Cross validating the thetam model\n")
@@ -398,13 +400,15 @@ hybridModel <- function(y, models = "aefnst",
   # Check for valid weights when weights = "insample.errors" and submodels produce perfect fits
   if(is.element(NaN, modelResults$weights) & weights %in% c("insample.errors", "cv.errors")){
     warning('At least one model perfectly fit the series, so accuracy measures cannot be used for weights. Reverting to weights = "equal".')
-    modelResults$weights <- rep(1/ length(includedModels), length(includedModels))
+    modelResults$weights <- rep(1/ length(includedModels),
+                                length(includedModels))
   }
   names(modelResults$weights) <- includedModels
 
   # Apply the weights to construct the fitted values
   fits <- sapply(includedModels, FUN = function(x) fitted(modelResults[[x]]))
-  fitsWeightsMatrix <- matrix(rep(modelResults$weights[includedModels], times = nrow(fits)),
+  fitsWeightsMatrix <- matrix(rep(modelResults$weights[includedModels],
+                              times = nrow(fits)),
                               nrow = nrow(fits), byrow = TRUE)
   fits <- rowSums(fits * fitsWeightsMatrix)
   resid <- y - fits
@@ -560,7 +564,8 @@ accuracy.hybridModel <- function(f,
 #' 
 accuracy.cvts <- function(f, ...){
   ME <- colMeans(f$residuals)
-  RMSE <- apply(f$residuals, MARGIN = 2, FUN = function(x){sqrt(sum(x ^ 2)/ length(x))})
+  RMSE <- apply(f$residuals, MARGIN = 2,
+                FUN = function(x){sqrt(sum(x ^ 2)/ length(x))})
   MAE <- colMeans(abs(f$residuals))
   results <- data.frame(ME, RMSE, MAE)
   rownames(results) <- paste("Forecast Horizon ", rownames(results))
@@ -660,8 +665,10 @@ plot.hybridModel <- function(x,
          
       } else{
          # Set the highest and lowest axis scale
-         ymax <- max(sapply(plotModels, FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
-         ymin <- min(sapply(plotModels, FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
+         ymax <- max(sapply(plotModels,
+                            FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
+         ymin <- min(sapply(plotModels,
+                            FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
          range <- ymax - ymin
          plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range), ...)
          #title(main = "Plot of original series (black) and fitted component models", outer = TRUE)

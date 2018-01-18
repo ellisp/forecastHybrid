@@ -33,7 +33,7 @@ if(require(forecast) &  require(testthat)){
     expect_error(aa <- hybridModel(inputSeries, models = "afns",
                                    a.args = list(xreg = mm),
                                    s.args = list(xreg = mm)))
-    aa <- hybridModel(inputSeries, models = "aefnst",
+    aa <- hybridModel(inputSeries, models = "aefnstz",
                       a.args = list(xreg = mm),
                       n.args = list(xreg = mm),
                       s.args = list(xreg = mm, method = "arima"))
