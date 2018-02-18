@@ -1,3 +1,6 @@
+# Version 2.1.11 [Unreleased]
+* Added `snaive()` model to the ensemble. It is disabled by default, but can be added with "z".
+
 # Version 2.0.10 [2018-01-03]
 * API change in `cvts()` for the `FCFUN` argument: custom forecasting functions should now return a S3 "forecast" object with the point forecast in `$mean`, and the `ts` properties should be properly set.
 * `cvts()` now defaults to 2 cores
