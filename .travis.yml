@@ -14,7 +14,7 @@ before_install:
 
 install:
   - Rscript -e 'install.packages(c("devtools", "covr"))'
-  - Rscript -e 'devtools::install_deps(dependencies = c("Depends", "Suggests"), threads = 2)'
+  - Rscript -e 'devtools::install_deps(dependencies = c("Depends", "Imports", "Suggests"), threads = 2)'
 script:
   - Rscript -e 'devtools::check()'
 
