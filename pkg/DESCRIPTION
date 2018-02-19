@@ -24,6 +24,7 @@ Suggests:
     GMDH,
     knitr,
     rmarkdown,
+    roxygen2,
     testthat
 VignetteBuilder: knitr
 License: GPL-3
