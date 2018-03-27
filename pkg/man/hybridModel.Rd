@@ -14,7 +14,7 @@ hybridModel(y, models = "aefnst", lambda = NULL, a.args = NULL,
 \arguments{
 \item{y}{A numeric vector or time series.}
 
-\item{models}{A character string of up to six characters indicating which contributing models to use:
+\item{models}{A character string of up to seven characters indicating which contributing models to use:
 a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}),
 f (\code{\link{thetam}}), n (\code{\link[forecast]{nnetar}}),
 s (\code{\link[forecast]{stlm}}), t (\code{\link[forecast]{tbats}}), and z (\code{\link[forecast]{snaive}}).}

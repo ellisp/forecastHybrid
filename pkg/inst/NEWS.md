@@ -1,4 +1,4 @@
-# Version 2.1.11 [Unreleased]
+# Version 2.1.11 [2018-03-27]
 * Added `snaive()` model to the ensemble. It is disabled by default, but can be added with "z".
 
 # Version 2.0.10 [2018-01-03]

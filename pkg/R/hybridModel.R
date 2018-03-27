@@ -11,7 +11,7 @@
 #' @param lambda
 #' Box-Cox transformation parameter.
 #' Ignored if NULL. Otherwise, data transformed before model is estimated.
-#' @param models A character string of up to six characters indicating which contributing models to use:
+#' @param models A character string of up to seven characters indicating which contributing models to use:
 #' a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}),
 #' f (\code{\link{thetam}}), n (\code{\link[forecast]{nnetar}}),
 #' s (\code{\link[forecast]{stlm}}), t (\code{\link[forecast]{tbats}}), and z (\code{\link[forecast]{snaive}}).
