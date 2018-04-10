@@ -6,7 +6,7 @@
 \usage{
 \method{forecast}{hybridModel}(object, h = ifelse(object$frequency > 1, 2 *
   object$frequency, 10), xreg = NULL, level = c(80, 95), PI = TRUE,
-  fan = FALSE, ...)
+  fan = FALSE, PI.combination = c("extreme", "mean"), ...)
 }
 \arguments{
 \item{object}{a hybrid time series model fit with \link{hybridModel}.}
@@ -25,6 +25,11 @@ so disabling prediction intervals will speed up the forecast generation. If \cod
 and \code{fan} are ignored.}
 
 \item{fan}{if \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable for fan plots.}
+
+\item{PI.combination}{Method for combining the prediction intervals from each of the component forecasts. Supplying \code{"mean"}
+will simply average each of the lower/upper intervals from each model without using the model weights used for the point forecasts.
+The default value \code{"extreme"} will take the most pessimistic intervals (i.e. the highest upper interval from all the component models
+and the lowest prediction interval from all of the component models').}
 
 \item{...}{other arguments passed to the individual \code{forecast} generic methods.}
 }

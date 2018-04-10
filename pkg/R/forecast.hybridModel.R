@@ -15,6 +15,10 @@
 #' @param PI should prediction intervals be produced? If a \code{nnetar} model is in the ensemble, this can be quite slow,
 #' so disabling prediction intervals will speed up the forecast generation. If \code{FALSE}, the arguments \code{level}
 #' and \code{fan} are ignored.
+#' @param PI.combination Method for combining the prediction intervals from each of the component forecasts. Supplying \code{"mean"}
+#' will simply average each of the lower/upper intervals from each model without using the model weights used for the point forecasts.
+#' The default value \code{"extreme"} will take the most pessimistic intervals (i.e. the highest upper interval from all the component models
+#' and the lowest prediction interval from all of the component models').
 #' @param ... other arguments passed to the individual \code{forecast} generic methods.
 #' @seealso \code{\link{hybridModel}}
 #' @details if \code{xreg} was used in construcing the \code{hybridModel},
@@ -51,7 +55,8 @@ forecast.hybridModel <- function(object,
                                  xreg = NULL,
                                  level = c(80, 95),
                                  PI = TRUE,
-                                 fan = FALSE, ...){
+                                 fan = FALSE,
+                                 PI.combination = c("extreme", "mean"), ...){
 
   # Check inputs
   if(!is.hybridModel(object)){
@@ -167,6 +172,13 @@ forecast.hybridModel <- function(object,
 
   # Construct the prediction intervals
   if(PI){
+    # Set the functions for the uppper/lower prediction intervals
+    if(PI.combination == "mean"){
+      upperFunction <- lowerFunction <- mean
+    } else{
+      upperFunction <- max
+      lowerFunction <- min
+    }
      nint <- length(level)
      upper <- lower <- matrix(NA, ncol = nint, nrow = length(finalForecast))
      # Prediction intervals for nnetar do not currently work, so exclude these
@@ -181,10 +193,9 @@ forecast.hybridModel <- function(object,
            tmpLower[, j2] <- as.numeric(matrix(forecasts[[j]]$lower, nrow = h)[, i])
            j2 <- j2 + 1
         }
-        # upper/lower prediction intervals are the extreme values for now
-        # We can modify it for other approaches by changing the FUN here
-        upper[, i] <- apply(tmpUpper, 1, FUN = max)
-        lower[, i] <- apply(tmpLower, 1, FUN = min)
+        # Apply the function for reconciling the prediction intervals
+        upper[, i] <- apply(tmpUpper, 1, FUN = upperFunction)
+        lower[, i] <- apply(tmpLower, 1, FUN = lowerFunction)
      }
      if(!is.finite(max(upper)) || !is.finite(min(lower))){
         warning("Prediction intervals are not finite.")
