@@ -20,6 +20,26 @@ if(require(forecast) &  require(testthat)){
     expect_error(forecast.hybridModel("a"))
   })
 
+  test_that("Testing prediction intervals", {
+    set.seed(5)
+    inputSeries <- ts(rnorm(10), f = 2)
+    mod <- hybridModel(inputSeries, models = "at")
+    h <- 100
+    fc <- forecast(mod, h = h, PI.combination = "extreme")
+    arimaForecast <- forecast(mod$auto.arima, h = h)
+    tbatsForecast <- forecast(mod$tbats, h = h)
+    # Default PI.combination = "extreme" should guarantee PI as pessimistic as any component
+    expect_true(all(arimaForecast$upper <= fc$upper))
+    expect_true(all(tbatsForecast$upper <= fc$upper))
+    expect_true(all(arimaForecast$lower >= fc$lower))
+    expect_true(all(tbatsForecast$lower >= fc$lower))
+
+    # Test  with PI.combination = "mean"
+    fc <- forecast(mod, h = h, PI.combination = "mean")
+    expect_true(all(xor(arimaForecast$upper <= fc$upper, tbatsForecast$upper <= fc$upper)))
+    expect_true(all(xor(arimaForecast$lower >= fc$lower, tbatsForecast$lower >= fc$lower)))
+  })
+
   test_that("Testing forecasts with xreg", {
     # Test a simple et model
     inputSeries <- ts(rnorm(5), f = 2)
