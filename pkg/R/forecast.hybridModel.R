@@ -174,7 +174,7 @@ forecast.hybridModel <- function(object,
   if(PI){
     # Set the functions for the uppper/lower prediction intervals
     piCombination <- match.arg(PI.combination)
-    if(PI.combination == "mean"){
+    if(piCombination == "mean"){
       upperFunction <- lowerFunction <- mean
     } else{
       upperFunction <- max

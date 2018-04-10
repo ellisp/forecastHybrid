@@ -1,3 +1,6 @@
+# Version 2.2.12 [Unreleased]
+* Added `PI.combination` argument to `forecast.hybridModel()`. The default behavior is to follow the existing methodology of using the most extreme prediction intervals from the component models. When `"mean"` is passed instead, a simple (unweighted) average of the component prediction intervals is used instead.
+
 # Version 2.1.11 [2018-03-27]
 * Added `snaive()` model to the ensemble. It is disabled by default, but can be added with "z".
 
