@@ -34,9 +34,9 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(wineind, models = "fs", n.args = list()))
     expect_warning(hybridModel(wineind, models = "fn", s.args = list()))
     expect_warning(hybridModel(wineind, models = "fs", t.args = list()))
-    # ts is too short: nnetar() with 2 * frequency(y) >= length(y)
-    inputSeries <- ts(rnorm(50), f = 24)
-    expect_warning(hybridModel(inputSeries, models = "fsn"))
+    # ts is too short: nnetar() and stlm() with 2 * frequency(y) >= length(y)
+    inputSeries <- ts(rnorm(8), f = 4)
+    expect_warning(hybridModel(inputSeries, models = "aesn"))
     # ts is too short: stlm() with 2 * frequency(y) >= length(y)
     inputSeries <- ts(rnorm(7), f = 4)
     expect_warning(hybridModel(inputSeries, models = "efs"))
@@ -61,6 +61,12 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(wineind, models = "fs", weights = "insample.errors"))
     expect_error(hybridModel(inputSeries, models = "ae",
                              e.args = list(lambda = 0.5)), NA)
+  })
+  test_that("Testing long data", {
+    set.seed(42)
+    dat <- ts(rnorm(52 * 3), f = 52)
+    expect_warning(hm <- hybridModel(y = dat, models = "fs"), NA)
+    expect_true(length(forecast(hm)$mean) == 52 * 2)
   })
   test_that("Testing model matching", {
     set.seed(123456)

@@ -179,12 +179,8 @@ hybridModel <- function(y, models = "aefnst",
     warning("frequency(y) >= 24. The ets model will not be used.")
     expandedModels <- expandedModels[expandedModels != "e"]
   }
-  if(is.element("f", expandedModels) && frequency(y) >=24){
-     warning("frequency(y) >= 24. The Theta model will not be used.")
-     expandedModels <- expandedModels[expandedModels != "f"]
-  }
   if(is.element("f", expandedModels) && length(y) <= frequency(y)){
-    warning("The theta model requires more than a year of data. The theta model will not be used.")
+    warning("The theta model requires more than one seasonal period of data. The theta model will not be used.")
     expandedModels <- expandedModels[expandedModels != "f"]
   }
 
