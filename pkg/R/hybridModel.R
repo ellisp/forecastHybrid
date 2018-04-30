@@ -175,8 +175,8 @@ hybridModel <- function(y, models = "aefnst",
   }
 
   # Check for problems for specific models (e.g. long seasonality for ets and non-seasonal for stlm or nnetar)
-  if(is.element("e", expandedModels) && frequency(y) >=24){
-    warning("frequency(y) >= 24. The ets model will not be used.")
+  if(is.element("e", expandedModels) && frequency(y) > 24){
+    warning("frequency(y) > 24. The ets model will not be used.")
     expandedModels <- expandedModels[expandedModels != "e"]
   }
   if(is.element("f", expandedModels) && length(y) <= frequency(y)){
