@@ -654,6 +654,8 @@ plot.hybridModel <- function(x,
         # Appease R CMD check for undeclared variable
         variable <- NULL
         value <- NULL
+        # If anyone knows a cleaner way to transform this "wide" data to "long" data for plotting
+        # with ggplot2 without using additional packages, let me know.
         pf <- matrix(as.matrix(plotFrame[, plotModels]), ncol = 1)
         pf <- data.frame(date = plotFrame$date,
                          variable = factor(rep(plotModels,
@@ -661,9 +663,9 @@ plot.hybridModel <- function(x,
                                            levels = plotModels),
                          value = pf)
         plotFrame <- pf[order(pf$variable, pf$date), ]
-         ggplot(data = plotFrame, 
-                aes(x = date, y = as.numeric(value), col = variable)) +
-                geom_line() + scale_y_continuous(name = "y")
+        ggplot(data = plotFrame,
+               aes(x = date, y = as.numeric(value), col = variable)) +
+        geom_line() + scale_y_continuous(name = "y")
          
       } else{
          # Set the highest and lowest axis scale
