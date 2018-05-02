@@ -18,7 +18,6 @@ Imports:
     doParallel (>= 1.0.10),
     foreach (>= 1.4.3),
     ggplot2 (>= 2.2.0),
-    reshape2 (>= 1.4.2),
     zoo (>= 1.7)
 Suggests:
     GMDH,

@@ -645,16 +645,22 @@ plot.hybridModel <- function(x,
    plotModels <- x$models
    if(type == "fit"){
       if(ggplot){
-         plotFrame <- data.frame(matrix(0, nrow = length(x$x), ncol = 0))
-         for(i in plotModels){
-            plotFrame[i] <- fitted(x[[i]])
-         }
-         names(plotFrame) <- plotModels
-         plotFrame$date <- as.Date(time(x$x))
-         # Appease R CMD check for undeclared variable
-         variable <- NULL
-         value <- NULL
-         plotFrame <- reshape2::melt(plotFrame, id = "date")
+        plotFrame <- data.frame(matrix(0, nrow = length(x$x), ncol = 0))
+        for(i in plotModels){
+          plotFrame[i] <- fitted(x[[i]])
+        }
+        names(plotFrame) <- plotModels
+        plotFrame$date <- as.Date(time(x$x))
+        # Appease R CMD check for undeclared variable
+        variable <- NULL
+        value <- NULL
+        pf <- matrix(as.matrix(plotFrame[, plotModels]), ncol = 1)
+        pf <- data.frame(date = plotFrame$date,
+                         variable = factor(rep(plotModels,
+                                               each = nrow(plotFrame)),
+                                           levels = plotModels),
+                         value = pf)
+        plotFrame <- pf[order(pf$variable, pf$date), ]
          ggplot(data = plotFrame, 
                 aes(x = date, y = as.numeric(value), col = variable)) +
                 geom_line() + scale_y_continuous(name = "y")
