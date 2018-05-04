@@ -1,4 +1,4 @@
-# Version 2.2.12 [2018-05-02]
+# Version 2.2.12 [2018-05-04]
 * Added `PI.combination` argument to `forecast.hybridModel()`. The default behavior is to follow the existing methodology of using the most extreme prediction intervals from the component models. When `"mean"` is passed instead, a simple (unweighted) average of the component prediction intervals is used instead.
 * The theta model included in an ensemble can nowhandle seasonality with frequency >= 24.
 * The ets model can now be included for hourly data.
