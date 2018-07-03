@@ -1,3 +1,53 @@
+#' Return a forecast model function for a given model character
+#'
+#' Convert the single-letter representation used in the "forecastHybrid" package to the
+#' corresponding model function from the "forecast" package
+#' @param modelCharacter a single character representing one of the models from the \code{models}
+#' argument passed to \link{hybridModel}
+#' @examples
+#' forecastHybrid:::getModel("a")
+#' forecastHybrid:::getModel("s")
+#' forecastHybrid:::getModel("z")
+#' @seealso \code{\link{hybridModel}}
+getModel <- function(modelCharacter){
+  models <- c("a" = auto.arima, "e" = ets, "f" = thetam, "n" = nnetar,
+              "s" = stlm, "t" = tbats, "z" = snaive)
+  return(models[[modelCharacter]])
+  }
+
+#' Translate character to model name
+#'
+#' Convert the single-letter representation used in the "forecastHybrid" package to the
+#' corresponding function name from the "forecast" package
+#' @param modelCharacter a single character representing one of the models from the \code{models}
+#' argument passed to \link{hybridModel}
+#' @examples
+#' forecastHybrid:::getModelName("a")
+#' forecastHybrid:::getModelName("s")
+#' forecastHybrid:::getModelName("z")
+#' @seealso \code{\link{hybridModel}}
+getModelName <- function(modelCharacter){
+  models <- c("a" = "auto.arima", "e" = "ets", "f" = "thetam", "n" = "nnetar",
+              "s" = "stlm", "t" = "tbats", "z" = "snaive")
+  as.character(models[modelCharacter])
+  }
+
+
+#' Helper function used to unpack the fitted model objects from a list
+#'
+#' @param fitModels A list containing the models to include in the ensemble
+#' @param expandedModels A character vector from the \code{models} argument of \link{hybridModel}
+#' @details See usage inside the \code{hybridModel} function.
+#' @seealso \code{\link{hybridModel}}
+unwrapParallelModels <- function(fitModels, expandedModels){
+  modelResults <- list()
+  for(i in seq_along(expandedModels)){
+    model <- expandedModels[i]
+    modelResults[[getModelName(model)]] <- fitModels[[i]]
+    }
+  return(modelResults)
+  }
+
 #' Hybrid time series modelling
 #'
 #' Create a hybrid time series model with two to five component models.
@@ -20,6 +70,7 @@
 #' @param n.args an optional \code{list} of arguments to pass to \code{\link[forecast]{nnetar}}. See details.
 #' @param s.args an optional \code{list} of arguments to pass to \code{\link[forecast]{stlm}}. See details.
 #' @param t.args an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}. See details.
+#' @param z.args an optional \code{list} of arguments to pass to \code{\link[forecast]{snaive}}. See details.
 #' @param weights method for weighting the forecasts of the various contributing
 #' models.  Defaults to \code{equal}, which has shown to be robust and better
 #' in many cases than giving more weight to models with better in-sample performance. Cross validated errors--implemented with \code{link{cvts}}
@@ -33,7 +84,6 @@
 #' and mean absolute scaled error (\code{MASE})
 #' are supported.
 #' @param parallel a boolean indicating if parallel processing should be used between models.
-#' This is currently unimplemented.
 #' Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.
 #' @param cvHorizon If \code{weights = "cv.errors"}, this controls which forecast to horizon to use
@@ -102,12 +152,13 @@ hybridModel <- function(y, models = "aefnst",
                         n.args = NULL,
                         s.args = NULL,
                         t.args = NULL,
+                        z.args = NULL,
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("RMSE", "MAE", "MASE"),
                         cvHorizon = frequency(y),
                         windowSize = 84,
                         horizonAverage = FALSE,
-                        parallel = FALSE, num.cores = 2L,
+                        parallel = TRUE, num.cores = 1L,
                         verbose = TRUE){
 
   # The dependent variable must be numeric and not a matrix/dataframe
@@ -207,90 +258,139 @@ hybridModel <- function(y, models = "aefnst",
     stop("A hybridModel must contain at least two component models.")
   }
 
-  # Check for currently unimplemented features
-  if(parallel){
-    warning("The 'parallel' argument is currently unimplemented. Ignoring for now.")
-  }
-
   if(weights == "cv.errors" && errorMethod == "MASE"){
     warning("cv errors currently do not support MASE. Reverting to RMSE.")
     errorMethod <- "RMSE"
   }
 
-  modelResults <- list()
-
+  # Setup parallel
+  cl <- parallel::makeCluster(num.cores)
+  doParallel::registerDoParallel(cl)
+  on.exit(parallel::stopCluster(cl))
   # We would allow for these models to run in parallel at the model level rather than within the model
   # since this has better performance. As an enhancement, users with >4 cores could benefit by running
   # parallelism both within and between models, based on the number of available cores.
-  # auto.arima()
-  if(is.element("a", expandedModels)){
-    if(verbose){
-      cat("Fitting the auto.arima model\n")
+  currentModel <- NULL
+  fitModels <- foreach::foreach(currentModel = expandedModels,
+                                .packages = c("forecast", "forecastHybrid")) %dopar% {
+    if(currentModel == "a"){
+      if(is.null(a.args)){
+        a.args <- list(lambda = lambda)
+      } else if(is.null(a.args$lambda)){
+        a.args$lambda <- lambda
+      }
+      fitModel <- do.call(auto.arima, c(list(y), a.args))
     }
-    if(is.null(a.args)){
-      a.args <- list(lambda = lambda)
-    } else if(is.null(a.args$lambda)){
-      a.args$lambda <- lambda
+    # ets()
+    else if(currentModel == "e"){
+      if(is.null(e.args)){
+        e.args <- list(lambda = lambda)
+      } else if(is.null(e.args$lambda)){
+        e.args$lambda <- lambda
+      }
+      fitModel <- do.call(ets, c(list(y), e.args))
     }
-    modelResults$auto.arima <- do.call(auto.arima, c(list(y), a.args))
+    # thetam()
+    else if(currentModel == "f"){
+       fitModel <- thetam(y)
+    }
+    # nnetar()
+    else if(currentModel == "n"){
+      if(is.null(n.args)){
+        n.args <- list(lambda = lambda)
+      } else if(is.null(n.args$lambda)){
+        n.args$lambda <- lambda
+      }
+      fitModel <- do.call(nnetar, c(list(y), n.args))
+    }
+    # stlm()
+    else if(currentModel == "s"){
+      if(is.null(s.args)){
+        s.args <- list(lambda = lambda)
+      } else if(is.null(s.args$lambda)){
+        s.args$lambda <- lambda
+      }
+      fitModel <- do.call(stlm, c(list(y), s.args))
+    }
+    # tbats()
+    else if(currentModel == "t"){
+      fitModel <- do.call(tbats, c(list(y), t.args))
+    }
+    #snaive
+    else if(currentModel == "z"){
+      fitModel <- snaive(y)
+    }
+    fitModel
   }
-  # ets()
-  if(is.element("e", expandedModels)){
-    if(verbose){
-      cat("Fitting the ets model\n")
-    }
-    if(is.null(e.args)){
-      e.args <- list(lambda = lambda)
-    } else if(is.null(e.args$lambda)){
-      e.args$lambda <- lambda
-    }
-    modelResults$ets <- do.call(ets, c(list(y), e.args))
-  }
-  # thetam()
-  if(is.element("f", expandedModels)){
-     if(verbose){
-        cat("Fitting the thetam model\n")
-     }
-     modelResults$thetam <- thetam(y)
-  }
-  # nnetar()
-  if(is.element("n", expandedModels)){
-    if(verbose){
-      cat("Fitting the nnetar model\n")
-    }
-    if(is.null(n.args)){
-      n.args <- list(lambda = lambda)
-    } else if(is.null(n.args$lambda)){
-      n.args$lambda <- lambda
-    }
-    modelResults$nnetar <- do.call(nnetar, c(list(y), n.args))
-  }
-  # stlm()
-  if(is.element("s", expandedModels)){
-    if(verbose){
-      cat("Fitting the stlm model\n")
-    }
-    if(is.null(s.args)){
-      s.args <- list(lambda = lambda)
-    } else if(is.null(s.args$lambda)){
-      s.args$lambda <- lambda
-    }
-    modelResults$stlm <- do.call(stlm, c(list(y), s.args))
-  }
-  # tbats()
-  if(is.element("t", expandedModels)){
-    if(verbose){
-      cat("Fitting the tbats model\n")
-    }
-    modelResults$tbats <- do.call(tbats, c(list(y), t.args))
-  }
-  #snaive
-  if(is.element("z", expandedModels)){
-    if(verbose){
-      cat("Fitting the snaive model\n")
-    }
-    modelResults$snaive <- snaive(y)
-  }
+  modelResults <- unwrapParallelModels(fitModels, expandedModels)
+#~   if(is.element("a", expandedModels)){
+#~     if(verbose){
+#~       cat("Fitting the auto.arima model\n")
+#~     }
+#~     if(is.null(a.args)){
+#~       a.args <- list(lambda = lambda)
+#~     } else if(is.null(a.args$lambda)){
+#~       a.args$lambda <- lambda
+#~     }
+#~     modelResults$auto.arima <- do.call(auto.arima, c(list(y), a.args))
+#~   }
+#~   # ets()
+#~   if(is.element("e", expandedModels)){
+#~     if(verbose){
+#~       cat("Fitting the ets model\n")
+#~     }
+#~     if(is.null(e.args)){
+#~       e.args <- list(lambda = lambda)
+#~     } else if(is.null(e.args$lambda)){
+#~       e.args$lambda <- lambda
+#~     }
+#~     modelResults$ets <- do.call(ets, c(list(y), e.args))
+#~   }
+#~   # thetam()
+#~   if(is.element("f", expandedModels)){
+#~      if(verbose){
+#~         cat("Fitting the thetam model\n")
+#~      }
+#~      modelResults$thetam <- thetam(y)
+#~   }
+#~   # nnetar()
+#~   if(is.element("n", expandedModels)){
+#~     if(verbose){
+#~       cat("Fitting the nnetar model\n")
+#~     }
+#~     if(is.null(n.args)){
+#~       n.args <- list(lambda = lambda)
+#~     } else if(is.null(n.args$lambda)){
+#~       n.args$lambda <- lambda
+#~     }
+#~     modelResults$nnetar <- do.call(nnetar, c(list(y), n.args))
+#~   }
+#~   # stlm()
+#~   if(is.element("s", expandedModels)){
+#~     if(verbose){
+#~       cat("Fitting the stlm model\n")
+#~     }
+#~     if(is.null(s.args)){
+#~       s.args <- list(lambda = lambda)
+#~     } else if(is.null(s.args$lambda)){
+#~       s.args$lambda <- lambda
+#~     }
+#~     modelResults$stlm <- do.call(stlm, c(list(y), s.args))
+#~   }
+#~   # tbats()
+#~   if(is.element("t", expandedModels)){
+#~     if(verbose){
+#~       cat("Fitting the tbats model\n")
+#~     }
+#~     modelResults$tbats <- do.call(tbats, c(list(y), t.args))
+#~   }
+#~   #snaive
+#~   if(is.element("z", expandedModels)){
+#~     if(verbose){
+#~       cat("Fitting the snaive model\n")
+#~     }
+#~     modelResults$snaive <- snaive(y)
+#~   }
 
   # Set the model weights
   includedModels <- names(modelResults)

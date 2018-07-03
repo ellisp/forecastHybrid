@@ -9,8 +9,7 @@ if(require(forecast) & require(testthat)){
                              models = 5))
     # Test for invalid mismatch length of y and xreg in a.args/s.args later?
     badxreg <- data.frame(rnorm(length(wineind) - 1))
-    expect_warning(expect_error(hybridModel(y = wineind,
-                                            a.args = list(xreg = badxreg))))
+    expect_error(hybridModel(y = wineind, a.args = list(xreg = badxreg)))
     # More invalid inputs
     expect_error(hybridModel(y = "hello world"))
     expect_error(hybridModel())
@@ -43,9 +42,6 @@ if(require(forecast) & require(testthat)){
     # ets with frequency(y) > 24
     inputSeries <- ts(rnorm(75), f = 25)
     expect_warning(hybridModel(inputSeries, models = "ens"))
-    # Parallel is not yet implemented in hybridModel
-    inputSeries <- ts(rnorm(8), f = 2)
-    expect_warning(hybridModel(inputSeries, models = "fs", parallel = TRUE))
   })
   test_that("Testing valid inputs", {
     set.seed(54321)
@@ -61,6 +57,10 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(wineind, models = "fs", weights = "insample.errors"))
     expect_error(hybridModel(inputSeries, models = "ae",
                              e.args = list(lambda = 0.5)), NA)
+    # test parallel
+    inputSeries <- ts(rnorm(8), f = 2)
+    expect_warning(hybridModel(inputSeries, models = "fs", parallel = TRUE), NA)
+    expect_warning(hybridModel(inputSeries, models = "fs", parallel = TRUE, num.cores = 2), NA)
   })
   test_that("Testing long data", {
     set.seed(42)
@@ -77,6 +77,8 @@ if(require(forecast) & require(testthat)){
   context("Testing generic functions")
   test_that("Testing is.hybridModel(), fitted.hybridModel(), residuals.hybridModel(), and accuracy.hybridModel()", {
     inputSeries <- subset(USAccDeaths, end = 25)
+    # add some seasonality so there are roots to plot in the arima model
+    inputSeries <- 100 * (1:12) + USAccDeaths
     exampleModel <- hybridModel(inputSeries)
     expect_true(is.hybridModel(exampleModel))
     expect_equal(length(fitted(exampleModel)),

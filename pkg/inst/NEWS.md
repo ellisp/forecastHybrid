@@ -1,3 +1,9 @@
+# Version 3.0.13 [Unrelease]
+* Parallel support added to `hybridModel()`. This can be controlled by setting `parallel = TRUE` (the default) and setting `num.cores`.
+* Added `z.args` for the `snaive()` model.
+* The `tbats()` and `snaive()` models now respect and use `lambda`.
+* The `verbose` argument was removed from `hybridModel()` and `cvts()` since it is no longer effective with the parallel implementation.
+
 # Version 2.2.12 [2018-05-04]
 * Added `PI.combination` argument to `forecast.hybridModel()`. The default behavior is to follow the existing methodology of using the most extreme prediction intervals from the component models. When `"mean"` is passed instead, a simple (unweighted) average of the component prediction intervals is used instead.
 * The theta model included in an ensemble can nowhandle seasonality with frequency >= 24.

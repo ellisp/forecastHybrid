@@ -6,10 +6,10 @@
 \usage{
 hybridModel(y, models = "aefnst", lambda = NULL, a.args = NULL,
   e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL,
-  weights = c("equal", "insample.errors", "cv.errors"),
+  z.args = NULL, weights = c("equal", "insample.errors", "cv.errors"),
   errorMethod = c("RMSE", "MAE", "MASE"), cvHorizon = frequency(y),
-  windowSize = 84, horizonAverage = FALSE, parallel = FALSE,
-  num.cores = 2L, verbose = TRUE)
+  windowSize = 84, horizonAverage = FALSE, parallel = TRUE,
+  num.cores = 1L, verbose = TRUE)
 }
 \arguments{
 \item{y}{A numeric vector or time series.}
@@ -31,6 +31,8 @@ Ignored if NULL. Otherwise, data transformed before model is estimated.}
 \item{s.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{stlm}}. See details.}
 
 \item{t.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}. See details.}
+
+\item{z.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{snaive}}. See details.}
 
 \item{weights}{method for weighting the forecasts of the various contributing
 models.  Defaults to \code{equal}, which has shown to be robust and better
@@ -56,7 +58,6 @@ all forecast horizons up to \code{cvHorizon} for calculating the errors instead 
 the single horizon given in \code{cvHorizon}.}
 
 \item{parallel}{a boolean indicating if parallel processing should be used between models.
-This is currently unimplemented.
 Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.}
 
 \item{num.cores}{If \code{parallel=TRUE}, how many cores to use.}
