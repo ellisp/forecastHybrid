@@ -12,6 +12,24 @@ if(require(forecast) & require(testthat)){
     expect_true(is.hybridModel(hm))
   })
 
+  test_that("Testing is.hybridModel(), fitted.hybridModel(), residuals.hybridModel(), and accuracy.hybridModel()", {
+    inputSeries <- subset(USAccDeaths, end = 25)
+    # add some seasonality so there are roots to plot in the arima model
+    inputSeries <- 100 * (1:12) + USAccDeaths
+    exampleModel <- hybridModel(inputSeries)
+    expect_true(is.hybridModel(exampleModel))
+    expect_equal(length(fitted(exampleModel)),
+                 length(residuals(exampleModel)))
+    expect_equal(length(fitted(exampleModel, individual = TRUE)),
+                 length(residuals(exampleModel, individual = TRUE)))
+    expect_error(accuracy(exampleModel), NA)
+    expect_error(accuracy(exampleModel, individual = TRUE), NA)
+    expect_error(plot(exampleModel, type = "fit", ggplot = FALSE), NA)
+    expect_error(plot(exampleModel, type = "models", ggplot = FALSE), NA)
+    expect_error(plot(exampleModel, type = "fit", ggplot = TRUE), NA)
+    expect_error(plot(exampleModel, type = "models", ggplot = TRUE), NA)
+  })
+
   test_that("Testing fitted and residual methods", {
     # The generic methods should not throw an error
     expect_error(fitted(hm), NA)

@@ -4,6 +4,7 @@ if(require(forecast) & require(testthat)){
   test_that("Testing invalid inputs", {
     # Invalid arguments for models
     expect_error(hybridModel(y = 1:10, models = "jten"))
+    # models must be characters
     expect_error(hybridModel(y = 1:10, models = 5))
     expect_error(hybridModel(y = matrix(1:10, nrow = 5, ncol = 2),
                              models = 5))
@@ -12,15 +13,25 @@ if(require(forecast) & require(testthat)){
     expect_error(hybridModel(y = wineind, a.args = list(xreg = badxreg)))
     # More invalid inputs
     expect_error(hybridModel(y = "hello world"))
+    # must provide input series
     expect_error(hybridModel())
+    # input series must have data
     expect_error(hybridModel(y = numeric()))
+    # input series must be numeric
     expect_error(hybridModel(y = "aten"))
+    # models must be one of a, e, f, t, n, s, z
     expect_error(hybridModel(y = wineind, models = "abcderfghijk"))
+    # ensemble must have at least two models
     expect_error(hybridModel(wineind, models = "a"))
+    # num.core must be positive
     expect_error(hybridModel(wineind, num.cores = -1L))
+    # num.cores must be an integer
     expect_error(hybridModel(wineind, num.cores = 3.3))
+    # num.cores must be numeric
     expect_error(hybridModel(wineind, num.cores = "a"))
+    # models must not be empty string
     expect_error(hybridModel(wineind, models = ""))
+    # parallel should be a boolean
     expect_error(hybridModel(wineind, parallel = "a"))
     # warning when component model fits perfectly and weights = "insample.error"
     #expect_warning(hybridModel(y = ts(1:9, frequency = 4), weights = "insample.errors"))
@@ -74,31 +85,14 @@ if(require(forecast) & require(testthat)){
     expect_error(hybridModel(y = rnorm(20), models = "AtTaaa"), NA)
     expect_error(hybridModel(y = rnorm(20), models = "nNeTEEEeA"), NA)
   })
-  context("Testing generic functions")
-  test_that("Testing is.hybridModel(), fitted.hybridModel(), residuals.hybridModel(), and accuracy.hybridModel()", {
-    inputSeries <- subset(USAccDeaths, end = 25)
-    # add some seasonality so there are roots to plot in the arima model
-    inputSeries <- 100 * (1:12) + USAccDeaths
-    exampleModel <- hybridModel(inputSeries)
-    expect_true(is.hybridModel(exampleModel))
-    expect_equal(length(fitted(exampleModel)),
-                 length(residuals(exampleModel)))
-    expect_equal(length(fitted(exampleModel, individual = TRUE)),
-                 length(residuals(exampleModel, individual = TRUE)))
-    expect_error(accuracy(exampleModel), NA)
-    expect_error(accuracy(exampleModel, individual = TRUE), NA)
-    expect_error(plot(exampleModel, type = "fit", ggplot = FALSE), NA)
-    expect_error(plot(exampleModel, type = "models", ggplot = FALSE), NA)
-    expect_error(plot(exampleModel, type = "fit", ggplot = TRUE), NA)
-    expect_error(plot(exampleModel, type = "models", ggplot = TRUE), NA)
-  })
+
   context("Testing cv.errors")
-    test_that("Testing hybridModel(weights = \"cv.errors\")", {
-      set.seed(33)
-      inputSeries <- ts(rnorm(12), f = 2)
-      expect_error(cvMod <- hybridModel(inputSeries, weights = "cv.errors",
-                                        windowSize = 8, cvHorizon = 2), NA)
-      expect_equal(length(cvMod$weights),
-                   length(unique(cvMod$weights)))
-    })
+  test_that("Testing hybridModel(weights = \"cv.errors\")", {
+  set.seed(33)
+  inputSeries <- ts(rnorm(12), f = 2)
+  expect_error(cvMod <- hybridModel(inputSeries, weights = "cv.errors",
+                                    windowSize = 8, cvHorizon = 2), NA)
+  expect_equal(length(cvMod$weights),
+               length(unique(cvMod$weights)))
+  })
 }

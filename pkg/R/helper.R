@@ -52,9 +52,59 @@ tsSubsetWithIndices <- function(x, indices) {
 
   if (maxIndex > length(xtime)){
     stop("Max subset index cannot exceed time series length")
-    }
+  }
   if (all(seq(minIndex, maxIndex, 1) != indices)){
     stop("Time series can only be subset with continuous indices")
-    }
+  }
   return(window(x, start = xtime[minIndex], end = xtime[maxIndex]))
+}
+
+#' Return a forecast model function for a given model character
+#'
+#' Convert the single-letter representation used in the "forecastHybrid" package to the
+#' corresponding model function from the "forecast" package
+#' @param modelCharacter a single character representing one of the models from the \code{models}
+#' argument passed to \link{hybridModel}
+#' @examples
+#' forecastHybrid:::getModel("a")
+#' forecastHybrid:::getModel("s")
+#' forecastHybrid:::getModel("z")
+#' @seealso \code{\link{hybridModel}}
+getModel <- function(modelCharacter){
+  models <- c("a" = auto.arima, "e" = ets, "f" = thetam, "n" = nnetar,
+              "s" = stlm, "t" = tbats, "z" = snaive)
+  return(models[[modelCharacter]])
+}
+
+#' Translate character to model name
+#'
+#' Convert the single-letter representation used in the "forecastHybrid" package to the
+#' corresponding function name from the "forecast" package
+#' @param modelCharacter a single character representing one of the models from the \code{models}
+#' argument passed to \link{hybridModel}
+#' @examples
+#' forecastHybrid:::getModelName("a")
+#' forecastHybrid:::getModelName("s")
+#' forecastHybrid:::getModelName("z")
+#' @seealso \code{\link{hybridModel}}
+getModelName <- function(modelCharacter){
+  models <- c("a" = "auto.arima", "e" = "ets", "f" = "thetam", "n" = "nnetar",
+              "s" = "stlm", "t" = "tbats", "z" = "snaive")
+  return(as.character(models[modelCharacter]))
+}
+
+
+#' Helper function used to unpack the fitted model objects from a list
+#'
+#' @param fitModels A list containing the models to include in the ensemble
+#' @param expandedModels A character vector from the \code{models} argument of \link{hybridModel}
+#' @details See usage inside the \code{hybridModel} function.
+#' @seealso \code{\link{hybridModel}}
+unwrapParallelModels <- function(fitModels, expandedModels){
+  modelResults <- list()
+  for(i in seq_along(expandedModels)){
+    model <- expandedModels[i]
+    modelResults[[getModelName(model)]] <- fitModels[[i]]
+  }
+  return(modelResults)
 }
