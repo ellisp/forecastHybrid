@@ -111,6 +111,10 @@ hybridModel <- function(y, models = "aefnst",
                         parallel = FALSE, num.cores = 2L,
                         verbose = TRUE){
 
+  ##############################################################################
+  # Validate input
+  ##############################################################################
+
   # The dependent variable must be numeric and not a matrix/dataframe
   forbiddenTypes <- c("data.frame", "data.table", "matrix")
   if(!is.numeric(y) || all(class(y) %in% forbiddenTypes)){
@@ -134,7 +138,7 @@ hybridModel <- function(y, models = "aefnst",
   errorMethod <- match.arg(errorMethod)
 
   # Match the specified models
-  expandedModels <- unique(tolower(unlist(strsplit(models, split = ""))))
+  expandedModels <- sort(unique(tolower(unlist(strsplit(models, split = "")))))
   if(length(expandedModels) > 7L){
     stop("Invalid models specified.")
   }
@@ -213,14 +217,17 @@ hybridModel <- function(y, models = "aefnst",
     errorMethod <- "RMSE"
   }
 
+  ##############################################################################
+  # Fit models
+  ##############################################################################
+
   # Setup parallel
   if(parallel){
     cl <- parallel::makeCluster(num.cores)
     doParallel::registerDoParallel(cl)
     on.exit(parallel::stopCluster(cl))
-    # We would allow for these models to run in parallel at the model level rather than within the model
-    # since this has better performance. As an enhancement, users with >4 cores could benefit by running
-    # parallelism both within and between models, based on the number of available cores.
+    # Parallel processing won't be used by default since the benefit only occurs on long series
+    # with large frequency
     currentModel <- NULL
     fitModels <- foreach::foreach(currentModel = expandedModels,
                                   .packages = c("forecast", "forecastHybrid")) %dopar% {
@@ -279,7 +286,7 @@ hybridModel <- function(y, models = "aefnst",
     modelResults <- list()
     if(is.element("a", expandedModels)){
       if(verbose){
-        cat("Fitting the auto.arima model\n")
+        message("Fitting the auto.arima model")
       }
       if(is.null(a.args)){
         a.args <- list(lambda = lambda)
@@ -291,7 +298,7 @@ hybridModel <- function(y, models = "aefnst",
     # ets()
     if(is.element("e", expandedModels)){
       if(verbose){
-        cat("Fitting the ets model\n")
+        message("Fitting the ets model")
       }
       if(is.null(e.args)){
         e.args <- list(lambda = lambda)
@@ -303,14 +310,14 @@ hybridModel <- function(y, models = "aefnst",
     # thetam()
     if(is.element("f", expandedModels)){
        if(verbose){
-          cat("Fitting the thetam model\n")
+          message("Fitting the thetam model")
        }
        modelResults$thetam <- thetam(y)
     }
     # nnetar()
     if(is.element("n", expandedModels)){
       if(verbose){
-        cat("Fitting the nnetar model\n")
+        message("Fitting the nnetar model")
       }
       if(is.null(n.args)){
         n.args <- list(lambda = lambda)
@@ -322,7 +329,7 @@ hybridModel <- function(y, models = "aefnst",
     # stlm()
     if(is.element("s", expandedModels)){
       if(verbose){
-        cat("Fitting the stlm model\n")
+        message("Fitting the stlm model")
       }
       if(is.null(s.args)){
         s.args <- list(lambda = lambda)
@@ -334,7 +341,7 @@ hybridModel <- function(y, models = "aefnst",
     # tbats()
     if(is.element("t", expandedModels)){
       if(verbose){
-        cat("Fitting the tbats model\n")
+        message("Fitting the tbats model")
       }
       if(is.null(t.args)){
         t.args <- list(lambda = lambda)
@@ -346,7 +353,7 @@ hybridModel <- function(y, models = "aefnst",
     #snaive
     if(is.element("z", expandedModels)){
       if(verbose){
-        cat("Fitting the snaive model\n")
+        message("Fitting the snaive model")
       }
       if(is.null(z.args)){
         z.args <- list(lambda = lambda)
@@ -357,105 +364,63 @@ hybridModel <- function(y, models = "aefnst",
     }
   }
 
+  ##############################################################################
+  # Determine model weights
+  ##############################################################################
 
   # Set the model weights
   includedModels <- names(modelResults)
   numModels <- length(expandedModels)
   if(weights == "equal"){
     modelResults$weights <- rep(1 / numModels, numModels)
-  } else if(weights %in% c("insample.errors", "cv.errors")){
-
-    # There is probably a better way of accomplishing this
-    # But this ugly approach will work for now
-    # These loops and if statements can be replace
-    # with do.call and/or map
+  }
+  else if(weights %in% c("insample.errors", "cv.errors")){
     modelResults$weights <- rep(0, numModels)
     index <- 1
     modResults <- modelResults
 
     if(weights == "cv.errors"){
-      #modResults <-
-      for(i in expandedModels){
-        if(i == "a"){
-          if(verbose){
-            cat("Cross validating the auto.arima model\n")
-          }
-          modResults$auto.arima <- cvts(y, FUN = auto.arima,
+      for(modelCode in expandedModels){
+        modelName <- getModelName(modelCode)
+        currentModel <- getModel(modelCode)
+        if(verbose){
+          message("Cross validating the ", modelName, " model")
+        }
+        modResults[[modelName]] <- cvts(y, FUN = currentModel,
                                         maxHorizon = cvHorizon,
                                         horizonAverage = horizonAverage,
                                         verbose = FALSE,
                                         windowSize = windowSize,
                                         num.cores = num.cores)
-        } else if(i == "e"){
-          if(verbose){
-            cat("Cross validating the ets model\n")
-          }
-          modResults$ets <- cvts(y, FUN = ets,
-                                 maxHorizon = cvHorizon,
-                                 horizonAverage = horizonAverage,
-                                 verbose = FALSE,
-                                 windowSize = windowSize,
-                                 num.cores = num.cores)
-        } else if(i == "f"){
-           if(verbose){
-              cat("Cross validating the thetam model\n")
-           }
-           modResults$thetam <- cvts(y, FUN = thetam,
-                                  maxHorizon = cvHorizon,
-                                  horizonAverage = horizonAverage,
-                                  verbose = FALSE,
-                                  windowSize = windowSize)
-        } else if(i == "n"){
-          if(verbose){
-            cat("Cross validating the nnetar model\n")
-          }
-          modResults$nnetar <- cvts(y, FUN = nnetar,
-                                    maxHorizon = cvHorizon,
-                                    horizonAverage = horizonAverage,
-                                    verbose = FALSE,
-                                    windowSize = windowSize)
-        } else if(i == "s"){
-          if(verbose){
-            cat("Cross validating the stlm model\n")
-          }
-          modResults$stlm <- cvts(y, FUN = stlm,
-                                  maxHorizon = cvHorizon,
-                                  horizonAverage = horizonAverage,
-                                  verbose = FALSE,
-                                  windowSize = windowSize)
-        } else if(i == "t"){
-          if(verbose){
-            cat("Cross validating the tbats model\n")
-          }
-          modResults$tbats <- cvts(y, FUN = tbats,
-                                   maxHorizon = cvHorizon,
-                                   horizonAverage = horizonAverage,
-                                   verbose = FALSE,
-                                   windowSize = windowSize)
-        }
       }
     }
     # If horizonAverage == TRUE, the resulting accuracy object will have only one row
     cvHorizon <- ifelse(horizonAverage, 1, cvHorizon)
     cvHorizon <- ifelse(weights != "cv.errors", 1, cvHorizon)
-    for(i in expandedModels){
-      if(i == "a"){
-        modelResults$weights[index] <- accuracy(modResults$auto.arima)[cvHorizon, errorMethod]
-      } else if(i == "e"){
-        modelResults$weights[index] <- accuracy(modResults$ets)[cvHorizon, errorMethod]
-      } else if(i == "f"){
-         modelResults$weights[index] <- accuracy(modResults$thetam)[cvHorizon, errorMethod]
-      } else if(i == "n"){
-        modelResults$weights[index] <- accuracy(modResults$nnetar)[cvHorizon, errorMethod]
-      } else if(i == "s"){
-        modelResults$weights[index] <- accuracy(modResults$stlm)[cvHorizon, errorMethod]
-      } else if(i == "t"){
-        modelResults$weights[index] <- accuracy(modResults$tbats)[cvHorizon, errorMethod]
-      }
-      index <- index + 1
-    }
+
+    # Set the weights
+    modelResults$weights <- sapply(expandedModels,
+                                   function(x) accuracy(modResults[[getModelName(x)]])[cvHorizon,
+                                                                                       errorMethod])
+#~     for(i in expandedModels){
+#~       if(i == "a"){
+#~         modelResults$weights[index] <- accuracy(modResults$auto.arima)[cvHorizon, errorMethod]
+#~       } else if(i == "e"){
+#~         modelResults$weights[index] <- accuracy(modResults$ets)[cvHorizon, errorMethod]
+#~       } else if(i == "f"){
+#~          modelResults$weights[index] <- accuracy(modResults$thetam)[cvHorizon, errorMethod]
+#~       } else if(i == "n"){
+#~         modelResults$weights[index] <- accuracy(modResults$nnetar)[cvHorizon, errorMethod]
+#~       } else if(i == "s"){
+#~         modelResults$weights[index] <- accuracy(modResults$stlm)[cvHorizon, errorMethod]
+#~       } else if(i == "t"){
+#~         modelResults$weights[index] <- accuracy(modResults$tbats)[cvHorizon, errorMethod]
+#~       }
+#~       index <- index + 1
+#~     }
     # Scale the weights
-    modelResults$weights <- (1 / modelResults$weights) / sum(1 / modelResults$weights)
+    inverseErrors <- 1 / modelResults$weights
+    modelResults$weights <- inverseErrors / sum(inverseErrors)
 
   }
 
@@ -466,6 +431,10 @@ hybridModel <- function(y, models = "aefnst",
                                 length(includedModels))
   }
   names(modelResults$weights) <- includedModels
+
+  ##############################################################################
+  # Prepare hybridModel object
+  ##############################################################################
 
   # Apply the weights to construct the fitted values
   fits <- sapply(includedModels, FUN = function(x) fitted(modelResults[[x]]))
