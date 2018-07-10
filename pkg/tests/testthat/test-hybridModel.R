@@ -95,4 +95,63 @@ if(require(forecast) & require(testthat)){
   expect_equal(length(cvMod$weights),
                length(unique(cvMod$weights)))
   })
+  test_that("Testing the hybridModel object", {
+    modelComparison <- list()
+    for(parallel in c(TRUE, FALSE)){
+      set.seed(4)
+      len <- 10
+      freq <- 2
+      testSeries <- ts(rnorm(len), f = freq)
+      xreg <- data.frame(matrix(rnorm(len * 3), nrow = len))
+      # Ignore nnetar for now since it isn't reproducible
+      models <- "aefstz"
+      hm <- hybridModel(testSeries, models = models,
+                        a.args = list(xreg = xreg), lambda = 0.2,
+                        parallel = parallel)
+      for(obj in hm){
+        expect_true(all(class(obj) != "NULL"))
+        expect_true(!is.null(obj))
+      }
+      # Ensure numeric values
+      expect_true(is.numeric(hm$fitted))
+      expect_true(is.numeric(hm$residuals))
+      expect_true(is.numeric(hm$x))
+      expect_true(length(hm$fitted) == length(testSeries))
+      expect_true(length(hm$residuals) == length(testSeries))
+      expect_true(length(hm$x) == length(testSeries))
+      expect_true(sum(hm$weights) == 1)
+      expect_true(length(hm$weights) == nchar(models))
+      expect_true(hm$frequency == freq)
+      # Ensure xreg is correct
+      expect_true(all(hm$auto.arima$xreg == xreg))
+      expect_true(hm$xreg$auto.arima)
+      #expect_true(!hm$xreg$nnetar)
+      expect_true(!hm$xreg$stlm)
+      # Ensure other fields are correct
+      expect_true(length(hm$models) == nchar(models))
+      expect_true(all(names(hm$weights) == hm$models))
+      # Ensure the models are of the expected classes
+      expect_true("ARIMA" %in% class(hm$auto.arima))
+      expect_true("ets" == class(hm$ets))
+      expect_true("thetam" %in% class(hm$thetam))
+      #expect_true("nnetar" == class(hm$nnetar))
+      expect_true("stlm" %in% class(hm$stlm))
+      expect_true("forecast" %in% class(hm$snaive))
+
+      # Test forecast
+      expect_error(forecast(hm, xreg = xreg), NA)
+      modelComparison[[as.character(parallel)]] <- hm
+    }
+    # Compare the results from parallel = TRUE and parallel = FALSE
+    tol <- 10^-8
+    parallelFitted <- modelComparison[["TRUE"]]$fitted
+    serialFitted <- modelComparison[["FALSE"]]$fitted
+    expect_true(sum(abs(parallelFitted - serialFitted), na.rm = TRUE) < tol)
+    expect_true(all(is.na(serialFitted) == is.na(parallelFitted)))
+
+    parallelResiduals <- modelComparison[["TRUE"]]$residuals
+    serialResiduals <- modelComparison[["FALSE"]]$residuals
+    expect_true(sum(abs(parallelResiduals - serialResiduals), na.rm = TRUE) < tol)
+    expect_true(all(is.na(serialResiduals) == is.na(parallelResiduals)))
+  })
 }

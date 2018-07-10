@@ -114,7 +114,8 @@ hybridModel <- function(y, models = "aefnst",
   ##############################################################################
   # Validate input
   ##############################################################################
-
+  modelArguments = list("a" = a.args, "e" = e.args, "f" = NULL, "n" = n.args,
+                    "s" = s.args, "t" = t.args, "z" = z.args)
   # The dependent variable must be numeric and not a matrix/dataframe
   forbiddenTypes <- c("data.frame", "data.table", "matrix")
   if(!is.numeric(y) || all(class(y) %in% forbiddenTypes)){
@@ -133,7 +134,9 @@ hybridModel <- function(y, models = "aefnst",
   # Match arguments to ensure validity
   weights <- match.arg(weights)
   if(weights == "insample.errors"){
-    warning("Using insample.error weights is not recommended for accuracy and may be deprecated in the future.")
+    wrnMsg <- paste0("Using insample.error weights is not recommended for accuracy and ",
+                     "may be deprecated in the future.")
+    warning(wrnMsg)
   }
   errorMethod <- match.arg(errorMethod)
 
@@ -221,7 +224,7 @@ hybridModel <- function(y, models = "aefnst",
   # Fit models
   ##############################################################################
 
-  # Setup parallel
+  # Parallel execuation
   if(parallel){
     cl <- parallel::makeCluster(num.cores)
     doParallel::registerDoParallel(cl)
@@ -231,136 +234,40 @@ hybridModel <- function(y, models = "aefnst",
     currentModel <- NULL
     fitModels <- foreach::foreach(currentModel = expandedModels,
                                   .packages = c("forecast", "forecastHybrid")) %dopar% {
-      if(currentModel == "a"){
-        if(is.null(a.args)){
-          a.args <- list(lambda = lambda)
-        } else if(is.null(a.args$lambda)){
-          a.args$lambda <- lambda
-        }
-        fitModel <- do.call(auto.arima, c(list(y), a.args))
-      }
-      # ets()
-      else if(currentModel == "e"){
-        if(is.null(e.args)){
-          e.args <- list(lambda = lambda)
-        } else if(is.null(e.args$lambda)){
-          e.args$lambda <- lambda
-        }
-        fitModel <- do.call(ets, c(list(y), e.args))
-      }
-      # thetam()
-      else if(currentModel == "f"){
+      # thetam() currently does not handle arguments
+      if(currentModel == "f"){
          fitModel <- thetam(y)
-      }
-      # nnetar()
-      else if(currentModel == "n"){
-        if(is.null(n.args)){
-          n.args <- list(lambda = lambda)
-        } else if(is.null(n.args$lambda)){
-          n.args$lambda <- lambda
+      } else{ # All other models handle lambda and additional arguments
+        argsAdditional <- modelArguments[[currentModel]]
+        if(is.null(argsAdditional)){
+          argsAdditional <- list(lambda = lambda)
+        } else if(is.null(argsAdditional$lambda)){
+          argsAdditional$lambda <- lambda
         }
-        fitModel <- do.call(nnetar, c(list(y), n.args))
-      }
-      # stlm()
-      else if(currentModel == "s"){
-        if(is.null(s.args)){
-          s.args <- list(lambda = lambda)
-        } else if(is.null(s.args$lambda)){
-          s.args$lambda <- lambda
-        }
-        fitModel <- do.call(stlm, c(list(y), s.args))
-      }
-      # tbats()
-      else if(currentModel == "t"){
-        fitModel <- do.call(tbats, c(list(y), t.args))
-      }
-      #snaive
-      else if(currentModel == "z"){
-        fitModel <- snaive(y)
+        fitModel <- do.call(getModel(currentModel), c(list(y), argsAdditional))
       }
       fitModel
     }
     modelResults <- unwrapParallelModels(fitModels, expandedModels)
-  }
-  else{
+  } else{# serial execution
     modelResults <- list()
-    if(is.element("a", expandedModels)){
+    for(modelCode in expandedModels){
+      modelName <- getModelName(modelCode)
       if(verbose){
-        message("Fitting the auto.arima model")
+        message("Fitting the ", modelName, " model")
       }
-      if(is.null(a.args)){
-        a.args <- list(lambda = lambda)
-      } else if(is.null(a.args$lambda)){
-        a.args$lambda <- lambda
+      # thetam() currently does not handle arguments
+      if(modelCode == "f"){
+         modelResults[[modelName]] <- thetam(y)
+      } else{ # All other models handle lambda and additional arguments
+        argsAdditional <- modelArguments[[modelCode]]
+        if(is.null(argsAdditional)){
+          argsAdditional <- list(lambda = lambda)
+        } else if(is.null(argsAdditional$lambda)){
+          argsAdditional$lambda <- lambda
+        }
+        modelResults[[modelName]] <- do.call(getModel(modelCode), c(list(y = y), argsAdditional))
       }
-      modelResults$auto.arima <- do.call(auto.arima, c(list(y), a.args))
-    }
-    # ets()
-    if(is.element("e", expandedModels)){
-      if(verbose){
-        message("Fitting the ets model")
-      }
-      if(is.null(e.args)){
-        e.args <- list(lambda = lambda)
-      } else if(is.null(e.args$lambda)){
-        e.args$lambda <- lambda
-      }
-      modelResults$ets <- do.call(ets, c(list(y), e.args))
-    }
-    # thetam()
-    if(is.element("f", expandedModels)){
-       if(verbose){
-          message("Fitting the thetam model")
-       }
-       modelResults$thetam <- thetam(y)
-    }
-    # nnetar()
-    if(is.element("n", expandedModels)){
-      if(verbose){
-        message("Fitting the nnetar model")
-      }
-      if(is.null(n.args)){
-        n.args <- list(lambda = lambda)
-      } else if(is.null(n.args$lambda)){
-        n.args$lambda <- lambda
-      }
-      modelResults$nnetar <- do.call(nnetar, c(list(y), n.args))
-    }
-    # stlm()
-    if(is.element("s", expandedModels)){
-      if(verbose){
-        message("Fitting the stlm model")
-      }
-      if(is.null(s.args)){
-        s.args <- list(lambda = lambda)
-      } else if(is.null(s.args$lambda)){
-        s.args$lambda <- lambda
-      }
-      modelResults$stlm <- do.call(stlm, c(list(y), s.args))
-    }
-    # tbats()
-    if(is.element("t", expandedModels)){
-      if(verbose){
-        message("Fitting the tbats model")
-      }
-      if(is.null(t.args)){
-        t.args <- list(lambda = lambda)
-      } else if(is.null(t.args$lambda)){
-        t.args$lambda <- lambda
-      }
-      modelResults$tbats <- do.call(tbats, c(list(y), t.args))
-    }
-    #snaive
-    if(is.element("z", expandedModels)){
-      if(verbose){
-        message("Fitting the snaive model")
-      }
-      if(is.null(z.args)){
-        z.args <- list(lambda = lambda)
-      } else if(is.null(z.args$lambda)){
-        z.args$lambda <- lambda
-      }
-      modelResults$snaive <- do.call(snaive, c(list(y), z.args))
     }
   }
 
@@ -373,8 +280,7 @@ hybridModel <- function(y, models = "aefnst",
   numModels <- length(expandedModels)
   if(weights == "equal"){
     modelResults$weights <- rep(1 / numModels, numModels)
-  }
-  else if(weights %in% c("insample.errors", "cv.errors")){
+  } else if(weights %in% c("insample.errors", "cv.errors")){
     modelResults$weights <- rep(0, numModels)
     index <- 1
     modResults <- modelResults
@@ -402,22 +308,7 @@ hybridModel <- function(y, models = "aefnst",
     modelResults$weights <- sapply(expandedModels,
                                    function(x) accuracy(modResults[[getModelName(x)]])[cvHorizon,
                                                                                        errorMethod])
-#~     for(i in expandedModels){
-#~       if(i == "a"){
-#~         modelResults$weights[index] <- accuracy(modResults$auto.arima)[cvHorizon, errorMethod]
-#~       } else if(i == "e"){
-#~         modelResults$weights[index] <- accuracy(modResults$ets)[cvHorizon, errorMethod]
-#~       } else if(i == "f"){
-#~          modelResults$weights[index] <- accuracy(modResults$thetam)[cvHorizon, errorMethod]
-#~       } else if(i == "n"){
-#~         modelResults$weights[index] <- accuracy(modResults$nnetar)[cvHorizon, errorMethod]
-#~       } else if(i == "s"){
-#~         modelResults$weights[index] <- accuracy(modResults$stlm)[cvHorizon, errorMethod]
-#~       } else if(i == "t"){
-#~         modelResults$weights[index] <- accuracy(modResults$tbats)[cvHorizon, errorMethod]
-#~       }
-#~       index <- index + 1
-#~     }
+
     # Scale the weights
     inverseErrors <- 1 / modelResults$weights
     modelResults$weights <- inverseErrors / sum(inverseErrors)
@@ -426,7 +317,9 @@ hybridModel <- function(y, models = "aefnst",
 
   # Check for valid weights when weights = "insample.errors" and submodels produce perfect fits
   if(is.element(NaN, modelResults$weights) & weights %in% c("insample.errors", "cv.errors")){
-    warning('At least one model perfectly fit the series, so accuracy measures cannot be used for weights. Reverting to weights = "equal".')
+    wrnMsg <- paste0("At least one model perfectly fit the series, so accuracy measures cannot",
+                     " be used for weights. Reverting to weights = \"equal\".")
+    warning(wrnMsg)
     modelResults$weights <- rep(1/ length(includedModels),
                                 length(includedModels))
   }
@@ -453,23 +346,15 @@ hybridModel <- function(y, models = "aefnst",
   # Save which models used xreg
   xregs <- list()
   if("a" %in% expandedModels){
-      xregs$auto.arima <- FALSE
-      if("xreg" %in% names(a.args) && !is.null(a.args$xreg)){
-        xregs$auto.arima <- TRUE
-      }
+    xregs$auto.arima <- ifelse("xreg" %in% names(a.args) && !is.null(a.args$xreg), TRUE, FALSE)
   }
   if("n" %in% expandedModels){
-      xregs$nnetar <- FALSE
-      if("xreg" %in% names(n.args) && !is.null(n.args$xreg)){
-        xregs$nnetar <- TRUE
-      }
+    xregs$nnetar <- ifelse("xreg" %in% names(n.args) && !is.null(n.args$xreg), TRUE, FALSE)
   }
   if("s" %in% expandedModels){
-      xregs$stlm <- FALSE
-      methodArima <- "method" %in% names(s.args) && s.args$method == "arima"
-      if("xreg" %in% names(s.args) && !is.null(s.args$xreg) && methodArima){
-        xregs$stlm <- TRUE
-      }
+    methodArima <- "method" %in% names(s.args) && s.args$method == "arima"
+    xregs$stlm <- ifelse("xreg" %in% names(s.args) && !is.null(s.args$xreg) && methodArima,
+                         TRUE, FALSE)
   }
 
   # Prepare the hybridModel object
