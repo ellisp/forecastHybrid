@@ -34,7 +34,7 @@ if(require(forecast) & require(testthat)){
     # parallel should be a boolean
     expect_error(hybridModel(wineind, parallel = "a"))
     # warning when component model fits perfectly and weights = "insample.error"
-    #expect_warning(hybridModel(y = ts(1:9, frequency = 4), weights = "insample.errors"))
+    expect_warning(hybridModel(y = ts(1:9, frequency = 4), weights = "insample.errors"))
 
   })
   test_that("Testing for warnings", {
@@ -153,5 +153,27 @@ if(require(forecast) & require(testthat)){
     serialResiduals <- modelComparison[["FALSE"]]$residuals
     expect_true(sum(abs(parallelResiduals - serialResiduals), na.rm = TRUE) < tol)
     expect_true(all(is.na(serialResiduals) == is.na(parallelResiduals)))
+  })
+
+  test_that("Testing the weighting methods", {
+    inputSeries <- ts(rnorm(100), f = 2)
+    # Test two quick models since we will be performing cross validation
+    models <- "fs"
+    weights <- c("equal", "insample.errors", "cv.errors")
+    results <- list()
+    for(weight in weights){
+      hm <- hybridModel(inputSeries, models = models, weights = weight)
+      expect_true(sum(hm$weights) == 1)
+      expect_true(all(hm$weights) >= 0)
+      expect_true(all(hm$weights) <= 1)
+      expect_true(length(hm$weights) == nchar(models))
+      results[[weight]] <- hm
+    }
+    # Test that weights are not equal
+    weightResults <- sapply(results, function(x) x$weights)
+    weights <- as.list(data.frame(weightResults))
+    expect_true(all(weights$insample.errors != weights$cv.errors))
+    expect_true(all(weights$insample.errors != weights$equal))
+    expect_true(all(weights$equal != weights$cv.errors))
   })
 }
