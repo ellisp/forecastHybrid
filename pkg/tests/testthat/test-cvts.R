@@ -22,10 +22,16 @@ if(require(forecast) & require(testthat)){
   context("Testing input for cvts()")
   test_that("Testing invalid inputs", {
     expect_error(cvts("invalid"))
+    # useHorizon must be > 0
     expect_error(cvts(AirPassengers, FUN = thetam, FCFUN = forecast, useHorizon = 0L))
+    # windowSize should be an integer
     expect_error(cvts(AirPassengers, FUN = thetam, FCFUN = forecast, windowSize = 3.2))
     expect_error(cvts(AirPassengers, FUN = thetam, FCFUN = forecast, windowSize = 130,
                       maxHorizon = 12))
+    # windowSize must be > 0
+    expect_error(cvts(AirPassengers, windowSize = 0))
+    # maxHorizon must be > 0
+    expect_error(cvts(AirPassengers, maxHorizon = 0))
   })
   test_that("Testing valid inputs", {
      expect_error(cvts(USAccDeaths, FUN = thetam, FCFUN = forecast, rolling = FALSE,

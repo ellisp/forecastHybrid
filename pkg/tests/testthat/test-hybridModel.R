@@ -35,8 +35,8 @@ if(require(forecast) & require(testthat)){
     expect_error(hybridModel(wineind, parallel = "a"))
     # warning when component model fits perfectly and weights = "insample.error"
     expect_warning(hybridModel(y = ts(1:9, frequency = 4), weights = "insample.errors"))
-
   })
+
   test_that("Testing for warnings", {
     # hybridModel creates a warning when an arg list for an unused model is passed
     expect_warning(hybridModel(wineind, models = "fs", a.args = list()))
@@ -44,6 +44,8 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(wineind, models = "fs", n.args = list()))
     expect_warning(hybridModel(wineind, models = "fn", s.args = list()))
     expect_warning(hybridModel(wineind, models = "fs", t.args = list()))
+    # thetam() requires at least one seasonal period of data
+    expect_warning(hybridModel(ts(rnorm(4), f = 7), models = "aef"))
     # ts is too short: nnetar() and stlm() with 2 * frequency(y) >= length(y)
     inputSeries <- ts(rnorm(8), f = 4)
     expect_warning(hybridModel(inputSeries, models = "aesn"))
@@ -53,7 +55,12 @@ if(require(forecast) & require(testthat)){
     # ets with frequency(y) > 24
     inputSeries <- ts(rnorm(75), f = 25)
     expect_warning(hybridModel(inputSeries, models = "ens"))
+    # weights = "cv.weights" with errorMethod = "MASE" is not yet implemented
+    expect_warning(hybridModel(wineind, models = "fs", weights = "cv.errors", errorMethod = "MASE"))
+    # weights = "insample.errors" when there is a perfect fit
+    expect_warning(hybridModel(ts(1:10, f = 2), weight="insample.errors"))
   })
+
   test_that("Testing valid inputs", {
     set.seed(54321)
     expect_error(hybridModel(wineind, models = "an", f.args = list()))
@@ -73,12 +80,14 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(inputSeries, models = "fs", parallel = TRUE), NA)
     expect_warning(hybridModel(inputSeries, models = "fs", parallel = TRUE, num.cores = 2), NA)
   })
+
   test_that("Testing long data", {
     set.seed(42)
     dat <- ts(rnorm(52 * 3), f = 52)
     expect_warning(hm <- hybridModel(y = dat, models = "fs"), NA)
     expect_true(length(forecast(hm)$mean) == 52 * 2)
   })
+
   test_that("Testing model matching", {
     set.seed(123456)
     expect_error(hybridModel(y = rnorm(20), models = "AAAAE"), NA)
@@ -95,6 +104,7 @@ if(require(forecast) & require(testthat)){
   expect_equal(length(cvMod$weights),
                length(unique(cvMod$weights)))
   })
+
   test_that("Testing the hybridModel object", {
     modelComparison <- list()
     for(parallel in c(TRUE, FALSE)){

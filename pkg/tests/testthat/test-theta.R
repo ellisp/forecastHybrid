@@ -1,5 +1,4 @@
 test_that("the forecast(thetam(...)) returns the same results as thetaf(...)", {
-
    # real seasonal data
    fc1 <- thetaf(AirPassengers, h = 12)
    fc2 <- forecast(thetam(AirPassengers), h = 12)
@@ -47,6 +46,8 @@ test_that("the forecast(thetam(...)) returns the same results as thetaf(...)", {
 test_that("invalid inputs to thetam", {
    expect_error(thetam("hello"))
    expect_error(thetam(mtcars))
+   shortSeries <- ts(rnorm(6), f = 7)
+   expect_error(thetam(shortSeries))
 })
 
 test_that("hybrid models with theta give same results as when done manually", {

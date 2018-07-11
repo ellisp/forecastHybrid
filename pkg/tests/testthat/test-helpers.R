@@ -27,4 +27,12 @@ if(require(forecast) & require(testthat)){
     expect_true(length(results) == 2)
     expect_true(all(names(results) == c("thetam", "stlm")))
   })
+
+  test_that("Testing tsSubsetWithIndices()", {
+    expect_true(all(head(wineind) == tsSubsetWithIndices(wineind, 1:5)))
+    # Invalid subset outside of range
+    expect_error(tsSubsetWithIndices(wineind, length(wineind) + 1))
+    # Non-continuous indices
+    expect_error(tsSubsetWithIndices(wineind, 4:1))
+    })
 }
