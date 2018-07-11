@@ -167,15 +167,21 @@ if(require(forecast) & require(testthat)){
 
   test_that("Testing the weighting methods", {
     inputSeries <- ts(rnorm(100), f = 2)
+    tol <- 10^-8
     # Test two quick models since we will be performing cross validation
     models <- "fs"
     weights <- c("equal", "insample.errors", "cv.errors")
+    # TODO: add another loop here for errorMethod once MASE with cv.errors is implemented
     results <- list()
     for(weight in weights){
-      hm <- hybridModel(inputSeries, models = models, weights = weight)
-      expect_true(sum(hm$weights) == 1)
-      expect_true(all(hm$weights) >= 0)
-      expect_true(all(hm$weights) <= 1)
+      if(weight == "insample.errors"){
+        expect_warning(hm <- hybridModel(inputSeries, models = models, weights = weight))
+      } else{
+        hm <- hybridModel(inputSeries, models = models, weights = weight)
+      }
+      expect_true(sum(hm$weights) - 1 < tol)
+      expect_true(all(hm$weights >= 0))
+      expect_true(all(hm$weights <= 1))
       expect_true(length(hm$weights) == nchar(models))
       results[[weight]] <- hm
     }

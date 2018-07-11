@@ -116,22 +116,12 @@ hybridModel <- function(y, models = "aefnst",
   ##############################################################################
   modelArguments = list("a" = a.args, "e" = e.args, "f" = NULL, "n" = n.args,
                     "s" = s.args, "t" = t.args, "z" = z.args)
-  # The dependent variable must be numeric and not a matrix/dataframe
-  forbiddenTypes <- c("data.frame", "data.table", "matrix")
-  if(!is.numeric(y) || all(class(y) %in% forbiddenTypes)){
-    stop("The time series must be numeric and may not be a matrix or dataframe object.")
-  }
-  if(!length(y)){
-    stop("The time series must have observations")
-  }
 
-  if(length(y) < 4){
-    stop("The time series must have at least four observations")
-  }
+  # Validate and clean the input timeseries
+  y <- prepareTimeseries(y = y)
 
-  y <- as.ts(y)
-
-  # Match arguments to ensure validity
+  # using weights = "insample.errors" will tend to overfit and favor complex models, so it is
+  # not recommended
   weights <- match.arg(weights)
   if(weights == "insample.errors"){
     wrnMsg <- paste0("Using insample.error weights is not recommended for accuracy and ",
@@ -142,78 +132,14 @@ hybridModel <- function(y, models = "aefnst",
 
   # Match the specified models
   expandedModels <- sort(unique(tolower(unlist(strsplit(models, split = "")))))
-  if(length(expandedModels) > 7L){
-    stop("Invalid models specified.")
-  }
-  # All characters must be valid
-  validModels <- c("a", "e", "f", "n", "s", "t", "z")
-  if(!all(expandedModels %in% validModels)){
-    stop("Invalid models specified.")
-  }
-  if(!length(expandedModels)){
-    stop("At least one component model type must be specified.")
-  }
+  # Check models and data length to ensure enough data: remove models that require more data
+  expandedModels <- removeModels(y = y, models = expandedModels)
 
-  # Validate cores and parallel arguments
-  if(!is.logical(parallel)){
-    stop("The parallel argument must be TRUE/FALSE.")
-  }
-  if(!is.numeric(num.cores)){
-    stop("The number of cores specified must be an integer greater than zero.")
-  }
-  if(as.logical((num.cores %% 1L)) || num.cores <= 0L){
-    stop("The number of cores specified must be an integer greater than zero.")
-  }
+  # Check the parallel arguments
+  checkParallelArguments(parallel = parallel, num.cores = num.cores)
 
   # Check a.args/t.args/e.args/n.args/s.args
-  if(!is.null(a.args) && !is.element("a", expandedModels)){
-    warning("auto.arima was not selected in the models argument, but a.args was passed. Ignoring a.args")
-  }
-  if(!is.null(e.args) && !is.element("e", expandedModels)){
-    warning("ets was not selected in the models argument, but e.args was passed. Ignoring e.args")
-  }
-  if(!is.null(n.args) && !is.element("n", expandedModels)){
-    warning("nnetar was not selected in the models argument, but n.args was passed. Ignoring n.args")
-  }
-  if(!is.null(s.args) && !is.element("s", expandedModels)){
-    warning("stlm was not selected in the models argument, but s.args was passed. Ignoring s.args")
-  }
-  if(!is.null(t.args) && !is.element("t", expandedModels)){
-    warning("tbats was not selected in the models argument, but t.args was passed. Ignoring t.args")
-  }
-
-  # Check for problems for specific models (e.g. long seasonality for ets and non-seasonal for stlm or nnetar)
-  if(is.element("e", expandedModels) && frequency(y) > 24){
-    warning("frequency(y) > 24. The ets model will not be used.")
-    expandedModels <- expandedModels[expandedModels != "e"]
-  }
-  if(is.element("f", expandedModels) && length(y) <= frequency(y)){
-    warning("The theta model requires more than one seasonal period of data. The theta model will not be used.")
-    expandedModels <- expandedModels[expandedModels != "f"]
-  }
-
-  if(is.element("s", expandedModels)){
-    if(frequency(y) < 2L){
-      warning("The stlm model requires that the input data be a seasonal ts object. The stlm model will not be used.")
-      expandedModels <- expandedModels[expandedModels != "s"]
-    }
-    if(frequency(y) * 2L >= length(y)){
-      warning("The stlm model requres a series more than twice as long as the seasonal period. The stlm model will not be used.")
-      expandedModels <- expandedModels[expandedModels != "s"]
-    }
-  }
-  if(is.element("n", expandedModels)){
-    if(frequency(y) * 2L >= length(y)){
-      warning("The nnetar model requres a series more than twice as long as the seasonal period. The nnetar model will not be used.")
-      expandedModels <- expandedModels[expandedModels != "n"]
-    }
-  }
-
-
-  # A model run should include at least two component models
-  if(length(expandedModels) < 2L){
-    stop("A hybridModel must contain at least two component models.")
-  }
+  checkModelArgs(modelArguments = modelArguments, models = expandedModels)
 
   if(weights == "cv.errors" && errorMethod == "MASE"){
     warning("cv errors currently do not support MASE. Reverting to RMSE.")
@@ -282,7 +208,6 @@ hybridModel <- function(y, models = "aefnst",
     modelResults$weights <- rep(1 / numModels, numModels)
   } else if(weights %in% c("insample.errors", "cv.errors")){
     modelResults$weights <- rep(0, numModels)
-    index <- 1
     modResults <- modelResults
 
     if(weights == "cv.errors"){
