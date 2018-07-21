@@ -22,7 +22,7 @@ The latest development version can be installed using the [devtools](https://cra
 
 
 ```r
-devtools::install_github("ellisp/forecastHybrid/pkg")
+devtools::install_gitlab("dashaub/forecastHybrid/pkg")
 ```
 Version updates to CRAN will be published frequently after new features are implemented, so the development version is not recommended unless you plan to modify the code or a particular bugfix is needed.
 

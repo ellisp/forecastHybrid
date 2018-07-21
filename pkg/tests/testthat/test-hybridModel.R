@@ -58,7 +58,7 @@ if(require(forecast) & require(testthat)){
     # weights = "cv.weights" with errorMethod = "MASE" is not yet implemented
     expect_warning(hybridModel(wineind, models = "fs", weights = "cv.errors", errorMethod = "MASE"))
     # weights = "insample.errors" when there is a perfect fit
-    expect_warning(hybridModel(ts(1:10, f = 2), weight="insample.errors"))
+    expect_warning(hybridModel(ts(1:20, f = 2), weight="insample.errors"))
   })
 
   test_that("Testing valid inputs", {
@@ -111,6 +111,7 @@ if(require(forecast) & require(testthat)){
       set.seed(4)
       len <- 10
       freq <- 2
+      tol <- 10^-8
       testSeries <- ts(rnorm(len), f = freq)
       xreg <- data.frame(matrix(rnorm(len * 3), nrow = len))
       # Ignore nnetar for now since it isn't reproducible
@@ -129,7 +130,9 @@ if(require(forecast) & require(testthat)){
       expect_true(length(hm$fitted) == length(testSeries))
       expect_true(length(hm$residuals) == length(testSeries))
       expect_true(length(hm$x) == length(testSeries))
-      expect_true(sum(hm$weights) == 1)
+      expect_true(all(hm$weights >= 0))
+      # Weights should sum to 1 but allow tolerance
+      expect_true(sum(hm$weights) - 1 < tol)
       expect_true(length(hm$weights) == nchar(models))
       expect_true(hm$frequency == freq)
       # Ensure xreg is correct
