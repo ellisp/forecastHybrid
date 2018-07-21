@@ -10,7 +10,8 @@ if(require(forecast) & require(testthat)){
                              models = 5))
     # Test for invalid mismatch length of y and xreg in a.args/s.args later?
     badxreg <- data.frame(rnorm(length(wineind) - 1))
-    expect_warning(expect_error(hybridModel(y = wineind, a.args = list(xreg = badxreg))))
+    expect_warning(expect_error(hybridModel(y = wineind,
+                                            a.args = list(xreg = badxreg))))
     # More invalid inputs
     expect_error(hybridModel(y = "hello world"))
     # must provide input series
@@ -33,8 +34,6 @@ if(require(forecast) & require(testthat)){
     expect_error(hybridModel(wineind, models = ""))
     # parallel should be a boolean
     expect_error(hybridModel(wineind, parallel = "a"))
-    # warning when component model fits perfectly and weights = "insample.error"
-    expect_warning(hybridModel(y = ts(1:9, frequency = 4), weights = "insample.errors"))
   })
 
   test_that("Testing for warnings", {
@@ -56,7 +55,8 @@ if(require(forecast) & require(testthat)){
     inputSeries <- ts(rnorm(75), f = 25)
     expect_warning(hybridModel(inputSeries, models = "ens"))
     # weights = "cv.weights" with errorMethod = "MASE" is not yet implemented
-    expect_warning(hybridModel(wineind, models = "fs", weights = "cv.errors", errorMethod = "MASE"))
+    expect_warning(hybridModel(wineind, models = "fs", weights = "cv.errors",
+                               errorMethod = "MASE"))
     # weights = "insample.errors" when there is a perfect fit
     expect_warning(hybridModel(ts(1:20, f = 2), weight="insample.errors"))
   })
@@ -72,13 +72,15 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(inputSeries, models = "aensft",
                                weights = "insample.errors"))
     # soft deprecated insample.errors
-    expect_warning(hybridModel(wineind, models = "fs", weights = "insample.errors"))
+    expect_warning(hybridModel(wineind, models = "fs",
+                               weights = "insample.errors"))
     expect_error(hybridModel(inputSeries, models = "ae",
                              e.args = list(lambda = 0.5)), NA)
     # test parallel
     inputSeries <- ts(rnorm(8), f = 2)
     expect_warning(hybridModel(inputSeries, models = "fs", parallel = TRUE), NA)
-    expect_warning(hybridModel(inputSeries, models = "fs", parallel = TRUE, num.cores = 2), NA)
+    expect_warning(hybridModel(inputSeries, models = "fs", parallel = TRUE,
+                               num.cores = 2), NA)
   })
 
   test_that("Testing long data", {
@@ -178,7 +180,8 @@ if(require(forecast) & require(testthat)){
     results <- list()
     for(weight in weights){
       if(weight == "insample.errors"){
-        expect_warning(hm <- hybridModel(inputSeries, models = models, weights = weight))
+        expect_warning(hm <- hybridModel(inputSeries, models = models,
+                                         weights = weight))
       } else{
         hm <- hybridModel(inputSeries, models = models, weights = weight)
       }
