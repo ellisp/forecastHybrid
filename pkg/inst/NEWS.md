@@ -1,5 +1,6 @@
 # Version 3.0.13 [Unreleased]
 * Parallel support added to `hybridModel()`. This can be controlled by setting `parallel = TRUE` and setting `num.cores`. By default this is not enabled since the performance improvement typically only occurs when fitting `auto.arima` and `tbats` models on long series with large frequency (e.g. `taylor`).
+* Project is now hosted on [Gitlab](https://gitlab.com/dashaub/forecastHybrid) at as well as [Github](https://github.com/ellisp/forecastHybrid). Pull requests can be submitted to either platform, and branches should sync to Gitlab automatically every hour.
 * Added `z.args` for the `snaive()` model.
 * The `tbats()` and `snaive()` models now respect and use `lambda` when passed in `t.args` and `z.args`.
 * Refactored code to remove code duplication and cleaned up the hybridModel file by moving code into helper and generic files.
