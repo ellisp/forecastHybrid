@@ -1,4 +1,4 @@
-# Version 3.0.13 [2018-07-22]
+# Version 3.0.14 [2018-07-22]
 * Parallel support added to `hybridModel()`. This can be controlled by setting `parallel = TRUE` and setting `num.cores`. By default this is not enabled since the performance improvement typically only occurs when fitting `auto.arima` and `tbats` models on long series with large frequency (e.g. `taylor`).
 * Added `z.args` for the `snaive()` model.
 * The `tbats()` and `snaive()` models now respect and use `lambda` when passed in `t.args` and `z.args`.
