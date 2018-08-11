@@ -28,8 +28,8 @@ fitted.hybridModel <- function(object,
   #chkDots(...)
   if(individual){
     results <- list()
-    for(i in object$models){
-      results[[i]] <- fitted(object[[i]])
+    for(model in object$models){
+      results[[model]] <- fitted(object[[model]])
     }
     return(results)
   }
@@ -53,8 +53,8 @@ residuals.hybridModel <- function(object,
   #chkDots(...)
   if(individual){
     results <- list()
-    for(i in object$models){
-      results[[i]] <- residuals(object[[i]])
+    for(model in object$models){
+      results[[model]] <- residuals(object[[model]])
     }
     return(results)
   }
@@ -85,8 +85,8 @@ accuracy.hybridModel <- function(f,
   #chkDots(...)
   if(individual){
     results <- list()
-    for(i in f$models){
-      results[[i]] <- forecast::accuracy(f[[i]])
+    for(model in f$models){
+      results[[model]] <- forecast::accuracy(f[[model]])
     }
     return(results)
   }
@@ -145,9 +145,9 @@ print.hybridModel <- function(x, ...){
   cat("Hybrid forecast model comprised of the following models: ")
   cat(x$models, sep = ", ")
   cat("\n")
-  for(i in x$models){
+  for(model in x$models){
     cat("############\n")
-    cat(i, "with weight", round(x$weights[i], 3), "\n")
+    cat(model, "with weight", round(x$weights[model], 3), "\n")
   }
 }
 

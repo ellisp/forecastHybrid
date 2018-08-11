@@ -4,8 +4,8 @@
 \alias{forecast.hybridModel}
 \title{Hybrid forecast}
 \usage{
-\method{forecast}{hybridModel}(object, h = ifelse(object$frequency > 1, 2 *
-  object$frequency, 10), xreg = NULL, level = c(80, 95), PI = TRUE,
+\method{forecast}{hybridModel}(object, h = ifelse(object$frequency > 1, 2
+  * object$frequency, 10), xreg = NULL, level = c(80, 95), PI = TRUE,
   fan = FALSE, PI.combination = c("extreme", "mean"), ...)
 }
 \arguments{

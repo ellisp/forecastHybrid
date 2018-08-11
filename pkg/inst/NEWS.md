@@ -5,7 +5,7 @@
 * Refactored code to remove code duplication and cleaned up the hybridModel file by moving code into helper and generic files.
 * Weights and cross validation for the `snaive` model are now handled correctly.
 * Project is now hosted on [GitLab](https://gitlab.com/dashaub/forecastHybrid) as well as [GitHub](https://github.com/ellisp/forecastHybrid). Pull requests can be submitted to either platform, and branches should sync to Gitlab automatically every hour.
-* Commits and tags are now signed with RSA key 09183768E3BC25497F9060C701B81BAF17A89621. The public key is located in the package archive root directory in `davidshaub@gmx.com.key` and hosted on both GitHub and GitLab in `pkg/davidshaub@gmx.com.key`.
+* Commits and tags are now signed with RSA key 09183768E3BC25497F9060C701B81BAF17A89621. The public key is located in the package archive root directory in `inst/davidshaub@gmx.com.key` and hosted on both GitHub and GitLab in `pkg/inst/davidshaub@gmx.com.key`.
 
 # Version 2.2.12 [2018-05-04]
 * Added `PI.combination` argument to `forecast.hybridModel()`. The default behavior is to follow the existing methodology of using the most extreme prediction intervals from the component models. When `"mean"` is passed instead, a simple (unweighted) average of the component prediction intervals is used instead.
