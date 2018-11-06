@@ -9,9 +9,8 @@ if(require(forecast) & require(testthat)){
     expect_error(hybridModel(y = matrix(1:10, nrow = 5, ncol = 2),
                              models = 5))
     # Test for invalid mismatch length of y and xreg in a.args/s.args later?
-    badxreg <- data.frame(rnorm(length(wineind) - 1))
-    expect_warning(expect_error(hybridModel(y = wineind,
-                                            a.args = list(xreg = badxreg))))
+    badxreg <- rnorm(length(wineind) - 1)
+    expect_error(hybridModel(y = wineind, a.args = list(xreg = badxreg)))
     # More invalid inputs
     expect_error(hybridModel(y = "hello world"))
     # must provide input series
@@ -115,7 +114,9 @@ if(require(forecast) & require(testthat)){
       freq <- 2
       tol <- 10^-8
       testSeries <- ts(rnorm(len), f = freq)
-      xreg <- data.frame(matrix(rnorm(len * 3), nrow = len))
+      cols <- c("a", "b", "c")
+      xreg <- matrix(rnorm(len * length(cols)), nrow = len)
+      colnames(xreg) <- cols
       # Ignore nnetar for now since it isn't reproducible
       models <- "aefstz"
       hm <- hybridModel(testSeries, models = models,
