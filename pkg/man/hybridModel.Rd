@@ -78,9 +78,9 @@ of ensemble forecasts. While default settings for the individual component model
 in most cases, fine control can be exerted by passing detailed arguments to the component models in the
 \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
 Note that if \code{xreg} is passed to the \code{a.args}, \code{n.args}, or \code{s.args} component models
-it must be passed as a dataframe instead of the matrix object
-that the "forecast" package functions usually accept.
-This is due to a limitation in how the component models are called.
+it must now be passed as a matrix. In "forecastHybrid" versions earlier than 4.0.15 it would
+instead be passed in as a dataframe, but for consistency with "forecast" v8.5 we now require
+a matrix with colnames
 \cr
 \cr
 Characteristics of the input series can cause problems for certain types of models and paramesters.
