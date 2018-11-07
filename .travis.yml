@@ -1,6 +1,11 @@
 # thanks to https://github.com/travis-ci/travis-ci/issues/5775
 sudo: false
 
+addons:
+  apt:
+    packages:
+      - libxml2-dev libgit2-dev
+
 language: r
 r:
   - oldrel
@@ -13,18 +18,12 @@ before_install:
   - cd pkg
 
 install:
-  - Rscript -e 'install.packages(c("devtools", "covr"))'
-  - Rscript -e 'devtools::install_deps(dependencies = c("Depends", "Imports", "Suggests"), threads = 2)'
+  - Rscript -e 'install.packages(c("devtools", "covr"), repos = "https://cloud.r-project.org")'
+  - Rscript -e 'devtools::install_deps(dependencies = TRUE, threads = 2, repos = "https://cloud.r-project.org")'
+
 script:
   - Rscript -e 'devtools::check()'
 
-notifications:
-  email:
-    on_success: change
-    on_failure: change
-
-r_github_packages:
-  - jimhester/covr
 
 after_success:
   - Rscript -e 'covr::coveralls()'
