@@ -10,7 +10,7 @@ if(require(forecast) & require(testthat)){
                              models = 5))
     # Test for invalid mismatch length of y and xreg in a.args/s.args later?
     badxreg <- rnorm(length(wineind) - 1)
-    expect_error(hybridModel(y = wineind, a.args = list(xreg = badxreg)))
+    expect_warning(expect_error(hybridModel(y = wineind, a.args = list(xreg = badxreg))))
     # More invalid inputs
     expect_error(hybridModel(y = "hello world"))
     # must provide input series

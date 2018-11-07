@@ -49,6 +49,7 @@ if(require(forecast) &  require(testthat)){
     # Test xregs
     inputSeries <- subset(wineind, end = 25)
     mm <- matrix(runif(length(inputSeries)), nrow = length(inputSeries))
+    colnames(mm) <- "a"
     # stlm only works with xreg when method = "arima" is passed in s.args
     expect_error(aa <- hybridModel(inputSeries, models = "afns",
                                    a.args = list(xreg = mm),
