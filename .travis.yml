@@ -23,7 +23,7 @@ install:
 
 script:
   - Rscript -e 'devtools::check()'
-
+  - Rscript -e 'devtools::test()'
 
 after_success:
   - Rscript -e 'covr::coveralls()'
