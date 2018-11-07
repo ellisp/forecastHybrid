@@ -31,6 +31,6 @@ License: GPL-3
 URL: https://gitlab.com/dashaub/forecastHybrid
 BugReports: https://github.com/ellisp/forecastHybrid/issues
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 ByteCompile: true
 NeedsCompilation: no
