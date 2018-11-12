@@ -11,6 +11,8 @@ if(require(forecast) &  require(testthat)){
     expect_error(forecast(object = hModel, h = "a"))
     # h should be an integer
     expect_error(forecast(object = hModel, h = 3.2))
+    # xreg should be a matrix
+    expect_error(forecast(object = hModel, xreg = "1"))
     # matrix should be numeric
     expect_error(forecast(object = hModel, h = 5,
                                      xreg = matrix("a", nrow = 5, ncol = 2)))
@@ -137,6 +139,8 @@ if(require(forecast) &  require(testthat)){
         expect_error(forecast(hm_xreg$stlm, xreg = xrTest), NA)
         hm_xreg_fc <- forecast(hm_xreg, xreg = xrTest)
         expect_true(length(hm_fc$mean) == length(hm_xreg_fc$mean))
+        # Model with xreg should be better than model without
+        expect_true(AIC(hm_xreg$auto.arima) < AIC(hm$auto.arima))
     }
   })
 }
