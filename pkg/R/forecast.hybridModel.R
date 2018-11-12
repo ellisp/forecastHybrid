@@ -70,14 +70,14 @@ forecast.hybridModel <- function(object,
 
   # xreg should be a matrix and have same number of observations as the horizon
   if(!is.null(xreg)){
-    if(!is.matrix(xreg) && !is.data.frame(xreg)){
-      stop("The supplied xreg must be a matrix or data.frame.")
+    if(!is.matrix(xreg) && !is.numeric(xreg) && !is.data.frame(xreg)){
+      stop("The supplied xreg must be numeric, matrix, or data.frame.")
     }
     xreg <- as.matrix(xreg)
     if(!is.numeric(xreg)){
       stop("The supplied xreg must be numeric.")
     }
-    if(nrow(xreg) != h){
+    if(is.matrix(xreg) && nrow(xreg) != h){
       warning("The number of rows in xreg should match h. Setting h to nrow(xreg).")
       h <- nrow(xreg)
     }
@@ -132,7 +132,7 @@ forecast.hybridModel <- function(object,
     xregN <- xreg
     if(!object$xreg$nnetar){
       xregN <- NULL
-      }
+    }
     forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xregN, PI = PI, level = level, ...)
     forecasts$pointForecasts[, "nnetar"] <- forecasts$nnetar$mean
   }
@@ -142,7 +142,7 @@ forecast.hybridModel <- function(object,
     # xreg is only used in stlm if method = "arima"
     if(!object$xreg$stlm){
       xregS <- NULL
-      }
+    }
     forecasts$stlm <- forecast(object$stlm, h = h, xreg = xregS, level = level, ...)
     forecasts$pointForecasts[, "stlm"] <- forecasts$stlm$mean
   }
@@ -176,22 +176,22 @@ forecast.hybridModel <- function(object,
     piCombination <- match.arg(PI.combination)
     if(piCombination == "mean"){
       upperFunction <- lowerFunction <- mean
-    } else{
+    } else if(piCombination == "extreme"){
       upperFunction <- max
       lowerFunction <- min
     }
      nint <- length(level)
      upper <- lower <- matrix(NA, ncol = nint, nrow = length(finalForecast))
-     # Prediction intervals for nnetar do not currently work, so exclude these
-     piModels <- object$models#[object$models != "nnetar"]
+
+     piModels <- object$models
      # Produce each upper/lower limit
      for(i in 1:nint){
         # Produce the upper/lower limit for each model for a given level
         tmpUpper <- tmpLower <- matrix(NA, nrow = h, ncol = length(piModels))
         j2 <- 1
-        for(j in piModels){
-           tmpUpper[, j2] <- as.numeric(matrix(forecasts[[j]]$upper, nrow = h)[, i])
-           tmpLower[, j2] <- as.numeric(matrix(forecasts[[j]]$lower, nrow = h)[, i])
+        for(mod in piModels){
+           tmpUpper[, j2] <- as.numeric(matrix(forecasts[[mod]]$upper, nrow = h)[, i])
+           tmpLower[, j2] <- as.numeric(matrix(forecasts[[mod]]$lower, nrow = h)[, i])
            j2 <- j2 + 1
         }
         # Apply the function for reconciling the prediction intervals

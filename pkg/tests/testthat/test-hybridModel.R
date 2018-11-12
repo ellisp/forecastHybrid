@@ -4,6 +4,9 @@ if(require(forecast) & require(testthat)){
   test_that("Testing invalid inputs", {
     # Invalid arguments for models
     expect_error(hybridModel(y = 1:10, models = "jten"))
+    expect_error(hybridModel(y = 1:10, models = "ae32"))
+    expect_error(hybridModel(y = 1:10, models = "32"))
+    expect_error(hybridModel(y = 1:10, models = ""))
     # models must be characters
     expect_error(hybridModel(y = 1:10, models = 5))
     expect_error(hybridModel(y = matrix(1:10, nrow = 5, ncol = 2),
@@ -108,9 +111,9 @@ if(require(forecast) & require(testthat)){
 
   test_that("Testing the hybridModel object", {
     modelComparison <- list()
-    for(parallel in c(TRUE, FALSE)){
+    for(parallel in c(FALSE, TRUE)){
       set.seed(4)
-      len <- 10
+      len <- 20
       freq <- 2
       tol <- 10^-8
       testSeries <- ts(rnorm(len), f = freq)
@@ -154,8 +157,11 @@ if(require(forecast) & require(testthat)){
       expect_true("stlm" %in% class(hm$stlm))
       expect_true("forecast" %in% class(hm$snaive))
 
+      # Base forecasts should work
+      expect_error(forecast(hm$auto.arima, xreg = xreg), NA)
       # Test forecast
-      expect_error(forecast(hm, xreg = xreg), NA)
+      h <- nrow(xreg)
+      expect_error(forecast(hm, h = h, xreg = xreg), NA)
       modelComparison[[as.character(parallel)]] <- hm
     }
     # Compare the results from parallel = TRUE and parallel = FALSE
