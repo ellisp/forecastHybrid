@@ -77,7 +77,7 @@ forecast.hybridModel <- function(object,
     if(!is.numeric(xreg)){
       stop("The supplied xreg must be numeric.")
     }
-    if(is.matrix(xreg) && nrow(xreg) != h){
+    if(is.null(h) || nrow(xreg) != h){
       warning("The number of rows in xreg should match h. Setting h to nrow(xreg).")
       h <- nrow(xreg)
     }
