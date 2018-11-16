@@ -17,13 +17,5 @@ cache: packages
 before_install:
   - cd pkg
 
-install:
-  - Rscript -e 'install.packages(c("devtools", "covr"), repos = "https://cloud.r-project.org")'
-  - Rscript -e 'devtools::install_deps(dependencies = TRUE, threads = 2, repos = "https://cloud.r-project.org")'
-
-script:
-  - Rscript -e 'devtools::check()'
-
-
 after_success:
   - Rscript -e 'covr::coveralls()'

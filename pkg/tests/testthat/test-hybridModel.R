@@ -4,14 +4,16 @@ if(require(forecast) & require(testthat)){
   test_that("Testing invalid inputs", {
     # Invalid arguments for models
     expect_error(hybridModel(y = 1:10, models = "jten"))
+    expect_error(hybridModel(y = 1:10, models = "ae32"))
+    expect_error(hybridModel(y = 1:10, models = "32"))
+    expect_error(hybridModel(y = 1:10, models = ""))
     # models must be characters
     expect_error(hybridModel(y = 1:10, models = 5))
     expect_error(hybridModel(y = matrix(1:10, nrow = 5, ncol = 2),
                              models = 5))
     # Test for invalid mismatch length of y and xreg in a.args/s.args later?
-    badxreg <- data.frame(rnorm(length(wineind) - 1))
-    expect_warning(expect_error(hybridModel(y = wineind,
-                                            a.args = list(xreg = badxreg))))
+    badxreg <- rnorm(length(wineind) - 1)
+    expect_warning(expect_error(hybridModel(y = wineind, a.args = list(xreg = badxreg))))
     # More invalid inputs
     expect_error(hybridModel(y = "hello world"))
     # must provide input series
@@ -109,13 +111,15 @@ if(require(forecast) & require(testthat)){
 
   test_that("Testing the hybridModel object", {
     modelComparison <- list()
-    for(parallel in c(TRUE, FALSE)){
+    for(parallel in c(FALSE, TRUE)){
       set.seed(4)
-      len <- 10
+      len <- 20
       freq <- 2
       tol <- 10^-8
       testSeries <- ts(rnorm(len), f = freq)
-      xreg <- data.frame(matrix(rnorm(len * 3), nrow = len))
+      cols <- c("a", "b", "c")
+      xreg <- matrix(rnorm(len * length(cols)), nrow = len)
+      colnames(xreg) <- cols
       # Ignore nnetar for now since it isn't reproducible
       models <- "aefstz"
       hm <- hybridModel(testSeries, models = models,
@@ -153,8 +157,11 @@ if(require(forecast) & require(testthat)){
       expect_true("stlm" %in% class(hm$stlm))
       expect_true("forecast" %in% class(hm$snaive))
 
+      # Base forecasts should work
+      expect_error(forecast(hm$auto.arima, xreg = xreg), NA)
       # Test forecast
-      expect_error(forecast(hm, xreg = xreg), NA)
+      h <- nrow(xreg)
+      expect_error(forecast(hm, h = h, xreg = xreg), NA)
       modelComparison[[as.character(parallel)]] <- hm
     }
     # Compare the results from parallel = TRUE and parallel = FALSE
@@ -197,5 +204,19 @@ if(require(forecast) & require(testthat)){
     expect_true(all(weights$insample.errors != weights$cv.errors))
     expect_true(all(weights$insample.errors != weights$equal))
     expect_true(all(weights$equal != weights$cv.errors))
+  })
+
+  test_that("Testing the hybrid model with xreg", {
+    # Test with data from issue #86
+    trainSet <- beaver1[1:100, ]
+    testSet <- beaver1[-(1:100), ]
+    trainXreg <- as.matrix(data.frame(trainSet$activ, trainSet$time))
+    beaverhm <- hybridModel(ts(trainSet$temp, f = 6),
+                            models = "aenst",
+                            a.args = list(xreg = trainXreg),
+                            n.args = list(xreg = trainXreg),
+                            s.args = list(xreg = trainXreg, method = "arima"))
+    expect_true(all.equal(names(beaverhm$xreg), c("auto.arima", "nnetar", "stlm")))
+    expect_true(all(beaverhm$xreg == TRUE))
   })
 }
