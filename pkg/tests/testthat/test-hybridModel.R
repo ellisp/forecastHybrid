@@ -205,4 +205,18 @@ if(require(forecast) & require(testthat)){
     expect_true(all(weights$insample.errors != weights$equal))
     expect_true(all(weights$equal != weights$cv.errors))
   })
+
+  test_that("Testing the hybrid model with xreg", {
+    # Test with data from issue #86
+    trainSet <- beaver1[1:100, ]
+    testSet <- beaver1[-(1:100), ]
+    trainXreg <- as.matrix(data.frame(trainSet$activ, trainSet$time))
+    beaverhm <- hybridModel(ts(trainSet$temp, f = 6),
+                            models = "aenst",
+                            a.args = list(xreg = trainXreg),
+                            n.args = list(xreg = trainXreg),
+                            s.args = list(xreg = trainXreg, method = "arima"))
+    expect_true(all.equal(names(beaverhm$xreg), c("auto.arima", "nnetar", "stlm")))
+    expect_true(all(beaverhm$xreg == TRUE))
+  })
 }

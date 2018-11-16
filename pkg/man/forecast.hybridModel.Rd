@@ -15,7 +15,8 @@
 periods is set to the number of rows of \code{xreg}.}
 
 \item{xreg}{future values of regression variables (for use if one of the ensemble methods used
-in creating the hybrid forecast was \code{auto.arima}, \code{nnetar}, or \code{stlm} and the model(s) used \code{xreg} in the fit)}
+in creating the hybrid forecast was \code{auto.arima}, \code{nnetar}, or \code{stlm} and the model(s) used \code{xreg} in the fit).
+It should be supplied as a matrix.}
 
 \item{level}{confidence level for prediction intervals. This can be expressed as a decimal between 0.0 and 1.0 or numeric
 between 0 and 100.}

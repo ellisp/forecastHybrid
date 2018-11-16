@@ -1,5 +1,5 @@
 # Version 4.0.15 [Unreleased]
-* The `xreg` argument passed in must now be a matrix instead of a dataframe for consistency with "forecast" v8.5.
+* The `xreg` argument passed in should now be a matrix instead of a dataframe for consistency with "forecast" v8.5.
 
 # Version 3.0.14 [2018-07-22]
 * Parallel support added to `hybridModel()`. This can be controlled by setting `parallel = TRUE` and setting `num.cores`. By default this is not enabled since the performance improvement typically only occurs when fitting `auto.arima` and `tbats` models on long series with large frequency (e.g. `taylor`).

@@ -103,7 +103,6 @@ if(require(forecast) &  require(testthat)){
     expect_true(ncol(fc$lower) == 17)
     })
 
-
     test_that("More forecast xreg tests", {
     # forecast xreg with multiple meaningful xreg
     set.seed(5)
