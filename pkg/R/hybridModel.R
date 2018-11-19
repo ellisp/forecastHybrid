@@ -158,19 +158,20 @@ hybridModel <- function(y, models = "aefnst",
     # Parallel processing won't be used by default since the benefit only occurs on long series
     # with large frequency
     currentModel <- NULL
-    fitModels <- foreach::foreach(currentModel = expandedModels,
+    fitModels <- foreach::foreach(modelCode = expandedModels,
                                   .packages = c("forecast", "forecastHybrid")) %dopar% {
       # thetam() currently does not handle arguments
-      if(currentModel == "f"){
+      if(modelCode == "f"){
          fitModel <- thetam(y)
       } else{ # All other models handle lambda and additional arguments
-        argsAdditional <- modelArguments[[currentModel]]
+        argsAdditional <- modelArguments[[modelCode]]
         if(is.null(argsAdditional)){
           argsAdditional <- list(lambda = lambda)
         } else if(is.null(argsAdditional$lambda)){
           argsAdditional$lambda <- lambda
         }
-        fitModel <- do.call(getModel(currentModel), c(list(y), argsAdditional))
+        currentModel <- purrr::partial(getModel(modelCode), y = y)
+        fitModel <- do.call(currentModel, argsAdditional)
       }
       fitModel
     }
@@ -192,7 +193,8 @@ hybridModel <- function(y, models = "aefnst",
         } else if(is.null(argsAdditional$lambda)){
           argsAdditional$lambda <- lambda
         }
-        modelResults[[modelName]] <- do.call(getModel(modelCode), c(list(y = y), argsAdditional))
+        currentModel <- purrr::partial(getModel(modelCode), y = y)
+        modelResults[[modelName]] <- do.call(currentModel, argsAdditional)
       }
     }
   }

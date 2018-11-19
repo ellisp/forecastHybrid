@@ -19,6 +19,7 @@ Imports:
     doParallel (>= 1.0.10),
     foreach (>= 1.4.3),
     ggplot2 (>= 2.2.0),
+    purrr (>= 0.2.5),
     zoo (>= 1.7)
 Suggests:
     GMDH,

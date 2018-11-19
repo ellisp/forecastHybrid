@@ -1,5 +1,8 @@
 # Version 4.0.15 [Unreleased]
 * The `xreg` argument passed in should now be a matrix instead of a dataframe for consistency with "forecast" v8.5.
+* Fix messy function call in #27. This results in `hybridModel` objects that use far less memory and that print more cleanly to the console. For example, previously `hm <- hybridModel(wineind); format(object.size(hm), units = "auto")` produced a 5.8 Mb object but now it is only 314.8 Kb.
+* Adds "purrr" to imports.
+
 
 # Version 3.0.14 [2018-07-22]
 * Parallel support added to `hybridModel()`. This can be controlled by setting `parallel = TRUE` and setting `num.cores`. By default this is not enabled since the performance improvement typically only occurs when fitting `auto.arima` and `tbats` models on long series with large frequency (e.g. `taylor`).
