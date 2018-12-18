@@ -63,7 +63,7 @@
 #'
 #' @examples
 #' series <- subset(AirPassengers, end = 50)
-#' cvmod1 <- cvts(AirPassengers, FUN = stlm,
+#' cvmod1 <- cvts(series, FUN = snaive,
 #'                windowSize = 25, maxHorizon = 12)
 #' accuracy(cvmod1)
 #'
@@ -73,6 +73,11 @@
 #' cvmodCustom <- cvts(series, FUN = stlmClean, windowSize = 26, maxHorizon = 6)
 #' accuracy(cvmodCustom)
 #'
+#' # Use the rwf() function from the "forecast" package.
+#' # This function does not have a modeling function and
+#' # instead calculates a forecast on the time series directly
+#' series <- subset(AirPassengers, end = 26)
+#' rwcv <- cvts(series, FCFUN = rwf, windowSize = 24, maxHorizon = 1)
 #'
 #' \dontrun{
 #' cvmod2 <- cvts(USAccDeaths, FUN = ets,
@@ -83,12 +88,6 @@
 #'                FCFUN = forecast, rolling = TRUE, windowSize = 48,
 #'                maxHorizon = 12)
 #' }
-#'
-#' # Use the rwf() function from the "forecast" package.
-#' # This function does not have a modeling function and
-#' # instead calculates a forecast on the time series directly
-#' series <- subset(AirPassengers, end = 26)
-#' rwcv <- cvts(series, FCFUN = rwf, windowSize = 24, maxHorizon = 1)
 #'
 #' @author David Shaub
 #' @importFrom utils getAnywhere
