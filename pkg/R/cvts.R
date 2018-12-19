@@ -25,8 +25,8 @@
 #' @param num.cores the number of cores to use for parallel fitting. If the underlying model
 #' that is being fit also utilizes parallelization, the number of cores it is using multiplied
 #' by `num.cores` should not exceed the number of cores available on your machine.
-#' @param extraPackages if a custom `FUN` or `FCFUN` is being used that requires packages to be
-#' loaded, these can be passed here
+#' @param extraPackages on Windows if a custom `FUN` or `FCFUN` is being used that requires packages to be
+#' loaded, these can be passed here so that they can be passed to parallel socket workers
 #' @param ... Other arguments to be passed to the model function FUN
 #'
 #' @details Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
@@ -106,45 +106,21 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
                  verbose = TRUE, num.cores = 2L, extraPackages = NULL,
                  ...){
+
+
+  ##################################################################################################
+  # Parse and validate args
+  ##################################################################################################
+
+
   # Default model function
   # This can be useful for methods that estimate the model and forecasts in one step
   # e.g. GMDH() from the "GMDH" package or thetaf()/meanf()/rwf() from "forecast". In this case,
   # no model function is used but the forecast function is applied in FCFUN
-  if(is.null(FUN)){
-    FUN <- function(x){
-      return(x)
-    }
-  }
-
-  if(.Platform$OS.type == "unix"){
-    cl <- parallel::makeForkCluster(num.cores)
-  } else {
-    cl <- parallel::makeCluster(num.cores)
-  }
-  doParallel::registerDoParallel(cl)
-  on.exit(parallel::stopCluster(cl))
-
-  # Determine which packages will need to be sent to the parallel workers
-  excludePackages <- c("", "R_GlobalEnv")
-  includePackages <- "forecast"
-  funPackage <- environmentName(environment(FUN))
-  if(!is.element(funPackage, excludePackages)){
-    includePackages <- c(includePackages, funPackage)
-  }
+  FUN <- ifelse(is.null(FUN), function(x) x, FUN)
 
   # Default forecast function
-  if(is.null(FCFUN)){
-    FCFUN <- forecast
-  }
-  # Determine which packages will need to be sent to the parallel workers
-  fcfunPackage <- environmentName(environment(FCFUN))
-  if(!is.element(fcfunPackage, excludePackages)){
-    includePackages <- c(includePackages, fcfunPackage)
-  }
-  if(!is.null(extraPackages)){
-    includePackages <- c(includePackages, extraPackages)
-  }
-  includePackages <- unique(includePackages)
+  FCFUN <- ifelse(is.null(FCFUN), forecast, FCFUN)
 
   f = frequency(x)
   tspx <- tsp(x)
@@ -171,14 +147,48 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 
   # Check if fitting function accepts xreg when xreg is not NULL
   xregUse <- FALSE
-  if (!is.null(xreg)) {
+  if(!is.null(xreg)){
     fitArgs <- formals(FUN)
-    if (any(grepl("xreg", names(fitArgs)))) {
+    if(any(grepl("xreg", names(fitArgs)))){
       xregUse <- TRUE
       xreg <- as.matrix(xreg)
     } else
       warning("Ignoring xreg parameter since fitting function does not accept xreg")
   }
+
+
+  ##################################################################################################
+  # Setup parallel
+  ##################################################################################################
+
+
+  if(.Platform$OS.type == "unix"){
+    cl <- parallel::makeForkCluster(num.cores)
+    includePackages <- NULL
+  } else {
+    cl <- parallel::makeCluster(num.cores)
+    # Someone with more Windows experience might know a better way of doing all this
+    # Determine which packages will need to be sent to the parallel workers
+    excludePackages <- c("", "R_GlobalEnv")
+    includePackages <- "forecast"
+    funPackage <- environmentName(environment(FUN))
+    if(!is.element(funPackage, excludePackages)){
+      includePackages <- c(includePackages, funPackage)
+    }
+
+    # Determine which packages will need to be sent to the parallel workers
+    fcfunPackage <- environmentName(environment(FCFUN))
+    if(!is.element(fcfunPackage, excludePackages)){
+      includePackages <- c(includePackages, fcfunPackage)
+    }
+    if(!is.null(extraPackages)){
+      includePackages <- c(includePackages, extraPackages)
+    }
+    includePackages <- unique(includePackages)
+  }
+
+  doParallel::registerDoParallel(cl)
+  on.exit(parallel::stopCluster(cl))
 
   # Combined code for rolling/nonrolling CV
   nrow = ifelse(rolling, length(x) - windowSize - maxHorizon + 1,
@@ -187,6 +197,12 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 
   forecasts <- fits <- vector("list", nrow(resultsMat))
   slices <- tsPartition(x, rolling, windowSize, maxHorizon)
+
+
+  ##################################################################################################
+  # Run parallel CV
+  ##################################################################################################
+
 
   # Perform the cv fits
   # adapted from code from Rob Hyndman at http://robjhyndman.com/hyndsight/tscvexample/
