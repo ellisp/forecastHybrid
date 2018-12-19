@@ -150,8 +150,21 @@ if(require(forecast) & require(testthat)){
      expect_true(length(cvmod2) == 6)
 
      cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
-                    FCFUN = forecast, rolling = TRUE, windowSize = 48,
+                    FCFUN = function(mod, h) forecast(mod, h = h, PI=FALSE),
+                    rolling = FALSE, windowSize = 48,
                     maxHorizon = 12)
      expect_true(length(cvmod3) == 6)
    })
+   test_that("parity when 1 vs 2 cores used", {
+    series <- ts(rnorm(10), f = 2)
+    cv_serial <- cvts(series, FUN = stlm, windowSize = 6, maxHorizon = 2, num.cores = 1)
+    cv_parallel <- cvts(series, FUN = stlm, windowSize = 6, maxHorizon = 2, num.cores = 2)
+    expect_true(all(names(cv_serial) == names(cv_parallel)))
+    expect_true(is.null(cv_serial$xreg))
+    expect_true(is.null(cv_parallel$xreg))
+    expect_true(identical(cv_serial$x, cv_parallel$x))
+    expect_true(identical(cv_serial$residuals, cv_parallel$residuals))
+    expect_true(identical(cv_serial$forecasts, cv_parallel$forecasts))
+    expect_true(all.equal(length(cv_serial$models), length(cv_parallel$models), 3))
+    })
  }

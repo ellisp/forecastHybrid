@@ -84,8 +84,11 @@
 #'                saveModels = FALSE, saveForecasts = FALSE,
 #'                windowSize = 36, maxHorizon = 12)
 #'
+#' # If we don't need prediction intervals and are using the nnetar model, turning off PI
+#' # will make the forecasting much faster
 #' cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
-#'                FCFUN = forecast, rolling = TRUE, windowSize = 48,
+#'                FCFUN = function(mod, h) forecast(mod, h = h, PI=FALSE),
+#'                rolling = FALSE, windowSize = 48,
 #'                maxHorizon = 12)
 #' }
 #'
