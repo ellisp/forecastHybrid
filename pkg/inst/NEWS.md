@@ -1,4 +1,4 @@
-# Version 4.0.16 [unreleased]
+# Version 4.1.16 [2018-12-19]
 * Use forking instead of a socket cluster for parallel execution on UNIX-like systems for `cvts()`. This results in significantly faster execution and less memory usage, particularly when the `FUN` and `FCFUN` functions are very quick (e.g. `snaive()`, `rwf()`, `stlm()`), the time series is short, few cores are used, or few CV folds run.
 * Faster `cvts()` examples.
 * More tests for `cvts()`.
@@ -74,7 +74,7 @@ the number of cores used by each model multiplied by `num.cores` passed to
 * Fixed an error where e.args was passed to tbats instead of t.args
 
 # Version 0.2.0 [2016-09-23]
-* Add timeseries cross validation with `cvts()`
+* Add time series cross validation with `cvts()`
 * Add support for `weights = "cv.errors"` in `hybridModel()`
 * Fix model weights when `weights = "insample.errors"` and one or more component models perfectly fit the time series
 * Fixed erroneous warning message when `xreg` is included in `n.args` but a `nnetar` model is not included in the model list
