@@ -2,7 +2,7 @@
 % Please edit documentation in R/hybridModel.R
 \name{hybridModel}
 \alias{hybridModel}
-\title{Hybrid time series modelling}
+\title{Hybrid time series modeling}
 \usage{
 hybridModel(y, models = "aefnst", lambda = NULL, a.args = NULL,
   e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL,
@@ -58,7 +58,7 @@ all forecast horizons up to \code{cvHorizon} for calculating the errors instead 
 the single horizon given in \code{cvHorizon}.}
 
 \item{parallel}{a boolean indicating if parallel processing should be used between models.
-Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.}
+Parallelization will still occur within individual models that support it and can be controlled using \code{a.args} and \code{t.args}.}
 
 \item{num.cores}{If \code{parallel=TRUE}, how many cores to use.}
 
@@ -83,9 +83,9 @@ instead be passed in as a dataframe, but for consistency with "forecast" v8.5 we
 a matrix with colnames
 \cr
 \cr
-Characteristics of the input series can cause problems for certain types of models and paramesters.
+Characteristics of the input series can cause problems for certain types of models and parameters.
 For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal;
-furthemore, the data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)})
+furthermore, the data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)})
 for the decomposition to succeed.
 If this is not the case, \code{hybridModel()}
 will remove the \code{stlm} model so an error does not occur.

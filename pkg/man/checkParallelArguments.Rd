@@ -7,7 +7,7 @@
 checkParallelArguments(parallel, num.cores)
 }
 \arguments{
-\item{parallel}{A logic to indicate if paralle processing should be used}
+\item{parallel}{A logic to indicate if parallel processing should be used}
 
 \item{num.cores}{An integer for the number of threads to use}
 }

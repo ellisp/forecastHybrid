@@ -12,7 +12,7 @@ tsSubsetWithIndices(x, indices)
 \item{indices}{A contiguous vector of indices to use for subsetting}
 }
 \value{
-A time series object appropiately subsetted using provided indices
+A time series object appropriately subsetted using provided indices
 }
 \description{
 Use provided indices to subset a time series. The provided indices must be contiguous

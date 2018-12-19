@@ -1,7 +1,8 @@
 # Version 4.0.16 [unreleased]
-* use forking instead of a socket cluster for parallel execution on UNIX-like systems for `cvts()`. This results in significantly faster execution and less memory usage, particularly when the `FUN` and `FCFUN` functions are very quick (e.g. `snaive()`, `rwf()`, `stlm()`), the time series is short, few cores are used, or few CV folds run.
-* faster `cvts()` examples.
-* more tests for `cvts()`
+* Use forking instead of a socket cluster for parallel execution on UNIX-like systems for `cvts()`. This results in significantly faster execution and less memory usage, particularly when the `FUN` and `FCFUN` functions are very quick (e.g. `snaive()`, `rwf()`, `stlm()`), the time series is short, few cores are used, or few CV folds run.
+* Faster `cvts()` examples.
+* More tests for `cvts()`.
+* Fix spelling errors.
 
 # Version 4.0.15 [2018-12-17]
 * The `xreg` argument passed in should now be a matrix instead of a dataframe for consistency with "forecast" v8.5.

@@ -9,7 +9,7 @@
 #' @param FUN the model function used. Custom functions are allowed. See details and examples.
 #' @param FCFUN a function that process point forecasts for the model function. This defaults to \code{\link{forecast}}. Custom functions are allowed. See details and examples.
 #' See details.
-#' @param rolling should a rolling procedure be used? If TRUE, nonoverlapping windows of size \code{maxHorizon}
+#' @param rolling should a rolling procedure be used? If TRUE, non-overlapping windows of size \code{maxHorizon}
 #' will be used for fitting each model. If FALSE, the size of the dataset used for training will grow
 #' by one each iteration.
 #' @param windowSize length of the window to build each model. When \code{rolling == FALSE}, the each model will be
@@ -24,7 +24,7 @@
 #' @param verbose should the current progress be printed to the console?
 #' @param num.cores the number of cores to use for parallel fitting. If the underlying model
 #' that is being fit also utilizes parallelization, the number of cores it is using multiplied
-#' by `num.cores` should not exceed the number of cores avaialble on your machine.
+#' by `num.cores` should not exceed the number of cores available on your machine.
 #' @param extraPackages if a custom `FUN` or `FCFUN` is being used that requires packages to be
 #' loaded, these can be passed here
 #' @param ... Other arguments to be passed to the model function FUN
@@ -37,7 +37,7 @@
 #' after each iteration.
 #'
 #' For the rolling approach, training points are heavily recycled, both in terms of used for fitting
-#' and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}. In constrast, the models fit with
+#' and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}. In contrast, the models fit with
 #' the non-rolling approach share less overlap, and the predicted forecast values are also only compared to the actual values once.
 #' The former approach is similar to leave-one-out cross validation while the latter resembles k-fold cross validation. As a result,
 #' rolling cross validation requires far more iterations and computationally takes longer to complete, but a disadvantage of the

@@ -40,7 +40,7 @@ tsCombine <- function(...) {
 #' @export
 #' @param x A time series object
 #' @param indices A contiguous vector of indices to use for subsetting
-#' @return A time series object appropiately subsetted using provided indices
+#' @return A time series object appropriately subsetted using provided indices
 #' 
 #' @author Ganesh Krishnan 
 #' @examples 
@@ -110,7 +110,7 @@ unwrapParallelModels <- function(fitModels, expandedModels){
 
 #' Helper function to remove models that require more data
 #'
-#' @param y The input timeseries
+#' @param y The input time series
 #' @param models The model codes to test
 removeModels <- function(y, models){
   expandedModels <- models
@@ -163,7 +163,7 @@ removeModels <- function(y, models){
 
 #' Helper function to check the that the parallel arguments are valid
 #'
-#' @param parallel A logic to indicate if paralle processing should be used
+#' @param parallel A logic to indicate if parallel processing should be used
 #' @param num.cores An integer for the number of threads to use
 checkParallelArguments <- function(parallel, num.cores){
   # Validate cores and parallel arguments
@@ -178,9 +178,9 @@ checkParallelArguments <- function(parallel, num.cores){
   }
 }
 
-#' Helper function to validate and clean the input timeseries
+#' Helper function to validate and clean the input time series
 #'
-#' @param y The input timeseries
+#' @param y The input time series
 prepareTimeseries <- function(y){
   # The dependent variable must be numeric and not a matrix/dataframe
   forbiddenTypes <- c("data.frame", "data.table", "matrix")

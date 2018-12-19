@@ -2,13 +2,13 @@
 % Please edit documentation in R/helper.R
 \name{prepareTimeseries}
 \alias{prepareTimeseries}
-\title{Helper function to validate and clean the input timeseries}
+\title{Helper function to validate and clean the input time series}
 \usage{
 prepareTimeseries(y)
 }
 \arguments{
-\item{y}{The input timeseries}
+\item{y}{The input time series}
 }
 \description{
-Helper function to validate and clean the input timeseries
+Helper function to validate and clean the input time series
 }

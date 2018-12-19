@@ -1,4 +1,4 @@
-#' Hybrid time series modelling
+#' Hybrid time series modeling
 #'
 #' Create a hybrid time series model with two to five component models.
 #'
@@ -34,7 +34,7 @@
 #' and mean absolute scaled error (\code{MASE})
 #' are supported.
 #' @param parallel a boolean indicating if parallel processing should be used between models.
-#' Parallelization will still occur within individual models that suport it and can be controlled using \code{a.args} and \code{t.args}.
+#' Parallelization will still occur within individual models that support it and can be controlled using \code{a.args} and \code{t.args}.
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.
 #' @param cvHorizon If \code{weights = "cv.errors"}, this controls which forecast to horizon to use
 #' for the error calculations.
@@ -59,9 +59,9 @@
 #' a matrix with colnames
 #' \cr
 #' \cr
-#' Characteristics of the input series can cause problems for certain types of models and paramesters.
+#' Characteristics of the input series can cause problems for certain types of models and parameters.
 #' For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal;
-#' furthemore, the data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)})
+#' furthermore, the data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)})
 #' for the decomposition to succeed.
 #' If this is not the case, \code{hybridModel()}
 #' will remove the \code{stlm} model so an error does not occur.

@@ -8,7 +8,7 @@
 #' having first performed classic multiplicative seasonal adjustment.  A drift value is also calculated
 #' by \code{lsfit(0:(length(y) - 1), y)$coef[2] / 2}.  In combination with \code{forecast.thetam()}, this provides
 #' identical results to \code{forecast::thetaf(...)}.  The  purpose of splitting it into a `model` and 
-#' `forecast` functions is to make the approach consistent with other modelling / forecasting approaches
+#' `forecast` functions is to make the approach consistent with other modeling / forecasting approaches
 #' used in \code{hybridModel()}.
 #' @return An object of class \code{thetam}
 #' @author Peter Ellis

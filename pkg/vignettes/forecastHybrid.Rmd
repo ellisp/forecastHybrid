@@ -35,7 +35,7 @@ library(forecastHybrid)
 ```
 
 ## Quick start
-If you don't have time to read the whole guide and want to get started immediatly with sane default settings to forecast the ```USAccDeaths``` timeseries, run the following:
+If you don't have time to read the whole guide and want to get started immediately with sane default settings to forecast the ```USAccDeaths``` timeseries, run the following:
 ```{r quickstart, cache = TRUE}
 quickModel <- hybridModel(USAccDeaths)
 forecast(quickModel)
@@ -94,7 +94,7 @@ By default each component model is given equal weight in the final ensemble. Emp
 hm2 <- hybridModel(series, weights = "insample.errors", errorMethod = "MASE", models = "aenst")
 hm2 
 ```
-After the model is fit, these weights are stored in the ```weights``` attribute of the model. The user can view and manipulated these weights after the fit is complete. Note that the ```hybridModel()``` function automatically scales weights to sum to one, so a user should similar scale the weights to ensure the forecasts remain unbiased. Furthermore, the vector that replaces ```weights``` must retain names specifying the component model it corresponds to since weights are not assigned by position but rather by component name. Similarly, indiviudal components may also be replaced
+After the model is fit, these weights are stored in the ```weights``` attribute of the model. The user can view and manipulated these weights after the fit is complete. Note that the ```hybridModel()``` function automatically scales weights to sum to one, so a user should similar scale the weights to ensure the forecasts remain unbiased. Furthermore, the vector that replaces ```weights``` must retain names specifying the component model it corresponds to since weights are not assigned by position but rather by component name. Similarly, individual components may also be replaced
 ```{r viewWeights, cache = TRUE}
 hm2$weights 
 newWeights <- c(0.1, 0.2, 0.3, 0.1, 0.3)
@@ -143,7 +143,7 @@ hm3 <- hybridModel(y = series, models = "aefnst",
                    t.args = list(use.arma.errors = FALSE)) 
 ```
 
-Since the ```lambda``` argument is shared between most of the models in the "forecast" framework, it is included as a special paramemeter that can be used to set the Box-Cox transform in all models instead of settings this individually. For example,
+Since the ```lambda``` argument is shared between most of the models in the "forecast" framework, it is included as a special parameter that can be used to set the Box-Cox transform in all models instead of settings this individually. For example,
 
 ```{r lambda, cache = TRUE}
 hm4 <- hybridModel(y = wineind, models = "ae", lambda = 0.15)
@@ -163,11 +163,11 @@ hm5$stlm$lambda
 
 ```
 
-Note that lambda has no impact on ```thetam``` models, and that there is no ```f.args``` argument to provide parguments to ```thetam```.  Following ```forecast::thetaf``` on which ```thetam``` is based, there are no such arguments; it always runs with the defaults.
+Note that lambda has no impact on ```thetam``` models, and that there is no ```f.args``` argument to provide parameters to ```thetam```.  Following ```forecast::thetaf``` on which ```thetam``` is based, there are no such arguments; it always runs with the defaults.
 
 Covariates can also be supplied to ```auto.arima``` and ```nnetar``` models as is done in the "forecast" package. To do this, utilize the ```a.args``` and ```n.args``` lists. Note that the ```xreg``` may also be passed to a ```stlm``` model, but only when ```method = "arima"``` instead of the default ```method = "ets"```. Unlike the usage in the "forecast" package, the ```xreg``` argument should be passed as a matrix, not a dataframe. The ```stlm``` models require that the input series will be seasonal, so in the example below we will convert the input data to a ```ts``` object. If a ```xreg``` is used in training, it must also be supplied to the ```forecast()``` function in the ```xreg``` argument. Note that if the number of rows in the ```xreg``` to be used for the forecast does not match the supplied ```h``` forecast horizon, the function will overwrite ```h``` with the number of rows in ```xreg``` and issue a warning.
 ```{r xreg, cache = TRUE}
-# Use the beaver1 dataset with the variable "activ" as a covariate and "temp" as the timeseries
+# Use the beaver1 dataset with the variable "activ" as a covariate and "temp" as the time series
 # Divice this into a train and test set
 trainSet <- beaver1[1:100, ] 
 testSet <- beaver1[-(1:100), ]
@@ -190,14 +190,14 @@ accuracy(beaverfc, testSet$temp)
 ## Cross Validation
 It can be useful to perform cross validation on a forecasting model to estimate a model's out-of-sample forecasting performance. The `cvts()` function allows us to do this on arbitrary functions. We could do this as part of a model selection procedure to determine which models to include in our call to `hybridModel()` or merely to understand how well we expect to forecast the series during unobserved windows.
 
-For example, let's perform cross validation for a `stlm()` model and a `naive()` model on the `woolyrnq` timeseries. The most important `cvts()` arguments that commonly need adjusting are `rolling` (if `TRUE`, the model will always be fit on a fixed `windowSize` instead of growing by one new observation for each new model fit during cross validation), `windowSize` (starting length of time series to fit a model), and `maxHorizon` (the forecast horizon for predictions from each model). Since a naive forecast is a good baseline that any decent model should surpass, let's see how the `stlm()` model compares.
+For example, let's perform cross validation for a `stlm()` model and a `naive()` model on the `woolyrnq` time series. The most important `cvts()` arguments that commonly need adjusting are `rolling` (if `TRUE`, the model will always be fit on a fixed `windowSize` instead of growing by one new observation for each new model fit during cross validation), `windowSize` (starting length of time series to fit a model), and `maxHorizon` (the forecast horizon for predictions from each model). Since a naive forecast is a good baseline that any decent model should surpass, let's see how the `stlm()` model compares.
 ```{r, cvts_comparison, cache=TRUE}
 stlmMod <- cvts(woolyrnq, FUN = stlm, windowSize = 100, maxHorizon = 8)
 naiveMod <- cvts(woolyrnq, FUN = naive, windowSize = 100, maxHorizon = 8)
 accuracy(stlmMod)
 accuracy(naiveMod)
 ```
-We see from looking at the accuracy measure--in particular the smaller RMSE and MAE--the `stlm()` model unsurprisingly performs better and will likely give us better future forecasts. We also notice that the apparent edge over the naive forecast tends to diminish or even disappear for longer forecast horizons, and a look at the original timeseries makes this result obvious: this timeseries lacks an obvious trend and is a relatively difficult timeseries to forecast past a fewer seasonal periods, so the naive model will not perform relatively poorly.
+We see from looking at the accuracy measure--in particular the smaller RMSE and MAE--the `stlm()` model unsurprisingly performs better and will likely give us better future forecasts. We also notice that the apparent edge over the naive forecast tends to diminish or even disappear for longer forecast horizons, and a look at the original time series makes this result obvious: this time series lacks an obvious trend and is a relatively difficult time series to forecast past a fewer seasonal periods, so the naive model will not perform relatively poorly.
 ```{r, woolyrnq_plot}
 plot(woolyrnq)
 ```
@@ -242,7 +242,7 @@ series <- subset(AirPassengers, end = 94)
 cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)
 
 ## Cross Validation Weights
-Previously we explored fitting `hybridModel()` objects with `weights = "equal"` or `weights = "insample.errors`, but we can now leverage the process conducted in `cvts()` to select the appropriate weights inteligently based on the expected out-of-sample forecast accuracy of each component model. While this is the methodologically-sound weight procedure, it also comes at significant computational cost since the cross validation procedure necessitates fitting each model several times for each cross validation fold in addition to the final fit on the whole dataset. Fortunately this process can be conducted in parallel if multiple cores are available. Some of the arguments explained above in `cvts()` such as `windowSize` and the `cvHorizon` can also be controlled here.
+Previously we explored fitting `hybridModel()` objects with `weights = "equal"` or `weights = "insample.errors`, but we can now leverage the process conducted in `cvts()` to select the appropriate weights intelligently based on the expected out-of-sample forecast accuracy of each component model. While this is the methodologically-sound weight procedure, it also comes at significant computational cost since the cross validation procedure necessitates fitting each model several times for each cross validation fold in addition to the final fit on the whole dataset. Fortunately this process can be conducted in parallel if multiple cores are available. Some of the arguments explained above in `cvts()` such as `windowSize` and the `cvHorizon` can also be controlled here.
 ```
 cvMod <- hybridModel(woolyrnq, models = "ns", weights = "cv.errors", windowSize = 100, cvHorizon = 8, num.cores = 4)
 cvMod

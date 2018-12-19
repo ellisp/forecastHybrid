@@ -18,7 +18,7 @@ cvts(x, FUN = NULL, FCFUN = NULL, rolling = FALSE, windowSize = 84,
 \item{FCFUN}{a function that process point forecasts for the model function. This defaults to \code{\link{forecast}}. Custom functions are allowed. See details and examples.
 See details.}
 
-\item{rolling}{should a rolling procedure be used? If TRUE, nonoverlapping windows of size \code{maxHorizon}
+\item{rolling}{should a rolling procedure be used? If TRUE, non-overlapping windows of size \code{maxHorizon}
 will be used for fitting each model. If FALSE, the size of the dataset used for training will grow
 by one each iteration.}
 
@@ -41,7 +41,7 @@ metrics for each individual horizon?}
 
 \item{num.cores}{the number of cores to use for parallel fitting. If the underlying model
 that is being fit also utilizes parallelization, the number of cores it is using multiplied
-by `num.cores` should not exceed the number of cores avaialble on your machine.}
+by `num.cores` should not exceed the number of cores available on your machine.}
 
 \item{extraPackages}{if a custom `FUN` or `FCFUN` is being used that requires packages to be
 loaded, these can be passed here}
@@ -60,7 +60,7 @@ entire series or 2) a non-rolling approach where a fixed training length is used
 after each iteration.
 
 For the rolling approach, training points are heavily recycled, both in terms of used for fitting
-and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}. In constrast, the models fit with
+and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}. In contrast, the models fit with
 the non-rolling approach share less overlap, and the predicted forecast values are also only compared to the actual values once.
 The former approach is similar to leave-one-out cross validation while the latter resembles k-fold cross validation. As a result,
 rolling cross validation requires far more iterations and computationally takes longer to complete, but a disadvantage of the
@@ -106,8 +106,11 @@ cvmod2 <- cvts(USAccDeaths, FUN = ets,
                saveModels = FALSE, saveForecasts = FALSE,
                windowSize = 36, maxHorizon = 12)
 
+# If we don't need prediction intervals and are using the nnetar model, turning off PI
+# will make the forecasting much faster
 cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
-               FCFUN = forecast, rolling = TRUE, windowSize = 48,
+               FCFUN = function(mod, h) forecast(mod, h = h, PI=FALSE),
+               rolling = FALSE, windowSize = 48,
                maxHorizon = 12)
 }
 

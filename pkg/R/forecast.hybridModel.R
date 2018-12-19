@@ -22,7 +22,7 @@
 #' and the lowest prediction interval from all of the component models').
 #' @param ... other arguments passed to the individual \code{forecast} generic methods.
 #' @seealso \code{\link{hybridModel}}
-#' @details if \code{xreg} was used in construcing the \code{hybridModel},
+#' @details if \code{xreg} was used in constructing the \code{hybridModel},
 #' it must also be passed into \code{forecast.hybridModel}.
 #' \cr
 #' \cr

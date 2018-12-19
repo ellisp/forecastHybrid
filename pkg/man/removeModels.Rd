@@ -7,7 +7,7 @@
 removeModels(y, models)
 }
 \arguments{
-\item{y}{The input timeseries}
+\item{y}{The input time series}
 
 \item{models}{The model codes to test}
 }
