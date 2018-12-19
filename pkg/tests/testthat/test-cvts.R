@@ -143,4 +143,15 @@ if(require(forecast) & require(testthat)){
      series <- ts(rnorm(6), f = 2)
      expect_error(cvts(series, FCFUN = FCFUN, windowSize = 4, maxHorizon = 1), NA)
    })
+   test_that("examples from docs", {
+     cvmod2 <- cvts(USAccDeaths, FUN = ets,
+                    saveModels = FALSE, saveForecasts = FALSE,
+                    windowSize = 36, maxHorizon = 12)
+     expect_true(length(cvmod2) == 6)
+
+     cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
+                    FCFUN = forecast, rolling = TRUE, windowSize = 48,
+                    maxHorizon = 12)
+     expect_true(length(cvmod3) == 6)
+   })
  }

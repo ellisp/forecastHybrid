@@ -112,6 +112,15 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
       return(x)
     }
   }
+
+  if(.Platform$OS.type == "unix"){
+    cl <- parallel::makeForkCluster(num.cores)
+  } else {
+    cl <- parallel::makeCluster(num.cores)
+  }
+  doParallel::registerDoParallel(cl)
+  on.exit(parallel::stopCluster(cl))
+
   # Determine which packages will need to be sent to the parallel workers
   excludePackages <- c("", "R_GlobalEnv")
   includePackages <- "forecast"
@@ -180,15 +189,12 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   # adapted from code from Rob Hyndman at http://robjhyndman.com/hyndsight/tscvexample/
   # licensend under >= GPL2 from the author
 
-  cl <- parallel::makeCluster(num.cores)
-  doParallel::registerDoParallel(cl)
-  on.exit(parallel::stopCluster(cl))
   # Appease R CMD CHECK with sliceNum declaration
   sliceNum <- NULL
   results <- foreach::foreach(sliceNum = seq_along(slices),
                               .packages = includePackages) %dopar% {
     if(verbose){
-      cat("Fitting fold", sliceNum, "of", nrow(resultsMat), "\n")
+      message("Fitting fold", sliceNum, "of", nrow(resultsMat), "\n")
     }
     results <- list()
 
@@ -252,11 +258,11 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  extra = list(...))
 
   result <- list(x = x,
-               xreg = xreg,
-               params = params,
-               forecasts = forecasts, 
-               models = fits, 
-               residuals = resids)
+                 xreg = xreg,
+                 params = params,
+                 forecasts = forecasts, 
+                 models = fits, 
+                 residuals = resids)
 
   class(result) <- "cvts"
   return(result)
