@@ -152,7 +152,11 @@ hybridModel <- function(y, models = "aefnst",
 
   # Parallel execuation
   if(parallel){
-    cl <- parallel::makeCluster(num.cores)
+    if(.Platform$OS.type == "unix"){
+      cl <- parallel::makeForkCluster(num.cores)
+    } else{
+      cl <- parallel::makeCluster(num.cores)
+    }
     doParallel::registerDoParallel(cl)
     on.exit(parallel::stopCluster(cl))
     # Parallel processing won't be used by default since the benefit only occurs on long series

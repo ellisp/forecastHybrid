@@ -227,14 +227,14 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
       xregTrain <- xreg[trainIndices, ,drop = FALSE]
       xregTest <- xreg[testIndices, ,drop = FALSE]
       mod <- do.call(FUN, list(tsTrain, xreg = xregTrain, ...))
-      fc <- do.call(FCFUN, list(mod, xreg = xregTest, h = maxHorizon))
+      fc <- FCFUN(mod, xreg = xregTest, h = maxHorizon)
     }else{
       mod <- do.call(FUN, list(tsTrain, ...))
-      fc <- do.call(FCFUN, list(mod, h = maxHorizon))
+      fc <- FCFUN(mod, h = maxHorizon)
     }
 
     if(saveModels){
-      results$fits <- mod
+      results$mods <- mod
     }
 
     if(saveForecasts){
@@ -249,19 +249,18 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
   residlist <- lapply(results, function(x) unlist(x$resids))
   resids <- matrix(unlist(residlist, use.names = FALSE),
                    ncol = maxHorizon, byrow = TRUE)
-  forecasts <- lapply(results, function(x) x$forecasts)
-  fits <- lapply(results, function(x) x$fits)
+  forecasts <- NULL
+  if(saveForecasts){
+    forecasts <- lapply(results, function(x) x$forecasts)
+  }
+  mods <- NULL
+  if(saveModels){
+    mods <- lapply(results, function(x) x$mods)
+  }
 
   # Average the results from all forecast horizons up to maxHorizon
   if(horizonAverage){
     resids <- as.matrix(rowMeans(resids), ncol = 1)
-  }
-
-  if(!saveModels){
-    fits <- NULL
-  }
-  if(!saveForecasts){
-    forecasts <- NULL
   }
 
   params <- list(FUN = FUN,
@@ -280,7 +279,7 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
                  xreg = xreg,
                  params = params,
                  forecasts = forecasts, 
-                 models = fits, 
+                 models = mods,
                  residuals = resids)
 
   class(result) <- "cvts"
@@ -307,7 +306,9 @@ cvts <- function(x, FUN = NULL, FCFUN = NULL,
 #'
 
 tsPartition <- function(x, rolling, windowSize, maxHorizon) {
-  numPartitions <- ifelse(rolling, length(x) - windowSize - maxHorizon + 1, as.integer((length(x) - windowSize) / maxHorizon))
+  numPartitions <- ifelse(rolling,
+                          length(x) - windowSize - maxHorizon + 1,
+                          as.integer((length(x) - windowSize) / maxHorizon))
 
   slices <- rep(list(NA), numPartitions)
   start <- 1
@@ -321,7 +322,8 @@ tsPartition <- function(x, rolling, windowSize, maxHorizon) {
         ## Sample the correct slice for nonrolling
         else{
             trainIndices <- seq(start, start + windowSize - 1 + maxHorizon * (i - 1), 1)
-            testIndices <- seq(start + windowSize + maxHorizon * (i - 1), start + windowSize - 1 + maxHorizon * i)
+            testIndices <- seq(start + windowSize + maxHorizon * (i - 1),
+                               start + windowSize - 1 + maxHorizon * i)
         }
 
         slices[[i]] <- list(trainIndices = trainIndices, testIndices = testIndices)
