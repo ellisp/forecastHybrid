@@ -4,18 +4,31 @@
 \alias{thiefModel}
 \title{Forecast ensemble using THieF}
 \usage{
-thiefModel(y, models = "aefnt", h = 2 * frequency(x), verbose = TRUE)
+thiefModel(y, models = "aefnt", h = 2 * frequency(y),
+  verbose = FALSE)
+}
+\arguments{
+\item{y}{the input time series}
+
+\item{models}{the models to use. These are specified the same way as \code{\link{hybridModel}}}
+
+\item{h}{the forecast horizon}
+
+\item{verbose}{if \code{TRUE}, report the fitting status}
 }
 \description{
 Create a forecast ensemble using the theif() model
 }
 \details{
 Use the "thief" package method for reconciling forecasts across the temporal hierarchy.
-The base models to be included in the ensemble are the same as those in \text{hybridModel}, but
+The base models to be included in the ensemble are the same as those in \code{hybridModel}, but
 the \code{stlm} model cannot be included since it requires seasonal data.
 }
+\examples{
+thiefModel(USAccDeaths, models = "ef")
+}
 \seealso{
-\code{\link{[thief]thief}}
+\code{\link{[thief]{thief}}}
 
 \code{\link{hybridModel}}
 }

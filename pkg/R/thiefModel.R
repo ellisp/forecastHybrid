@@ -2,6 +2,7 @@
 #'
 #' Create a forecast ensemble using the theif() model
 #'
+#' @export
 #' @param y the input time series
 #' @param models the models to use. These are specified the same way as \code{\link{hybridModel}}
 #' @param h the forecast horizon
@@ -16,16 +17,33 @@
 #' @seealso \code{\link{[thief]{thief}}}
 #' @seealso \code{\link{hybridModel}}
 #'
-thiefModel <- function(y, models = "aefnt", h = 2 * frequency(x), verbose = FALSE){
+thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y), verbose = FALSE){
+
+  ##############################################################################
+  # Validate input
+  ##############################################################################
+  # Validate and clean the input timeseries
+  y <- prepareTimeseries(y = y)
+  # Match the specified models
+  models <- sort(unique(tolower(unlist(strsplit(models, split = "")))))
+  # Check models and data length to ensure enough data: remove models that require more data
+  models <- removeModels(y = y, models = models)
+
+
+  ##############################################################################
+  # Fit models
+  ##############################################################################
+
+
   forecasts <- list()
-  models <- unlist(strsplit(models, ""))
   fc_tsp <- NULL
   for(modelChar in models){
+    modelName <- getModelName(modelChar)
     if(verbose){
       message("Fitting the ", modelName <- getModelName(modelChar), " model")
     }
     FUN <- getModel(modelChar)
-    FCFUN <- function(y, h) forecast(FUN(y = y), h = h)
+    FCFUN <- function(x, h1) forecast(FUN(x), h = h1)
     fc <- thief(y, h = h, forecastfunction = FCFUN)
     fit <- fitted(fc)
     forecasts[[modelName]] <- fc
