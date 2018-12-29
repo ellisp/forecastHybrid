@@ -4,6 +4,7 @@
 #'
 #' @export
 #' @import forecast
+#' @import thief
 #' @import stats
 #' @import graphics
 #' @import zoo

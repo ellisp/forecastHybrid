@@ -15,6 +15,7 @@ Description: Convenient functions for ensemble forecasts in R combining
 Depends:
     R (>= 3.1.1),
     forecast (>= 8.1),
+    thief
 Imports:
     doParallel (>= 1.0.10),
     foreach (>= 1.4.3),
