@@ -28,7 +28,7 @@ the \code{stlm} model cannot be included since it requires seasonal data.
 thiefModel(USAccDeaths, models = "ef")
 }
 \seealso{
-\code{\link{[thief]{thief}}}
+\code{\link[thief]{thief}}
 
 \code{\link{hybridModel}}
 }

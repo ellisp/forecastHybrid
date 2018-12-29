@@ -14,7 +14,7 @@
 #' @examples
 #' thiefModel(USAccDeaths, models = "ef")
 #' @author David Shaub
-#' @seealso \code{\link{[thief]{thief}}}
+#' @seealso \code{\link[thief]{thief}}
 #' @seealso \code{\link{hybridModel}}
 #'
 thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y), verbose = FALSE){
