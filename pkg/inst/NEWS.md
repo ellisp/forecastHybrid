@@ -1,3 +1,7 @@
+# Version 4.2.17 [unreleased]
+* Ensembles with the `thief()` function can now be created with the new `thiefModel() function. The API is similar to that of `hybridModel()`.
+* Import "thief" package
+
 # Version 4.1.16 [2018-12-19]
 * Use forking instead of a socket cluster for parallel execution on UNIX-like systems for `cvts()`. This results in significantly faster execution and less memory usage, particularly when the `FUN` and `FCFUN` functions are very quick (e.g. `snaive()`, `rwf()`, `stlm()`), the time series is short, few cores are used, or few CV folds run.
 * Faster `cvts()` examples.
