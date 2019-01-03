@@ -191,8 +191,8 @@ prepareTimeseries <- function(y){
     stop("The time series must have observations")
   }
 
-  if(length(y) < 4){
-    stop("The time series must have at least four observations")
+  if(length(y) < 1){
+    stop("The time series must have an observations")
   }
   y <- as.ts(y)
 

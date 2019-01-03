@@ -5,7 +5,7 @@ if(require(forecast) &  require(testthat)){
     inputSeries <- ts(rnorm(24), f = 2)
     hModel <- hybridModel(inputSeries)
     # time series too short
-    expect_error(hybridModel(1:3, models = "ae"))
+    expect_error(hybridModel(numeric(), models = "ae"))
     # h must be positive
     expect_error(forecast(object = hModel, h = -1L))
     # h must be numeric
