@@ -85,7 +85,7 @@ hm_acc <- unlist(pblapply(M1_nonyearly,
 hm_small <- unlist(pblapply(M1_nonyearly,
                             FUN = function(x) compfc(x, function(x1, h1) forecast(hybridModel(x1, "aft", verbose = FALSE), PI = FALSE)), cl = numCores))
 
-m1_nonyearly_df <- data.frame(arima_acc, ets_acc, theta_acc, nnetar_acc, tbats_acc, snaive_acc, hm_acc)
+m1_nonyearly_df <- data.frame(arima_acc, ets_acc, theta_acc, nnetar_acc, tbats_acc, snaive_acc, hm_acc, hm_small)
 save(m1_nonyearly_df, file = "m1_nonyearly_df.RData")
 
 # 
