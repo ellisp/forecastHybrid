@@ -108,4 +108,4 @@ hm_thief <- unlist(pblapply(M1_nonyearly,
                             FUN = function(x) compfc_simple(x, function(x1, h1) thiefModel(x1, "aef")), cl = numCores))
 
 thief_df <- data.frame(thief_arima, thief_ets, thief_theta, thief_snaive, thief_hm, hm_thief)
-save(thief_df, file = "theif_df.RData")
+save(thief_df, file = "thief_df.RData")
