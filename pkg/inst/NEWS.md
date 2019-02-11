@@ -1,5 +1,5 @@
-# Version 4.2.17 [unreleased]
-* Ensembles with the `thief()` function can now be created with the new `thiefModel() function. The API is similar to that of `hybridModel()`.
+# Version 4.2.17 [2019-02-11]
+* Experimental ensembles with the `thief()` function can now be created with the new `thiefModel()` function. The API is similar to that of `hybridModel()`.
 * Import "thief" package
 
 # Version 4.1.16 [2018-12-19]
