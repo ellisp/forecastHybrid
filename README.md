@@ -208,7 +208,23 @@ fc$lower
 # Produce a forecast with prediction intervals at the 70%, 80%, 90%, and 95% levels
 fc2 <- forecast(hm2, h = 48, level = c(70, 80, 90, 95))
 ```
+## Citation
+To cite package ‘forecastHybrid’ in publications use:
 
+  David Shaub and Peter Ellis (2019). forecastHybrid: Convenient
+  Functions for Ensemble Time Series Forecasts. R package version
+  4.2.17. https://CRAN.R-project.org/package=forecastHybrid
+
+A BibTeX entry for LaTeX users is
+```
+  @Manual{,
+    title = {forecastHybrid: Convenient Functions for Ensemble Time Series Forecasts},
+    author = {David Shaub and Peter Ellis},
+    year = {2019},
+    note = {R package version 4.2.17},
+    url = {https://CRAN.R-project.org/package=forecastHybrid},
+  }
+```
 ## License
 (c) 2016-2018 David Shaub and Peter Ellis.
 
