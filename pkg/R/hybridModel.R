@@ -39,6 +39,8 @@
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.
 #' @param cvHorizon If \code{weights = "cv.errors"}, this controls which forecast to horizon to use
 #' for the error calculations.
+#' @param rolling If \code{weights = "cv.errors"}, this controls the use of rolling cross validation
+#' in \code{cvts()}
 #' @param windowSize length of the window to build each model, only used when \code{weights = "cv.errors"}.
 #' @param horizonAverage If \code{weights = "cv.errors"}, setting this to \code{TRUE} will average
 #' all forecast horizons up to \code{cvHorizon} for calculating the errors instead of using
@@ -106,6 +108,7 @@ hybridModel <- function(y, models = "aefnst",
                         z.args = NULL,
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("RMSE", "MAE", "MASE"),
+                        rolling = FALSE,
                         cvHorizon = frequency(y),
                         windowSize = 84,
                         horizonAverage = FALSE,
@@ -227,6 +230,7 @@ hybridModel <- function(y, models = "aefnst",
         modResults[[modelName]] <- cvts(y, FUN = currentModel,
                                         maxHorizon = cvHorizon,
                                         horizonAverage = horizonAverage,
+                                        rolling = rolling,
                                         verbose = FALSE,
                                         windowSize = windowSize,
                                         num.cores = num.cores)

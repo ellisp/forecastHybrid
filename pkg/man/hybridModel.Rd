@@ -7,9 +7,9 @@
 hybridModel(y, models = "aefnst", lambda = NULL, a.args = NULL,
   e.args = NULL, n.args = NULL, s.args = NULL, t.args = NULL,
   z.args = NULL, weights = c("equal", "insample.errors", "cv.errors"),
-  errorMethod = c("RMSE", "MAE", "MASE"), cvHorizon = frequency(y),
-  windowSize = 84, horizonAverage = FALSE, parallel = FALSE,
-  num.cores = 2L, verbose = TRUE)
+  errorMethod = c("RMSE", "MAE", "MASE"), rolling = FALSE,
+  cvHorizon = frequency(y), windowSize = 84, horizonAverage = FALSE,
+  parallel = FALSE, num.cores = 2L, verbose = TRUE)
 }
 \arguments{
 \item{y}{A numeric vector or time series.}
@@ -47,6 +47,9 @@ to be equal.
 Root mean square error (\code{RMSE}), mean absolute error (\code{MAE})
 and mean absolute scaled error (\code{MASE})
 are supported.}
+
+\item{rolling}{If \code{weights = "cv.errors"}, this controls the use of rolling cross validation
+in \code{cvts()}}
 
 \item{cvHorizon}{If \code{weights = "cv.errors"}, this controls which forecast to horizon to use
 for the error calculations.}

@@ -1,6 +1,9 @@
+# Version 4.2.18 [2019-09-29]
+* Add the `rolling` argument to `hybridModel()` that can be used when `` to control the `rolling` argument in `cvts()`.
+
 # Version 4.2.17 [2019-02-11]
 * Experimental ensembles with the `thief()` function can now be created with the new `thiefModel()` function. The API is similar to that of `hybridModel()`.
-* Import "thief" package
+* Import "thief" package.
 
 # Version 4.1.16 [2018-12-19]
 * Use forking instead of a socket cluster for parallel execution on UNIX-like systems for `cvts()`. This results in significantly faster execution and less memory usage, particularly when the `FUN` and `FCFUN` functions are very quick (e.g. `snaive()`, `rwf()`, `stlm()`), the time series is short, few cores are used, or few CV folds run.
@@ -42,9 +45,9 @@
 * Refactored many unit tests and the vignette for quicker examples.
 
 # Version 1.1.9 [2017-08-23]
-* Fixed a bug in `forecast.hybridModel()` when for models where `xreg` was not supplied to all of arima/nnetar models
-* Fixes in unit tests and better documentation of unit tests
-* `ts` objects created with the "timekt" package can now be used in `hybridModel()`
+* Fixed a bug in `forecast.hybridModel()` when for models where `xreg` was not supplied to all of arima/nnetar models.
+* Fixes in unit tests and better documentation of unit tests.
+* `ts` objects created with the "timekt" package can now be used in `hybridModel()`.
 * The `doParallel` and `forecast` packages are now imported instead of loading their entire namespaces.
 
 # Version 1.0.8 [2017-07-10]
