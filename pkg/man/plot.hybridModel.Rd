@@ -4,8 +4,7 @@
 \alias{plot.hybridModel}
 \title{Plot a hybridModel object}
 \usage{
-\method{plot}{hybridModel}(x, type = c("fit", "models"),
-  ggplot = FALSE, ...)
+\method{plot}{hybridModel}(x, type = c("fit", "models"), ggplot = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class hybridModel to plot.}

@@ -69,9 +69,10 @@ residuals.hybridModel <- function(object,
 #'
 #' Return the in-sample accuracy measures for the component models of the hybridModel
 #'
-#' @param f the input hybridModel.
+#' @param object the input hybridModel.
 #' @param individual if \code{TRUE}, return the accuracy of the component models instead
 #' of the accuracy for the whole ensemble model.
+#' @param f Deprecated. Please use `object` instead.
 #' @param ... other arguments (ignored).
 #' @seealso \code{\link[forecast]{accuracy}}
 #' @return The accuracy of the ensemble or individual component models.
@@ -79,18 +80,23 @@ residuals.hybridModel <- function(object,
 #'
 #' @author David Shaub
 #'
-accuracy.hybridModel <- function(f,
+accuracy.hybridModel <- function(object,
                                  individual = FALSE,
-                                 ...){
+                                 ...,
+                                 f = NULL){
+  if(!is.null(f)){
+    warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.")
+    object <- f
+  }
   #chkDots(...)
   if(individual){
     results <- list()
-    for(model in f$models){
-      results[[model]] <- forecast::accuracy(f[[model]])
+    for(model in object$models){
+      results[[model]] <- forecast::accuracy(object[[model]])
     }
     return(results)
   }
-  return(forecast::accuracy(f$fitted, getResponse(f)))
+  return(forecast::accuracy(object$fitted, getResponse(object)))
 }
 
 #' Accuracy measures for cross-validated time series
@@ -98,7 +104,8 @@ accuracy.hybridModel <- function(f,
 #' Returns range of summary measures of the cross-validated forecast accuracy
 #' for \code{cvts} objects.
 #'
-#' @param f a \code{cvts} objected created by \code{\link{cvts}}.
+#' @param object a \code{cvts} objected created by \code{\link{cvts}}.
+#' @param f Deprecated. Please use `object` instead.
 #' @param ... other arguments (ignored).
 #'
 #' @details
@@ -108,11 +115,15 @@ accuracy.hybridModel <- function(f,
 #' @export
 #' @author David Shaub
 #' 
-accuracy.cvts <- function(f, ...){
-  ME <- colMeans(f$residuals)
-  RMSE <- apply(f$residuals, MARGIN = 2,
+accuracy.cvts <- function(object, ..., f = NULL){
+  if(!is.null(f)){
+    warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.")
+    object <- f
+  }
+  ME <- colMeans(object$residuals)
+  RMSE <- apply(object$residuals, MARGIN = 2,
                 FUN = function(x){sqrt(sum(x ^ 2)/ length(x))})
-  MAE <- colMeans(abs(f$residuals))
+  MAE <- colMeans(abs(object$residuals))
   results <- data.frame(ME, RMSE, MAE)
   rownames(results) <- paste("Forecast Horizon ", rownames(results))
   # MASE TODO

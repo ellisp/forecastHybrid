@@ -4,8 +4,7 @@
 \alias{thiefModel}
 \title{Forecast ensemble using THieF}
 \usage{
-thiefModel(y, models = "aefnt", h = 2 * frequency(y),
-  verbose = FALSE)
+thiefModel(y, models = "aefnt", h = 2 * frequency(y), verbose = FALSE)
 }
 \arguments{
 \item{y}{the input time series}

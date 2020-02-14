@@ -4,12 +4,14 @@
 \alias{accuracy.cvts}
 \title{Accuracy measures for cross-validated time series}
 \usage{
-\method{accuracy}{cvts}(f, ...)
+\method{accuracy}{cvts}(object, ..., f = NULL)
 }
 \arguments{
-\item{f}{a \code{cvts} objected created by \code{\link{cvts}}.}
+\item{object}{a \code{cvts} objected created by \code{\link{cvts}}.}
 
 \item{...}{other arguments (ignored).}
+
+\item{f}{Deprecated. Please use `object` instead.}
 }
 \description{
 Returns range of summary measures of the cross-validated forecast accuracy

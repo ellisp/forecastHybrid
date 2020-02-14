@@ -4,15 +4,17 @@
 \alias{accuracy.hybridModel}
 \title{Accuracy measures for hybridModel objects}
 \usage{
-\method{accuracy}{hybridModel}(f, individual = FALSE, ...)
+\method{accuracy}{hybridModel}(object, individual = FALSE, ..., f = NULL)
 }
 \arguments{
-\item{f}{the input hybridModel.}
+\item{object}{the input hybridModel.}
 
 \item{individual}{if \code{TRUE}, return the accuracy of the component models instead
 of the accuracy for the whole ensemble model.}
 
 \item{...}{other arguments (ignored).}
+
+\item{f}{Deprecated. Please use `object` instead.}
 }
 \value{
 The accuracy of the ensemble or individual component models.

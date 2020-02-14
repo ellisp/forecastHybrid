@@ -4,11 +4,22 @@
 \alias{cvts}
 \title{Cross validation for time series}
 \usage{
-cvts(x, FUN = NULL, FCFUN = NULL, rolling = FALSE, windowSize = 84,
-  maxHorizon = 5, horizonAverage = FALSE, xreg = NULL,
+cvts(
+  x,
+  FUN = NULL,
+  FCFUN = NULL,
+  rolling = FALSE,
+  windowSize = 84,
+  maxHorizon = 5,
+  horizonAverage = FALSE,
+  xreg = NULL,
   saveModels = ifelse(length(x) > 500, FALSE, TRUE),
-  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE), verbose = TRUE,
-  num.cores = 2L, extraPackages = NULL, ...)
+  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
+  verbose = TRUE,
+  num.cores = 2L,
+  extraPackages = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{the input time series.}
