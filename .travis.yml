@@ -1,4 +1,7 @@
 # thanks to https://github.com/travis-ci/travis-ci/issues/5775
+env:
+  - NOT_CRAN=true
+
 sudo: false
 
 addons:

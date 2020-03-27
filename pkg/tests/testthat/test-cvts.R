@@ -1,23 +1,23 @@
 # Unit tests on the cvts function
 if(require(forecast) & require(testthat)){
-   naive_forecast <- function(train){
-      result <- list()
-      result$series <- train
-      result$forecast <- train[length(train)]
-      class(result) <- "naive_model"
-      return(result)
-   }
+  naive_forecast <- function(train){
+    result <- list()
+    result$series <- train
+    result$forecast <- train[length(train)]
+    class(result) <- "naive_model"
+    return(result)
+  }
 
-   forecastFunction <- function(model, h = 12){
-      result <- list()
-      result$model <- model
-      freq <- tsp(model$series)[3]
-      result$mean <- rep(model$forecast, h)
-      tsp(result$mean) <- c(tsp(model$series)[2] + 1/freq, tsp(model$series)[2] + h/freq,
-                            freq)
-      class(result) <- "forecast"
-      return(result)
-   }
+  forecastFunction <- function(model, h = 12){
+    result <- list()
+    result$model <- model
+    freq <- tsp(model$series)[3]
+    result$mean <- rep(model$forecast, h)
+    tsp(result$mean) <- c(tsp(model$series)[2] + 1/freq, tsp(model$series)[2] + h/freq,
+                          freq)
+    class(result) <- "forecast"
+    return(result)
+  }
 
   context("Testing input for cvts()")
   test_that("Testing invalid inputs", {
@@ -45,6 +45,9 @@ if(require(forecast) & require(testthat)){
     cv <- cvts(inputSeries, windowSize = 4, maxHorizon = 2)
     expect_error(accuracy(cv), NA)
   })
+
+  skip_on_cran()
+
   test_that("Rolling forecasts work", {
      cv <- cvts(AirPassengers, FUN = naive_forecast, FCFUN = forecastFunction,
                 rolling = TRUE, windowSize = 1, maxHorizon = 1)

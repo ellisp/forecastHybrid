@@ -23,6 +23,7 @@ if(require(forecast) &  require(testthat)){
     expect_error(forecast.hybridModel("a"))
   })
 
+  skip_on_cran()
   test_that("Testing prediction intervals", {
     set.seed(5)
     inputSeries <- ts(rnorm(10), f = 2)

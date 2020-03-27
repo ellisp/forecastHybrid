@@ -1,5 +1,7 @@
-# Version 4.2.18 [2019-09-29]
-* Add the `rolling` argument to `hybridModel()` that can be used when `` to control the `rolling` argument in `cvts()`.
+# Version 5.0.18 [2020-03-27]
+* Add the `rolling` argument to `hybridModel()` that can be used when `weights = "cv.errors"` to control the `rolling` argument in `cvts()`.
+* Update `accuracy()` formals to support changes in the "forecast" package version 8.12.
+* Disable longer-running tests on CRAN.
 
 # Version 4.2.17 [2019-02-11]
 * Experimental ensembles with the `thief()` function can now be created with the new `thiefModel()` function. The API is similar to that of `hybridModel()`.

@@ -14,7 +14,7 @@ Description: Convenient functions for ensemble forecasts in R combining
     and forecasting functions is also supported to evaluate model accuracy.
 Depends:
     R (>= 3.1.1),
-    forecast (>= 8.12),
+    forecast (>= 8.1),
     thief
 Imports:
     doParallel (>= 1.0.10),
@@ -33,7 +33,7 @@ License: GPL-3
 URL: https://gitlab.com/dashaub/forecastHybrid, https://github.com/ellisp/forecastHybrid
 BugReports: https://github.com/ellisp/forecastHybrid/issues
 LazyData: true
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 ByteCompile: true
 NeedsCompilation: no
 Encoding: UTF-8
