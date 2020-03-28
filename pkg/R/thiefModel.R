@@ -6,6 +6,7 @@
 #' @param y the input time series
 #' @param models the models to use. These are specified the same way as \code{\link{hybridModel}}
 #' @param h the forecast horizon
+#' @param comb the combination method to use by \code{\link[thief]{thief}}
 #' @param verbose if \code{TRUE}, report the fitting status
 #' @details Use the "thief" package method for reconciling forecasts across the temporal hierarchy.
 #' The base models to be included in the ensemble are the same as those in \code{hybridModel}, but
@@ -18,7 +19,9 @@
 #' @seealso \code{\link[thief]{thief}}
 #' @seealso \code{\link{hybridModel}}
 #'
-thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y), verbose = FALSE){
+thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y),
+                       comb=c("struc","mse","ols", "bu", "shr", "sam"),
+                       verbose = FALSE){
 
   ##############################################################################
   # Validate input
@@ -26,10 +29,13 @@ thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y), verbose = FALS
   # Validate and clean the input timeseries
   y <- prepareTimeseries(y = y)
   # Match the specified models
+  # Note: models that only work with seasonal data (e.g. stlm()) will not work
   models <- sort(unique(tolower(unlist(strsplit(models, split = "")))))
-  # Check models and data length to ensure enough data: remove models that require more data
+  # Check models and data length to ensure enough data: remove models that
+  # require more data
   models <- removeModels(y = y, models = models)
 
+  comb <- match.arg(comb)
 
   ##############################################################################
   # Fit models
@@ -44,9 +50,8 @@ thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y), verbose = FALS
       message("Fitting the ", modelName <- getModelName(modelChar), " model")
     }
     FUN <- getModel(modelChar)
-    FCFUN <- function(x, h1) forecast(FUN(x), h = h1)
-    fc <- thief(y, h = h, forecastfunction = FCFUN)
-    fit <- fitted(fc)
+    FCFUN <- function(y1, h1) forecast(object = FUN(y = y1), h = h1)
+    fc <- thief(y = y, h = h, comb = comb, forecastfunction = FCFUN)
     forecasts[[modelName]] <- fc
     fc_tsp <- tsp(fc$mean)
   }
@@ -77,5 +82,3 @@ thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y), verbose = FALS
   class(forecasts) <- "forecast"
   return(forecasts)
 }
-
-fc <- thiefModel(AirPassengers)

@@ -4,7 +4,13 @@
 \alias{thiefModel}
 \title{Forecast ensemble using THieF}
 \usage{
-thiefModel(y, models = "aefnt", h = 2 * frequency(y), verbose = FALSE)
+thiefModel(
+  y,
+  models = "aefnt",
+  h = 2 * frequency(y),
+  comb = c("struc", "mse", "ols", "bu", "shr", "sam"),
+  verbose = FALSE
+)
 }
 \arguments{
 \item{y}{the input time series}
@@ -12,6 +18,8 @@ thiefModel(y, models = "aefnt", h = 2 * frequency(y), verbose = FALSE)
 \item{models}{the models to use. These are specified the same way as \code{\link{hybridModel}}}
 
 \item{h}{the forecast horizon}
+
+\item{comb}{the combination method to use by \code{\link[thief]{thief}}}
 
 \item{verbose}{if \code{TRUE}, report the fitting status}
 }
