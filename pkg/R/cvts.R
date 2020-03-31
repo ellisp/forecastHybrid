@@ -80,16 +80,18 @@
 #' rwcv <- cvts(series, FCFUN = rwf, windowSize = 24, maxHorizon = 1)
 #'
 #' \dontrun{
-#' cvmod2 <- cvts(USAccDeaths, FUN = ets,
+#' # Don't return the model or forecast objects
+#' cvmod2 <- cvts(USAccDeaths, FUN = stlm,
 #'                saveModels = FALSE, saveForecasts = FALSE,
 #'                windowSize = 36, maxHorizon = 12)
 #'
 #' # If we don't need prediction intervals and are using the nnetar model, turning off PI
 #' # will make the forecasting much faster
-#' cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
+#' series <- subset(AirPassengers, end=40)
+#' cvmod3 <- cvts(series, FUN = hybridModel,
 #'                FCFUN = function(mod, h) forecast(mod, h = h, PI=FALSE),
-#'                rolling = FALSE, windowSize = 48,
-#'                maxHorizon = 12)
+#'                rolling = FALSE, windowSize = 36,
+#'                maxHorizon = 2)
 #' }
 #'
 #' @author David Shaub

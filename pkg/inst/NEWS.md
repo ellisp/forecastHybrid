@@ -3,6 +3,7 @@
 * Add `comb` as an argument to `thiefModel()`.
 * Update `accuracy()` formals to support changes in the "forecast" package version 8.12.
 * Disable longer-running tests on CRAN.
+* Faster examples and vignette
 
 # Version 4.2.17 [2019-02-11]
 * Experimental ensembles with the `thief()` function can now be created with the new `thiefModel()` function. The API is similar to that of `hybridModel()`.

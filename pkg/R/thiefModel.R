@@ -13,8 +13,8 @@
 #' the \code{stlm} model cannot be included since it requires seasonal data.
 #'
 #' @examples
-#' shortTs <- subset(woolyrnq, end = 8)
-#' thiefModel(shortTs, models = "ef")
+#' series <- subset(woolyrnq, end = 8)
+#' thiefModel(series, models = "fz")
 #' @author David Shaub
 #' @seealso \code{\link[thief]{thief}}
 #' @seealso \code{\link{hybridModel}}
