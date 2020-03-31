@@ -168,9 +168,9 @@ Note that lambda has no impact on ```thetam``` models, and that there is no ```f
 Covariates can also be supplied to ```auto.arima``` and ```nnetar``` models as is done in the "forecast" package. To do this, utilize the ```a.args``` and ```n.args``` lists. Note that the ```xreg``` may also be passed to a ```stlm``` model, but only when ```method = "arima"``` instead of the default ```method = "ets"```. Unlike the usage in the "forecast" package, the ```xreg``` argument should be passed as a matrix, not a dataframe. The ```stlm``` models require that the input series will be seasonal, so in the example below we will convert the input data to a ```ts``` object. If a ```xreg``` is used in training, it must also be supplied to the ```forecast()``` function in the ```xreg``` argument. Note that if the number of rows in the ```xreg``` to be used for the forecast does not match the supplied ```h``` forecast horizon, the function will overwrite ```h``` with the number of rows in ```xreg``` and issue a warning.
 ```{r xreg, cache = TRUE}
 # Use the beaver1 dataset with the variable "activ" as a covariate and "temp" as the time series
-# Divice this into a train and test set
+# Divide this into a train and test set
 trainSet <- beaver1[1:100, ] 
-testSet <- beaver1[-(1:100), ]
+testSet <- beaver1[101:110, ]
 trainXreg <- matrix(trainSet$activ)
 testXreg <- matrix(testSet$activ)
 
@@ -181,7 +181,7 @@ beaverhm <- hybridModel(ts(trainSet$temp, f = 6),
                         n.args = list(xreg = trainXreg),
                         s.args = list(xreg = trainXreg, method = "arima"))
 # Forecast future values
-beaverfc <- forecast(beaverhm, xreg = testXreg)
+beaverfc <- forecast(beaverhm, xreg = testXreg, PI=FALSE)
 
 # View the accuracy of the model
 accuracy(beaverfc, testSet$temp)
@@ -238,13 +238,14 @@ forecast.customMod <- function(x, h = 12){
  return(result)
 }
 series <- subset(AirPassengers, end = 94)
-```
 cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)
+```
 
 ## Cross Validation Weights
 Previously we explored fitting `hybridModel()` objects with `weights = "equal"` or `weights = "insample.errors`, but we can now leverage the process conducted in `cvts()` to select the appropriate weights intelligently based on the expected out-of-sample forecast accuracy of each component model. While this is the methodologically-sound weight procedure, it also comes at significant computational cost since the cross validation procedure necessitates fitting each model several times for each cross validation fold in addition to the final fit on the whole dataset. Fortunately this process can be conducted in parallel if multiple cores are available. Some of the arguments explained above in `cvts()` such as `windowSize` and the `cvHorizon` can also be controlled here.
 ```
-cvMod <- hybridModel(woolyrnq, models = "ns", weights = "cv.errors", windowSize = 100, cvHorizon = 8, num.cores = 4)
+cvMod <- hybridModel(woolyrnq, models = "ns",
+                     weights = "cv.errors", windowSize = 100,
+                     cvHorizon = 8, num.cores = 4)
 cvMod
-```
 ```
