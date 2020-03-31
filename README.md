@@ -211,21 +211,23 @@ fc2 <- forecast(hm2, h = 48, level = c(70, 80, 90, 95))
 ## Citation
 To cite package ‘forecastHybrid’ in publications use:
 
-  David Shaub and Peter Ellis (2019). forecastHybrid: Convenient
-  Functions for Ensemble Time Series Forecasts. R package version
-  4.2.17. https://CRAN.R-project.org/package=forecastHybrid
+  David Shaub and Peter Ellis (2020). forecastHybrid: Convenient
+  Functions for Ensemble Time Series Forecasts.
+  https://gitlab.com/dashaub/forecastHybrid,
+  https://github.com/ellisp/forecastHybrid.
 
 A BibTeX entry for LaTeX users is
 ```
   @Manual{,
     title = {forecastHybrid: Convenient Functions for Ensemble Time Series Forecasts},
     author = {David Shaub and Peter Ellis},
-    year = {2019},
-    note = {R package version 4.2.17},
-    url = {https://CRAN.R-project.org/package=forecastHybrid},
+    year = {2020},
+    note = {https://gitlab.com/dashaub/forecastHybrid,
+https://github.com/ellisp/forecastHybrid},
   }
+
 ```
 ## License
-(c) 2016-2019 David Shaub and Peter Ellis.
+(c) 2016-2020 David Shaub and Peter Ellis.
 
 This package is free software released under the [GPL-3](http://www.gnu.org/licenses/gpl-3.0.en.html) license.

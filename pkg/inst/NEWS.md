@@ -1,5 +1,6 @@
-# Version 5.0.18 [2020-03-27]
+# Version 5.0.18 [2020-03-31]
 * Add the `rolling` argument to `hybridModel()` that can be used when `weights = "cv.errors"` to control the `rolling` argument in `cvts()`.
+* Add `comb` as an argument to `thiefModel()`.
 * Update `accuracy()` formals to support changes in the "forecast" package version 8.12.
 * Disable longer-running tests on CRAN.
 
