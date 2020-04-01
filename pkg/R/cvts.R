@@ -79,7 +79,6 @@
 #' series <- subset(AirPassengers, end = 26)
 #' rwcv <- cvts(series, FCFUN = rwf, windowSize = 24, maxHorizon = 1)
 #'
-#' \dontrun{
 #' # Don't return the model or forecast objects
 #' cvmod2 <- cvts(USAccDeaths, FUN = stlm,
 #'                saveModels = FALSE, saveForecasts = FALSE,
@@ -92,7 +91,6 @@
 #'                FCFUN = function(mod, h) forecast(mod, h = h, PI=FALSE),
 #'                rolling = FALSE, windowSize = 36,
 #'                maxHorizon = 2)
-#' }
 #'
 #' @author David Shaub
 #' @importFrom utils getAnywhere

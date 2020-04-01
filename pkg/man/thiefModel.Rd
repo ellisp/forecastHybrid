@@ -32,8 +32,8 @@ The base models to be included in the ensemble are the same as those in \code{hy
 the \code{stlm} model cannot be included since it requires seasonal data.
 }
 \examples{
-shortTs <- subset(woolyrnq, end = 8)
-thiefModel(shortTs, models = "ef")
+series <- subset(woolyrnq, end = 8)
+thiefModel(series, models = "fz")
 }
 \seealso{
 \code{\link[thief]{thief}}
