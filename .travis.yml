@@ -20,5 +20,9 @@ cache: packages
 before_install:
   - cd pkg
 
+script:
+  - R CMD build .
+  - R CMD check forecastHybrid_*.tar.gz --run-donttest
+
 after_success:
   - Rscript -e 'covr::coveralls()'

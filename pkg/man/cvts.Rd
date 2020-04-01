@@ -106,6 +106,7 @@ series <- subset(austres, end = 38)
 cvmodCustom <- cvts(series, FUN = stlmClean, windowSize = 26, maxHorizon = 6)
 accuracy(cvmodCustom)
 
+\donttest{
 # Use the rwf() function from the "forecast" package.
 # This function does not have a modeling function and
 # instead calculates a forecast on the time series directly
@@ -121,10 +122,10 @@ cvmod2 <- cvts(USAccDeaths, FUN = stlm,
 # will make the forecasting much faster
 series <- subset(AirPassengers, end=40)
 cvmod3 <- cvts(series, FUN = hybridModel,
-               FCFUN = function(mod, h) forecast(mod, h = h, PI=FALSE),
+               FCFUN = function(mod, h) forecast(mod, h = h, PI = FALSE),
                rolling = FALSE, windowSize = 36,
                maxHorizon = 2)
-
+}
 }
 \seealso{
 \code{\link{accuracy.cvts}}
