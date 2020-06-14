@@ -22,11 +22,13 @@
 #' @param s.args an optional \code{list} of arguments to pass to \code{\link[forecast]{stlm}}. See details.
 #' @param t.args an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}. See details.
 #' @param z.args an optional \code{list} of arguments to pass to \code{\link[forecast]{snaive}}. See details.
+#' @param x.args an optional \code{list} of arguments to pass to \code{\link[forecast]{arfima}}. See details.
+
 #' @param weights method for weighting the forecasts of the various contributing
 #' models.  Defaults to \code{equal}, which has shown to be robust and better
 #' in many cases than giving more weight to models with better in-sample performance. Cross validated errors--implemented with \code{link{cvts}}
 #' should produce the best forecast, but the model estimation is also the slowest. Note that extra arguments
-#' passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} are not used
+#' passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, \code{x.args} and \code{t.args} are not used
 #' during cross validation. See further explanation in \code{\link{cvts}}.
 #' Weights utilizing in-sample errors are also available but not recommended.
 #' @param errorMethod  method of measuring accuracy to use if weights are not
@@ -55,7 +57,7 @@
 #' @details The \code{hybridModel} function fits multiple individual model specifications to allow easy creation
 #' of ensemble forecasts. While default settings for the individual component models work quite well
 #' in most cases, fine control can be exerted by passing detailed arguments to the component models in the
-#' \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
+#' \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, \code{x.args}, and \code{t.args} lists.
 #' Note that if \code{xreg} is passed to the \code{a.args}, \code{n.args}, or \code{s.args} component models
 #' it must now be passed as a matrix. In "forecastHybrid" versions earlier than 4.0.15 it would
 #' instead be passed in as a dataframe, but for consistency with "forecast" v8.5 we now require
@@ -77,7 +79,7 @@
 #' @examples
 #' \dontrun{
 #'
-#' # Fit an auto.arima, ets, thetam, nnetar, stlm, and tbats model
+#' # Fit an auto.arima, ets, thetam, nnetar, stlm, arfima, and tbats model
 #' # on the time series with equal weights
 #' mod1 <- hybridModel(AirPassengers)
 #' plot(forecast(mod1))
@@ -106,6 +108,7 @@ hybridModel <- function(y, models = "aefnst",
                         s.args = NULL,
                         t.args = NULL,
                         z.args = NULL,
+                        x.args=NULL,
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("RMSE", "MAE", "MASE"),
                         rolling = FALSE,
@@ -119,7 +122,7 @@ hybridModel <- function(y, models = "aefnst",
   # Validate input
   ##############################################################################
   modelArguments = list("a" = a.args, "e" = e.args, "f" = NULL, "n" = n.args,
-                    "s" = s.args, "t" = t.args, "z" = z.args)
+                    "s" = s.args, "t" = t.args, "z" = z.args, "x"=x.args)
 
   # Validate and clean the input timeseries
   y <- prepareTimeseries(y = y)
@@ -142,7 +145,7 @@ hybridModel <- function(y, models = "aefnst",
   # Check the parallel arguments
   checkParallelArguments(parallel = parallel, num.cores = num.cores)
 
-  # Check a.args/t.args/e.args/n.args/s.args
+  # Check a.args/t.args/e.args/n.args/s.args/x.args
   checkModelArgs(modelArguments = modelArguments, models = expandedModels)
 
   if(weights == "cv.errors" && errorMethod == "MASE"){
