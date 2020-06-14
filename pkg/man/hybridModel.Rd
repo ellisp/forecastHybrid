@@ -14,6 +14,7 @@ hybridModel(
   s.args = NULL,
   t.args = NULL,
   z.args = NULL,
+  x.args = NULL,
   weights = c("equal", "insample.errors", "cv.errors"),
   errorMethod = c("RMSE", "MAE", "MASE"),
   rolling = FALSE,
@@ -48,6 +49,8 @@ Ignored if NULL. Otherwise, data transformed before model is estimated.}
 
 \item{z.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{snaive}}. See details.}
 
+\item{x.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{arfima}}. See details.}
+  
 \item{weights}{method for weighting the forecasts of the various contributing
 models.  Defaults to \code{equal}, which has shown to be robust and better
 in many cases than giving more weight to models with better in-sample performance. Cross validated errors--implemented with \code{link{cvts}}
@@ -93,7 +96,7 @@ Create a hybrid time series model with two to five component models.
 The \code{hybridModel} function fits multiple individual model specifications to allow easy creation
 of ensemble forecasts. While default settings for the individual component models work quite well
 in most cases, fine control can be exerted by passing detailed arguments to the component models in the
-\code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
+\code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, \code{x.args}, and \code{t.args} lists.
 Note that if \code{xreg} is passed to the \code{a.args}, \code{n.args}, or \code{s.args} component models
 it must now be passed as a matrix. In "forecastHybrid" versions earlier than 4.0.15 it would
 instead be passed in as a dataframe, but for consistency with "forecast" v8.5 we now require
@@ -115,7 +118,7 @@ a series well with a seasonal period longer than 24 and will ignore the seasonal
 \examples{
 \dontrun{
 
-# Fit an auto.arima, ets, thetam, nnetar, stlm, and tbats model
+# Fit an auto.arima, ets, thetam, nnetar, stlm, arfima and tbats model
 # on the time series with equal weights
 mod1 <- hybridModel(AirPassengers)
 plot(forecast(mod1))
