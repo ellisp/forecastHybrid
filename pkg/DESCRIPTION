@@ -1,7 +1,7 @@
 Package: forecastHybrid
 Title: Convenient Functions for Ensemble Time Series Forecasts
-Version: 5.0.18
-Date: 2020-04-01
+Version: 5.0.19
+Date: 2020-08-11
 Authors@R: c(
    person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
    person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("aut"))
@@ -33,7 +33,7 @@ License: GPL-3
 URL: https://gitlab.com/dashaub/forecastHybrid, https://github.com/ellisp/forecastHybrid
 BugReports: https://github.com/ellisp/forecastHybrid/issues
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 ByteCompile: true
 NeedsCompilation: no
 Encoding: UTF-8

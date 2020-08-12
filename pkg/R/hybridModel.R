@@ -272,12 +272,7 @@ hybridModel <- function(y, models = "aefnst",
                               nrow = nrow(fits), byrow = TRUE)
   fits <- rowSums(fits * fitsWeightsMatrix)
   resid <- y - fits
-  # If y is a ts, make fits and resid a ts too
-  if (!is.null(tsp(y))){
-    fits <- ts(fits)
-    resid <- ts(fits)
-    tsp(fits) <- tsp(resid) <- tsp(y)
-  }
+  tsp(fits) <- tsp(y)
 
   # Save which models used xreg
   xregs <- list()
