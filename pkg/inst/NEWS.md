@@ -1,5 +1,7 @@
 # Version 5.0.19 [2020-08-11]
 * Fix `residuals.hybridModel()` and added tests.
+* Linting of package with the "lintr" package
+* `Makefile` targets for building and package development.
 
 # Version 5.0.18 [2020-04-01]
 * Add the `rolling` argument to `hybridModel()` that can be used when `weights = "cv.errors"` to control the `rolling` argument in `cvts()`.

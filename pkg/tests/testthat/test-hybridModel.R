@@ -1,5 +1,5 @@
 # Unit tests on the hybridModel function
-if(require(forecast) & require(testthat)){
+if (require(forecast) & require(testthat)) {
   context("Testing input for hybridModel()")
   test_that("Testing invalid inputs", {
     # Invalid arguments for models
@@ -60,7 +60,7 @@ if(require(forecast) & require(testthat)){
     expect_warning(hybridModel(wineind, models = "fs", weights = "cv.errors",
                                errorMethod = "MASE"))
     # weights = "insample.errors" when there is a perfect fit
-    expect_warning(hybridModel(ts(1:20, f = 2), weight="insample.errors"))
+    expect_warning(hybridModel(ts(1:20, f = 2), weight = "insample.errors"))
   })
 
   test_that("Testing valid inputs", {
@@ -118,7 +118,7 @@ if(require(forecast) & require(testthat)){
 
   test_that("Testing the hybridModel object", {
     modelComparison <- list()
-    for(parallel in c(FALSE, TRUE)){
+    for (parallel in c(FALSE, TRUE)) {
       set.seed(4)
       len <- 20
       freq <- 2
@@ -132,7 +132,7 @@ if(require(forecast) & require(testthat)){
       hm <- hybridModel(testSeries, models = models,
                         a.args = list(xreg = xreg), lambda = 0.2,
                         parallel = parallel)
-      for(obj in hm){
+      for (obj in hm) {
         expect_true(all(class(obj) != "NULL"))
         expect_true(!is.null(obj))
       }
@@ -160,7 +160,7 @@ if(require(forecast) & require(testthat)){
       expect_true("ARIMA" %in% class(hm$auto.arima))
       expect_true("ets" == class(hm$ets))
       expect_true("thetam" %in% class(hm$thetam))
-      #expect_true("nnetar" == class(hm$nnetar))
+      #expect_true("nnetar" == class(hm$nnetar))# TODO: is it multiple classes?
       expect_true("stlm" %in% class(hm$stlm))
       expect_true("forecast" %in% class(hm$snaive))
 
@@ -192,8 +192,8 @@ if(require(forecast) & require(testthat)){
     weights <- c("equal", "insample.errors", "cv.errors")
     # TODO: add another loop here for errorMethod once MASE with cv.errors is implemented
     results <- list()
-    for(weight in weights){
-      if(weight == "insample.errors"){
+    for (weight in weights) {
+      if (weight == "insample.errors") {
         expect_warning(hm <- hybridModel(inputSeries, models = models,
                                          weights = weight))
       } else{
@@ -216,7 +216,7 @@ if(require(forecast) & require(testthat)){
   test_that("Testing the hybrid model with xreg", {
     # Test with data from issue #86
     trainSet <- beaver1[1:100, ]
-    testSet <- beaver1[-(1:100), ]
+    testSet <- beaver1[- (1:100), ]
     trainXreg <- as.matrix(data.frame(trainSet$activ, trainSet$time))
     beaverhm <- hybridModel(ts(trainSet$temp, f = 6),
                             models = "aenst",

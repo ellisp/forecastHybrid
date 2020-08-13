@@ -20,8 +20,8 @@
 #' @seealso \code{\link{hybridModel}}
 #'
 thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y),
-                       comb=c("struc","mse","ols", "bu", "shr", "sam"),
-                       verbose = FALSE){
+                       comb=c("struc", "mse", "ols", "bu", "shr", "sam"),
+                       verbose = FALSE) {
 
   ##############################################################################
   # Validate input
@@ -43,17 +43,17 @@ thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y),
 
 
   forecasts <- list()
-  fc_tsp <- NULL
-  for(modelChar in models){
+  fcTsp <- NULL
+  for (modelChar in models) {
     modelName <- getModelName(modelChar)
-    if(verbose){
+    if (verbose) {
       message("Fitting the ", modelName <- getModelName(modelChar), " model")
     }
-    FUN <- getModel(modelChar)
-    FCFUN <- function(y1, h1) forecast(object = FUN(y = y1), h = h1)
+    FUN <- getModel(modelChar) # nolint
+    FCFUN <- function(y1, h1) forecast(object = FUN(y = y1), h = h1) # nolint
     fc <- thief(y = y, h = h, comb = comb, forecastfunction = FCFUN)
     forecasts[[modelName]] <- fc
-    fc_tsp <- tsp(fc$mean)
+    fcTsp <- tsp(fc$mean)
   }
 
 
@@ -72,7 +72,7 @@ thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y),
                          nrow = h, byrow = TRUE)
   fc <- sapply(forecasts, FUN = function(x) x$mean)
   fc <- ts(rowSums(fc * weightMatrix))
-  tsp(fc) <- fc_tsp
+  tsp(fc) <- fcTsp
 
   forecasts$mean <- fc
   forecasts$x <- y

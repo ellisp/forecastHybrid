@@ -57,48 +57,49 @@ forecast.hybridModel <- function(object,
                                  level = c(80, 95),
                                  PI = TRUE,
                                  fan = FALSE,
-                                 PI.combination = c("extreme", "mean"), ...){
+                                 PI.combination = c("extreme", "mean"), ...) {
 
+  chkDots(...)
   # Check inputs
-  if(!is.hybridModel(object)){
+  if (!is.hybridModel(object)) {
     stop("The object must be constructed from hybridModel().")
   }
 
   # apply nrow(xreg) to h if h isn't provided and xreg is
-  if(missing(h) && !missing(xreg)){
+  if (missing(h) && !missing(xreg)) {
     h <- nrow(xreg)
   }
 
   # xreg should be a matrix and have same number of observations as the horizon
-  if(!is.null(xreg)){
-    if(!is.matrix(xreg) && !is.numeric(xreg) && !is.data.frame(xreg)){
+  if (!is.null(xreg)) {
+    if (!is.matrix(xreg) && !is.numeric(xreg) && !is.data.frame(xreg)) {
       stop("The supplied xreg must be numeric, matrix, or data.frame.")
     }
     xreg <- as.matrix(xreg)
-    if(!is.numeric(xreg)){
+    if (!is.numeric(xreg)) {
       stop("The supplied xreg must be numeric.")
     }
-    if(is.null(h) || nrow(xreg) != h){
+    if (is.null(h) || nrow(xreg) != h) {
       warning("The number of rows in xreg should match h. Setting h to nrow(xreg).")
       h <- nrow(xreg)
     }
   }
 
   # Check the forecast horizon
-  if(!is.numeric(h)){
+  if (!is.numeric(h)) {
     stop("The forecast horizon h must be a positive integer.")
   }
-  if(!as.logical((h %% 1L == 0L)) || h <= 0L){
+  if (!as.logical((h %% 1L == 0L)) || h <= 0L) {
     stop("The forecast horizon h must be a positive integer.")
   }
 
   # Allow for fan prediction intervals
-  if(fan){
+  if (fan) {
     level <- seq(51, 99, by = 3)
   } else {
-    if(min(level) > 0 && max(level) < 1){
+    if (min(level) > 0 && max(level) < 1) {
       level <- 100 * level
-    } else if(min(level) < 0 || max(level) > 99.99){
+    } else if (min(level) < 0 || max(level) > 99.99) {
       stop("Prediction interval out of range")
     }
   }
@@ -111,47 +112,47 @@ forecast.hybridModel <- function(object,
   forecasts <- list()
   forecasts$pointForecasts <- matrix(numeric(), nrow = h, ncol = length(includedModels))
   colnames(forecasts$pointForecasts) <- includedModels
-  if("auto.arima" %in% includedModels){
+  if ("auto.arima" %in% includedModels) {
     # Only apply the xreg if it was used in the original model
     xregA <- xreg
-    if(!object$xreg$auto.arima){
+    if (!object$xreg$auto.arima) {
       xregA <- NULL
       }
     forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xregA, level = level, ...)
     forecasts$pointForecasts[, "auto.arima"] <- forecasts$auto.arima$mean
   }
-  if("ets" %in% includedModels){
+  if ("ets" %in% includedModels) {
     forecasts$ets <- forecast(object$ets, h = h, level = level, ...)
     forecasts$pointForecasts[, "ets"] <- forecasts$ets$mean
   }
-  if("thetam" %in% includedModels){
+  if ("thetam" %in% includedModels) {
      forecasts$thetam <- forecast(object$thetam, h = h, level = level, ...)
      forecasts$pointForecasts[, "thetam"] <- forecasts$thetam$mean
   }
-  if("nnetar" %in% includedModels){
+  if ("nnetar" %in% includedModels) {
     # Only apply the xreg if it was used in the original model
     xregN <- xreg
-    if(!object$xreg$nnetar){
+    if (!object$xreg$nnetar) {
       xregN <- NULL
     }
     forecasts$nnetar <- forecast(object$nnetar, h = h, xreg = xregN, PI = PI, level = level, ...)
     forecasts$pointForecasts[, "nnetar"] <- forecasts$nnetar$mean
   }
-  if("stlm" %in% includedModels){
+  if ("stlm" %in% includedModels) {
     # Only apply the xreg if it was used in the original model
     xregS <- xreg
     # xreg is only used in stlm if method = "arima"
-    if(!object$xreg$stlm){
+    if (!object$xreg$stlm) {
       xregS <- NULL
     }
     forecasts$stlm <- forecast(object$stlm, h = h, xreg = xregS, level = level, ...)
     forecasts$pointForecasts[, "stlm"] <- forecasts$stlm$mean
   }
-  if("tbats" %in% includedModels){
+  if ("tbats" %in% includedModels) {
     forecasts$tbats <- forecast(object$tbats, h = h, level = level, ...)
     forecasts$pointForecasts[, "tbats"] <- forecasts$tbats$mean
   }
-  if("snaive" %in% includedModels){
+  if ("snaive" %in% includedModels) {
     forecasts$snaive <- snaive(object$x, h = h, level = level, ...)
     forecasts$pointForecasts[, "snaive"] <- forecasts$snaive$mean
   }
@@ -172,12 +173,12 @@ forecast.hybridModel <- function(object,
   resid <- object$x - fits
 
   # Construct the prediction intervals
-  if(PI){
+  if (PI) {
     # Set the functions for the uppper/lower prediction intervals
     piCombination <- match.arg(PI.combination)
-    if(piCombination == "mean"){
+    if (piCombination == "mean") {
       upperFunction <- lowerFunction <- mean
-    } else if(piCombination == "extreme"){
+    } else if (piCombination == "extreme") {
       upperFunction <- max
       lowerFunction <- min
     }
@@ -186,11 +187,11 @@ forecast.hybridModel <- function(object,
 
      piModels <- object$models
      # Produce each upper/lower limit
-     for(i in 1:nint){
+     for (i in 1:nint) {
         # Produce the upper/lower limit for each model for a given level
         tmpUpper <- tmpLower <- matrix(NA, nrow = h, ncol = length(piModels))
         j2 <- 1
-        for(mod in piModels){
+        for (mod in piModels) {
            tmpUpper[, j2] <- as.numeric(matrix(forecasts[[mod]]$upper, nrow = h)[, i])
            tmpLower[, j2] <- as.numeric(matrix(forecasts[[mod]]$lower, nrow = h)[, i])
            j2 <- j2 + 1
@@ -199,7 +200,7 @@ forecast.hybridModel <- function(object,
         upper[, i] <- apply(tmpUpper, 1, FUN = upperFunction)
         lower[, i] <- apply(tmpLower, 1, FUN = lowerFunction)
      }
-     if(!is.finite(max(upper)) || !is.finite(min(lower))){
+     if (!is.finite(max(upper)) || !is.finite(min(lower))) {
         warning("Prediction intervals are not finite.")
      }
      colnames(lower) <- colnames(upper) <- paste0(level, "%")
@@ -207,9 +208,8 @@ forecast.hybridModel <- function(object,
      forecasts$upper <- upper
   }
 
-
   # Build the mean forecast as a ts object
-  tsp.x <- tsp(object$x)
+  #tsp.x <- tsp(object$x)
   #   if (!is.null(tsp.x)){
   #     start.f <- tsp(object$x)[2] + 1/object$frequency
   #   } else{
@@ -219,7 +219,7 @@ forecast.hybridModel <- function(object,
   forecasts$mean <- finalForecast
 
   # Add the fitted and residuals values
-  if(is.ts(object$x)){
+  if (is.ts(object$x)) {
     fits <- ts(fits)
     resid <- ts(resid)
     tsp(fits) <- tsp(resid) <- tsp(object$x)
