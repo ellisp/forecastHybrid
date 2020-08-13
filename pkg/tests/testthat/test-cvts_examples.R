@@ -1,5 +1,5 @@
 # Unit tests on the cvts function
-if(require(forecast) & require(testthat)){
+if (require(forecast) & require(testthat)) {
   context("Testing cvts() examples")
 
   test_that("Testing skipped examples", {
@@ -16,7 +16,7 @@ if(require(forecast) & require(testthat)){
     expect_null(cvmod2$models)
     expect_equal(dim(residuals(cvmod2)), c(3, 12))
 
-    series <- subset(AirPassengers, end=40)
+    series <- subset(AirPassengers, end = 40)
     cvmod3 <- cvts(series, FUN = hybridModel,
                    FCFUN = function(mod, h) forecast(mod, h = h, PI = FALSE),
                    rolling = FALSE, windowSize = 36,
@@ -24,6 +24,5 @@ if(require(forecast) & require(testthat)){
     expect_equal(length(cvmod3$forecasts), length(cvmod3$models))
     expect_equal(length(cvmod3$forecasts), 2)
     expect_equal(dim(residuals(cvmod3)), c(2, 2))
-    
   })
  }

@@ -1,5 +1,5 @@
 # Unit tests on the generic function
-if(require(forecast) & require(testthat)){
+if (require(forecast) & require(testthat)) {
   numObs <- 100L
   context("Testing generic functions")
   set.seed(2345)
@@ -13,7 +13,7 @@ if(require(forecast) & require(testthat)){
     expect_true(is.hybridModel(hm))
   })
 
-  test_that("Testing is.hybridModel(), fitted.hybridModel(), residuals.hybridModel(), and accuracy.hybridModel()", {
+  test_that("Testing generics is.hybridModel(), fitted(), residuals(), and accuracy()", {
     inputSeries <- subset(USAccDeaths, end = 25)
     # add some seasonality so there are roots to plot in the arima model
     inputSeries <- 100 * (1:12) + USAccDeaths

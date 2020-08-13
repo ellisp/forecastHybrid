@@ -1,5 +1,5 @@
 # Unit tests on the generic function
-if(require(forecast) & require(testthat)){
+if (require(forecast) & require(testthat)) {
   context("Testing helper functions")
   test_that("Testing internal helper functions", {
     # Test getModelName()

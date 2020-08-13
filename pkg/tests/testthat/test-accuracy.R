@@ -1,4 +1,4 @@
-if(require(forecast) & require(testthat)){
+if (require(forecast) & require(testthat)) {
   test_that("Accuracy generic function works", {
     inputSeries <- ts(rnorm(9), f = 4)
     hm <- hybridModel(inputSeries)
