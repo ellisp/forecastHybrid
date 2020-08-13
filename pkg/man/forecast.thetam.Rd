@@ -13,7 +13,8 @@
 )
 }
 \arguments{
-\item{object}{An object of class "\code{thetam}.  Usually the result of a call to \code{link{thetam}}.}
+\item{object}{An object of class "\code{thetam}.  Usually the result of a call
+to \code{link{thetam}}.}
 
 \item{h}{Number of periods for forecasting}
 
