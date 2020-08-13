@@ -1,4 +1,3 @@
-
 test_that("forecast nnetar prediction intervals with different levels work", {
    set.seed(23456)
    inputSeries <- ts(rnorm(5), f = 2)
