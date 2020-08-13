@@ -30,11 +30,14 @@ cvts(
 See details.}
 
 \item{rolling}{should a rolling procedure be used? If TRUE, non-overlapping windows of size \code{maxHorizon}
-will be used for fitting each model. If FALSE, the size of the dataset used for training will grow
+will be used for fitting each model. If FALSE, the size of the dataset used for training
+will grow
 by one each iteration.}
 
-\item{windowSize}{length of the window to build each model. When \code{rolling == FALSE}, the each model will be
-fit to a time series of this length, and when \code{rolling == TRUE} the first model will be fit to a series
+\item{windowSize}{length of the window to build each model. When \code{rolling == FALSE},
+the each model will be
+fit to a time series of this length, and when \code{rolling == TRUE} the first model will
+be fit to a series
 of this length and grow by one each iteration.}
 
 \item{maxHorizon}{maximum length of the forecast horizon to use for computing errors.}
@@ -42,11 +45,14 @@ of this length and grow by one each iteration.}
 \item{horizonAverage}{should the final errors be an average over all forecast horizons up to \code{maxHorizon} instead of producing
 metrics for each individual horizon?}
 
-\item{xreg}{External regressors to be used to fit the model. Only used if FUN accepts xreg as an argument. FCFUN is also expected to accept it (see details)}
+\item{xreg}{External regressors to be used to fit the model. Only used if FUN accepts xreg
+as an argument. FCFUN is also expected to accept it (see details)}
 
-\item{saveModels}{should the individual models be saved? Set this to \code{FALSE} on long time series to save memory.}
+\item{saveModels}{should the individual models be saved? Set this to \code{FALSE} on long
+time series to save memory.}
 
-\item{saveForecasts}{should the individual forecast from each model be saved? Set this to \code{FALSE} on long time series to save memory.}
+\item{saveForecasts}{should the individual forecast from each model be saved? Set this
+to \code{FALSE} on long time series to save memory.}
 
 \item{verbose}{should the current progress be printed to the console?}
 
@@ -54,7 +60,7 @@ metrics for each individual horizon?}
 that is being fit also utilizes parallelization, the number of cores it is using multiplied
 by `num.cores` should not exceed the number of cores available on your machine.}
 
-\item{extraPackages}{on Windows if a custom `FUN` or `FCFUN` is being used that requires packages to be
+\item{extraPackages}{on Windows if a custom `FUN` or `FCFUN` is being used that requires
 loaded, these can be passed here so that they can be passed to parallel socket workers}
 
 \item{...}{Other arguments to be passed to the model function FUN}
@@ -65,16 +71,22 @@ Perform cross validation on a time series.
 \details{
 Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
 without serial correlation since observations \eqn{x_t}{x[t]} and \eqn{x_{t+n}}{x[t+n]} are not independent. The \code{cvts()} function overcomes
-this obstacle using two methods: 1) rolling cross validation where an initial training window is used along with a forecast horizon
-and the initial window used for training grows by one observation each round until the training window and the forecast horizon capture the
+this obstacle using two methods: 1) rolling cross validation where an initial training window
+is used along with a forecast horizon
+and the initial window used for training grows by one observation each round until the training
+window and the forecast horizon capture the
 entire series or 2) a non-rolling approach where a fixed training length is used that is shifted forward by the forecast horizon
 after each iteration.
 
 For the rolling approach, training points are heavily recycled, both in terms of used for fitting
-and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}. In contrast, the models fit with
-the non-rolling approach share less overlap, and the predicted forecast values are also only compared to the actual values once.
-The former approach is similar to leave-one-out cross validation while the latter resembles k-fold cross validation. As a result,
-rolling cross validation requires far more iterations and computationally takes longer to complete, but a disadvantage of the
+and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}.
+In contrast, the models fit with
+the non-rolling approach share less overlap, and the predicted forecast values are also
+only compared to the actual values once.
+The former approach is similar to leave-one-out cross validation while the latter resembles
+k-fold cross validation. As a result,
+rolling cross validation requires far more iterations and computationally takes longer
+to complete, but a disadvantage of the
 non-rolling approach is the greater variance and general instability of cross-validated errors.
 
 The \code{FUN} and \code{FCFUN} arguments specify which function to use
@@ -85,14 +97,18 @@ accept the argument \code{h} and contain the point forecasts out to
 this horizon \code{h} in slot \code{$mean} of the returned object. An example is given with
 a custom model and forecast.
 
-For small time series (default \code{length <= 500}), all of the individual fit models are included in the final
+For small time series (default \code{length <= 500}), all of the individual fit models
+are included in the final
 \code{cvts} object that is returned. This can grow quite large since functions such as \code{auto.arima} will
 save fitted values, residual values, summary statistics, coefficient matrices, etc. Setting \code{saveModels = FALSE}
-can be safely done if there is no need to examine individual models fit at every stage of cross validation since the
+can be safely done if there is no need to examine individual models fit at every stage
+of cross validation since the
 forecasts from each fold and the associated residuals are always saved.
 
-External regressors are allowed via the \code{xreg} argument. It is assumed that both \code{FUN} and \code{FCFUN} accept the \code{xreg} parameter if \code{xreg} is not \code{NULL}.
-If \code{FUN} does not accept the \code{xreg} parameter a warning will be given. No warning is provided if \code{FCFUN} does not use the \code{xreg} parameter.
+External regressors are allowed via the \code{xreg} argument. It is assumed that both
+\code{FUN} and \code{FCFUN} accept the \code{xreg} parameter if \code{xreg} is not \code{NULL}.
+If \code{FUN} does not accept the \code{xreg} parameter a warning will be given.
+No warning is provided if \code{FCFUN} does not use the \code{xreg} parameter.
 }
 \examples{
 series <- subset(AirPassengers, end = 50)
@@ -101,7 +117,7 @@ cvmod1 <- cvts(series, FUN = snaive,
 accuracy(cvmod1)
 
 # We can also use custom model functions for modeling/forecasting
-stlmClean <- function(x){stlm(tsclean(x))}
+stlmClean <- function(x) stlm(tsclean(x))
 series <- subset(austres, end = 38)
 cvmodCustom <- cvts(series, FUN = stlmClean, windowSize = 26, maxHorizon = 6)
 accuracy(cvmodCustom)

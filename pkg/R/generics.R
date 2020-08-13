@@ -6,7 +6,7 @@
 #' @param x the input object.
 #' @return A boolean indicating if the object is a \code{hybridModel} is returned.
 #'
-is.hybridModel <- function(x){
+is.hybridModel <- function(x) {
   inherits(x, "hybridModel")
 }
 
@@ -24,7 +24,7 @@ is.hybridModel <- function(x){
 #'
 fitted.hybridModel <- function(object,
                                individual = FALSE,
-                               ...){
+                               ...) {
   #chkDots(...)
   if(individual){
     results <- list()
@@ -51,9 +51,9 @@ residuals.hybridModel <- function(object,
                                   individual = FALSE,
                                   ...){
   #chkDots(...)
-  if(individual){
+  if (individual) {
     results <- list()
-    for(model in object$models){
+    for (model in object$models) {
       results[[model]] <- residuals(object[[model]])
     }
     return(results)
@@ -83,13 +83,13 @@ residuals.hybridModel <- function(object,
 accuracy.hybridModel <- function(object,
                                  individual = FALSE,
                                  ...,
-                                 f = NULL){
-  if(!is.null(f)){
+                                 f = NULL) {
+  if (!is.null(f)) {
     warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.")
     object <- f
   }
   #chkDots(...)
-  if(individual){
+  if (individual) {
     results <- list()
     for(model in object$models){
       results[[model]] <- forecast::accuracy(object[[model]])
@@ -109,14 +109,14 @@ accuracy.hybridModel <- function(object,
 #' @param ... other arguments (ignored).
 #'
 #' @details
-#' Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy measures
-#' \code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy is calculated for each
-#' forecast horizon up to \code{maxHorizon}
+#' Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy
+#' measures \code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy
+#' is calculated for each forecast horizon up to \code{maxHorizon}
 #' @export
 #' @author David Shaub
 #' 
-accuracy.cvts <- function(object, ..., f = NULL){
-  if(!is.null(f)){
+accuracy.cvts <- function(object, ..., f = NULL) {
+  if (!is.null(f)) {
     warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.")
     object <- f
   }
@@ -138,7 +138,7 @@ accuracy.cvts <- function(object, ..., f = NULL){
 #' @details Print the names of the individual component models and their weights.
 #'
 #'
-summary.hybridModel <- function(x){
+summary.hybridModel <- function(x) {
   print(x)
 }
 
@@ -151,12 +151,12 @@ summary.hybridModel <- function(x){
 #' @export
 #' @details Print the names of the individual component models and their weights.
 #'
-print.hybridModel <- function(x, ...){
+print.hybridModel <- function(x, ...) {
   #chkDots(...)
   cat("Hybrid forecast model comprised of the following models: ")
   cat(x$models, sep = ", ")
   cat("\n")
-  for(model in x$models){
+  for (model in x$models) {
     cat("############\n")
     cat(model, "with weight", round(x$weights[model], 3), "\n")
   }
@@ -200,14 +200,14 @@ print.hybridModel <- function(x, ...){
 plot.hybridModel <- function(x,
                              type = c("fit", "models"),
                              ggplot = FALSE,
-                             ...){
+                             ...) {
    type <- match.arg(type)
    #chkDots(...)
    plotModels <- x$models
-   if(type == "fit"){
-      if(ggplot){
+   if (type == "fit") {
+      if (ggplot) {
         plotFrame <- data.frame(matrix(0, nrow = length(x$x), ncol = 0))
-        for(i in plotModels){
+        for (i in plotModels) {
           plotFrame[i] <- fitted(x[[i]])
         }
         names(plotFrame) <- plotModels
@@ -228,7 +228,7 @@ plot.hybridModel <- function(x,
                aes(x = date, y = as.numeric(value), col = variable)) +
         geom_line() + scale_y_continuous(name = "y")
          
-      } else{
+      } else {
          # Set the highest and lowest axis scale
          ymax <- max(sapply(plotModels,
                             FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
@@ -237,18 +237,18 @@ plot.hybridModel <- function(x,
          range <- ymax - ymin
          plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range), ...)
          #title(main = "Plot of original series (black) and fitted component models", outer = TRUE)
-         for(i in seq_along(plotModels)){
+         for (i in seq_along(plotModels)) {
             lines(fitted(x[[plotModels[i]]]), col = i + 1)
          }
          legend("top", plotModels, fill = 2:(length(plotModels) + 1), horiz = TRUE)
       }
-   } else if(type == "models"){
+   } else if (type == "models") {
       plotModels <- x$models[x$models != "stlm" & x$models != "nnetar"]
-      for(i in seq_along(plotModels)){
+      for (i in seq_along(plotModels)) {
          # bats, tbats, and nnetar aren't supported by autoplot
-         if(ggplot && !(plotModels[i] %in% c("tbats", "bats", "nnetar"))){
+         if (ggplot && !(plotModels[i] %in% c("tbats", "bats", "nnetar"))) {
             autoplot(x[[plotModels[i]]])
-         } else if(!ggplot){
+         } else if (!ggplot) {
             plot(x[[plotModels[i]]])
          }
       }

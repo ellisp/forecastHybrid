@@ -18,9 +18,9 @@ Returns range of summary measures of the cross-validated forecast accuracy
 for \code{cvts} objects.
 }
 \details{
-Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy measures
-\code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy is calculated for each
-forecast horizon up to \code{maxHorizon}
+Currently the method only implements \code{ME}, \code{RMSE}, and \code{MAE}. The accuracy
+measures \code{MPE}, \code{MAPE}, and \code{MASE} are not calculated. The accuracy
+is calculated for each forecast horizon up to \code{maxHorizon}
 }
 \author{
 David Shaub

@@ -28,32 +28,42 @@ hybridModel(
 \arguments{
 \item{y}{A numeric vector or time series.}
 
-\item{models}{A character string of up to seven characters indicating which contributing models to use:
+\item{models}{A character string of up to seven characters indicating which contributing
+models to use:
 a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}),
 f (\code{\link{thetam}}), n (\code{\link[forecast]{nnetar}}),
-s (\code{\link[forecast]{stlm}}), t (\code{\link[forecast]{tbats}}), and z (\code{\link[forecast]{snaive}}).}
+s (\code{\link[forecast]{stlm}}), t (\code{\link[forecast]{tbats}}),
+and z (\code{\link[forecast]{snaive}}).}
 
 \item{lambda}{Box-Cox transformation parameter.
 Ignored if NULL. Otherwise, data transformed before model is estimated.}
 
-\item{a.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{auto.arima}}. See details.}
+\item{a.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{auto.arima}}.
+See details.}
 
-\item{e.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{ets}}. See details.}
+\item{e.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{ets}}.
+See details.}
 
-\item{n.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{nnetar}}. See details.}
+\item{n.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{nnetar}}.
+See details.}
 
-\item{s.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{stlm}}. See details.}
+\item{s.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{stlm}}.
+See details.}
 
-\item{t.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}. See details.}
+\item{t.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}.
+See details.}
 
-\item{z.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{snaive}}. See details.}
+\item{z.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{snaive}}.
+See details.}
 
 \item{weights}{method for weighting the forecasts of the various contributing
 models.  Defaults to \code{equal}, which has shown to be robust and better
-in many cases than giving more weight to models with better in-sample performance. Cross validated errors--implemented with \code{link{cvts}}
-should produce the best forecast, but the model estimation is also the slowest. Note that extra arguments
-passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} are not used
-during cross validation. See further explanation in \code{\link{cvts}}.
+in many cases than giving more weight to models with better in-sample performance.
+Cross validated errors--implemented with \code{link{cvts}}
+should produce the best forecast, but the model estimation is also the slowest. Note that
+extra arguments
+passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} are
+not used during cross validation. See further explanation in \code{\link{cvts}}.
 Weights utilizing in-sample errors are also available but not recommended.}
 
 \item{errorMethod}{method of measuring accuracy to use if weights are not
@@ -68,18 +78,21 @@ in \code{cvts()}}
 \item{cvHorizon}{If \code{weights = "cv.errors"}, this controls which forecast to horizon to use
 for the error calculations.}
 
-\item{windowSize}{length of the window to build each model, only used when \code{weights = "cv.errors"}.}
+\item{windowSize}{length of the window to build each model, only used when
+\code{weights = "cv.errors"}.}
 
 \item{horizonAverage}{If \code{weights = "cv.errors"}, setting this to \code{TRUE} will average
 all forecast horizons up to \code{cvHorizon} for calculating the errors instead of using
 the single horizon given in \code{cvHorizon}.}
 
 \item{parallel}{a boolean indicating if parallel processing should be used between models.
-Parallelization will still occur within individual models that support it and can be controlled using \code{a.args} and \code{t.args}.}
+Parallelization will still occur within individual models that support it and can be controlled
+using \code{a.args} and \code{t.args}.}
 
 \item{num.cores}{If \code{parallel=TRUE}, how many cores to use.}
 
-\item{verbose}{Should the status of which model is being fit/cross validated be printed to the terminal?}
+\item{verbose}{Should the status of which model is being fit/cross validated be printed
+to the terminal?}
 }
 \value{
 An object of class hybridModel.
@@ -90,27 +103,28 @@ and can be accessed for all the regular manipulations available in the forecast 
 Create a hybrid time series model with two to five component models.
 }
 \details{
-The \code{hybridModel} function fits multiple individual model specifications to allow easy creation
-of ensemble forecasts. While default settings for the individual component models work quite well
-in most cases, fine control can be exerted by passing detailed arguments to the component models in the
+The \code{hybridModel} function fits multiple individual model specifications
+to allow easy creation of ensemble forecasts. While default settings for the individual
+component models work quite well in most cases, fine control can be exerted by passing detailed
+arguments to the component models in the
 \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
-Note that if \code{xreg} is passed to the \code{a.args}, \code{n.args}, or \code{s.args} component models
-it must now be passed as a matrix. In "forecastHybrid" versions earlier than 4.0.15 it would
-instead be passed in as a dataframe, but for consistency with "forecast" v8.5 we now require
-a matrix with colnames
+Note that if \code{xreg} is passed to the \code{a.args}, \code{n.args}, or
+\code{s.args} component models it must now be passed as a matrix. In "forecastHybrid"
+versions earlier than 4.0.15 it would instead be passed in as a dataframe, but for consistency
+with "forecast" v8.5 we now require a matrix with colnames
 \cr
 \cr
-Characteristics of the input series can cause problems for certain types of models and parameters.
-For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal;
-furthermore, the data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)})
-for the decomposition to succeed.
+Characteristics of the input series can cause problems for certain types of models
+and parameters. For example, \code{\link[forecast]{stlm}} models require that the input
+series be seasonal; furthermore, the data must include at least two seasons
+of data (i.e. \code{length(y) >= 2 * frequency(y)}) for the decomposition to succeed.
 If this is not the case, \code{hybridModel()}
 will remove the \code{stlm} model so an error does not occur.
 Similarly, \code{nnetar} models require that
-\code{length(y) >= 2 * frequency(y)}, so these models will be removed if the condition is not satisfied
-The \code{\link[forecast]{ets}} model does not handle
-a series well with a seasonal period longer than 24 and will ignore the seasonality. In this case,
-\code{hybridModel()} will also drop the \code{ets} model from the ensemble.
+\code{length(y) >= 2 * frequency(y)}, so these models will be removed if the condition
+is not satisfied. The \code{\link[forecast]{ets}} model does not handle
+a series well with a seasonal period longer than 24 and will ignore the seasonality.
+In this case, \code{hybridModel()} will also drop the \code{ets} model from the ensemble.
 }
 \examples{
 \dontrun{

@@ -12,22 +12,32 @@
 #' @param lambda
 #' Box-Cox transformation parameter.
 #' Ignored if NULL. Otherwise, data transformed before model is estimated.
-#' @param models A character string of up to seven characters indicating which contributing models to use:
+#' @param models A character string of up to seven characters indicating which contributing
+#' models to use:
 #' a (\code{\link[forecast]{auto.arima}}), e (\code{\link[forecast]{ets}}),
 #' f (\code{\link{thetam}}), n (\code{\link[forecast]{nnetar}}),
-#' s (\code{\link[forecast]{stlm}}), t (\code{\link[forecast]{tbats}}), and z (\code{\link[forecast]{snaive}}).
-#' @param a.args an optional \code{list} of arguments to pass to \code{\link[forecast]{auto.arima}}. See details.
-#' @param e.args an optional \code{list} of arguments to pass to \code{\link[forecast]{ets}}. See details.
-#' @param n.args an optional \code{list} of arguments to pass to \code{\link[forecast]{nnetar}}. See details.
-#' @param s.args an optional \code{list} of arguments to pass to \code{\link[forecast]{stlm}}. See details.
-#' @param t.args an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}. See details.
-#' @param z.args an optional \code{list} of arguments to pass to \code{\link[forecast]{snaive}}. See details.
+#' s (\code{\link[forecast]{stlm}}), t (\code{\link[forecast]{tbats}}),
+#' and z (\code{\link[forecast]{snaive}}).
+#' @param a.args an optional \code{list} of arguments to pass to \code{\link[forecast]{auto.arima}}.
+#' See details.
+#' @param e.args an optional \code{list} of arguments to pass to \code{\link[forecast]{ets}}.
+#' See details.
+#' @param n.args an optional \code{list} of arguments to pass to \code{\link[forecast]{nnetar}}.
+#' See details.
+#' @param s.args an optional \code{list} of arguments to pass to \code{\link[forecast]{stlm}}.
+#' See details.
+#' @param t.args an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}.
+#' See details.
+#' @param z.args an optional \code{list} of arguments to pass to \code{\link[forecast]{snaive}}.
+#' See details.
 #' @param weights method for weighting the forecasts of the various contributing
 #' models.  Defaults to \code{equal}, which has shown to be robust and better
-#' in many cases than giving more weight to models with better in-sample performance. Cross validated errors--implemented with \code{link{cvts}}
-#' should produce the best forecast, but the model estimation is also the slowest. Note that extra arguments
-#' passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} are not used
-#' during cross validation. See further explanation in \code{\link{cvts}}.
+#' in many cases than giving more weight to models with better in-sample performance.
+#' Cross validated errors--implemented with \code{link{cvts}}
+#' should produce the best forecast, but the model estimation is also the slowest. Note that
+#' extra arguments
+#' passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} are
+#' not used during cross validation. See further explanation in \code{\link{cvts}}.
 #' Weights utilizing in-sample errors are also available but not recommended.
 #' @param errorMethod  method of measuring accuracy to use if weights are not
 #' to be equal.
@@ -35,44 +45,48 @@
 #' and mean absolute scaled error (\code{MASE})
 #' are supported.
 #' @param parallel a boolean indicating if parallel processing should be used between models.
-#' Parallelization will still occur within individual models that support it and can be controlled using \code{a.args} and \code{t.args}.
+#' Parallelization will still occur within individual models that support it and can be controlled
+#' using \code{a.args} and \code{t.args}.
 #' @param num.cores If \code{parallel=TRUE}, how many cores to use.
 #' @param cvHorizon If \code{weights = "cv.errors"}, this controls which forecast to horizon to use
 #' for the error calculations.
 #' @param rolling If \code{weights = "cv.errors"}, this controls the use of rolling cross validation
 #' in \code{cvts()}
-#' @param windowSize length of the window to build each model, only used when \code{weights = "cv.errors"}.
+#' @param windowSize length of the window to build each model, only used when
+#' \code{weights = "cv.errors"}.
 #' @param horizonAverage If \code{weights = "cv.errors"}, setting this to \code{TRUE} will average
 #' all forecast horizons up to \code{cvHorizon} for calculating the errors instead of using
 #' the single horizon given in \code{cvHorizon}.
-#' @param verbose Should the status of which model is being fit/cross validated be printed to the terminal?
+#' @param verbose Should the status of which model is being fit/cross validated be printed
+#' to the terminal?
 #' @seealso \code{\link{forecast.hybridModel}}, \code{\link[forecast]{auto.arima}},
 #' \code{\link[forecast]{ets}}, \code{\link{thetam}}, \code{\link[forecast]{nnetar}},
 #' \code{\link[forecast]{stlm}}, \code{\link[forecast]{tbats}}
 #' @return An object of class hybridModel.
 #' The individual component models are stored inside of the object
 #' and can be accessed for all the regular manipulations available in the forecast package.
-#' @details The \code{hybridModel} function fits multiple individual model specifications to allow easy creation
-#' of ensemble forecasts. While default settings for the individual component models work quite well
-#' in most cases, fine control can be exerted by passing detailed arguments to the component models in the
+#' @details The \code{hybridModel} function fits multiple individual model specifications
+#' to allow easy creation of ensemble forecasts. While default settings for the individual
+#' component models work quite well in most cases, fine control can be exerted by passing detailed
+#' arguments to the component models in the
 #' \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
-#' Note that if \code{xreg} is passed to the \code{a.args}, \code{n.args}, or \code{s.args} component models
-#' it must now be passed as a matrix. In "forecastHybrid" versions earlier than 4.0.15 it would
-#' instead be passed in as a dataframe, but for consistency with "forecast" v8.5 we now require
-#' a matrix with colnames
+#' Note that if \code{xreg} is passed to the \code{a.args}, \code{n.args}, or
+#' \code{s.args} component models it must now be passed as a matrix. In "forecastHybrid"
+#' versions earlier than 4.0.15 it would instead be passed in as a dataframe, but for consistency
+#' with "forecast" v8.5 we now require a matrix with colnames
 #' \cr
 #' \cr
-#' Characteristics of the input series can cause problems for certain types of models and parameters.
-#' For example, \code{\link[forecast]{stlm}} models require that the input series be seasonal;
-#' furthermore, the data must include at least two seasons of data (i.e. \code{length(y) >= 2 * frequency(y)})
-#' for the decomposition to succeed.
+#' Characteristics of the input series can cause problems for certain types of models
+#' and parameters. For example, \code{\link[forecast]{stlm}} models require that the input
+#' series be seasonal; furthermore, the data must include at least two seasons
+#' of data (i.e. \code{length(y) >= 2 * frequency(y)}) for the decomposition to succeed.
 #' If this is not the case, \code{hybridModel()}
 #' will remove the \code{stlm} model so an error does not occur.
 #' Similarly, \code{nnetar} models require that
-#' \code{length(y) >= 2 * frequency(y)}, so these models will be removed if the condition is not satisfied
-#' The \code{\link[forecast]{ets}} model does not handle
-#' a series well with a seasonal period longer than 24 and will ignore the seasonality. In this case,
-#' \code{hybridModel()} will also drop the \code{ets} model from the ensemble.
+#' \code{length(y) >= 2 * frequency(y)}, so these models will be removed if the condition
+#' is not satisfied. The \code{\link[forecast]{ets}} model does not handle
+#' a series well with a seasonal period longer than 24 and will ignore the seasonality.
+#' In this case, \code{hybridModel()} will also drop the \code{ets} model from the ensemble.
 #'
 #' @examples
 #' \dontrun{
@@ -99,27 +113,28 @@
 #' @author David Shaub
 #'
 hybridModel <- function(y, models = "aefnst",
-                        lambda = NULL,
-                        a.args = NULL,
-                        e.args = NULL,
-                        n.args = NULL,
-                        s.args = NULL,
-                        t.args = NULL,
-                        z.args = NULL,
+                        lambda = NULL, # nolint
+                        a.args = NULL, # nolint
+                        e.args = NULL, # nolint
+                        n.args = NULL, # nolint
+                        s.args = NULL, # nolint
+                        t.args = NULL, # nolint
+                        z.args = NULL, # nolint
                         weights = c("equal", "insample.errors", "cv.errors"),
                         errorMethod = c("RMSE", "MAE", "MASE"),
                         rolling = FALSE,
                         cvHorizon = frequency(y),
                         windowSize = 84,
                         horizonAverage = FALSE,
-                        parallel = FALSE, num.cores = 2L,
-                        verbose = TRUE){
+                        parallel = FALSE,
+                        num.cores = 2L, # nolint
+                        verbose = TRUE) {
 
   ##############################################################################
   # Validate input
   ##############################################################################
-  modelArguments = list("a" = a.args, "e" = e.args, "f" = NULL, "n" = n.args,
-                    "s" = s.args, "t" = t.args, "z" = z.args)
+  modelArguments <- list("a" = a.args, "e" = e.args, "f" = NULL, "n" = n.args,
+                         "s" = s.args, "t" = t.args, "z" = z.args)
 
   # Validate and clean the input timeseries
   y <- prepareTimeseries(y = y)
@@ -127,7 +142,7 @@ hybridModel <- function(y, models = "aefnst",
   # using weights = "insample.errors" will tend to overfit and favor complex models, so it is
   # not recommended
   weights <- match.arg(weights)
-  if(weights == "insample.errors"){
+  if (weights == "insample.errors") {
     wrnMsg <- paste0("Using insample.error weights is not recommended for accuracy and ",
                      "may be deprecated in the future.")
     warning(wrnMsg)
@@ -145,7 +160,7 @@ hybridModel <- function(y, models = "aefnst",
   # Check a.args/t.args/e.args/n.args/s.args
   checkModelArgs(modelArguments = modelArguments, models = expandedModels)
 
-  if(weights == "cv.errors" && errorMethod == "MASE"){
+  if (weights == "cv.errors" && errorMethod == "MASE") {
     warning("cv errors currently do not support MASE. Reverting to RMSE.")
     errorMethod <- "RMSE"
   }
@@ -155,10 +170,10 @@ hybridModel <- function(y, models = "aefnst",
   ##############################################################################
 
   # Parallel execuation
-  if(parallel){
-    if(.Platform$OS.type == "unix"){
+  if (parallel) {
+    if (.Platform$OS.type == "unix") {
       cl <- parallel::makeForkCluster(num.cores)
-    } else{
+    } else {
       cl <- parallel::makeCluster(num.cores)
     }
     doParallel::registerDoParallel(cl)
@@ -169,13 +184,13 @@ hybridModel <- function(y, models = "aefnst",
     fitModels <- foreach::foreach(modelCode = expandedModels,
                                   .packages = c("forecast", "forecastHybrid")) %dopar% {
       # thetam() currently does not handle arguments
-      if(modelCode == "f"){
+      if (modelCode == "f") {
          fitModel <- thetam(y)
-      } else{ # All other models handle lambda and additional arguments
+      } else { # All other models handle lambda and additional arguments
         argsAdditional <- modelArguments[[modelCode]]
-        if(is.null(argsAdditional)){
+        if (is.null(argsAdditional)) {
           argsAdditional <- list(lambda = lambda)
-        } else if(is.null(argsAdditional$lambda)){
+        } else if (is.null(argsAdditional$lambda)) {
           argsAdditional$lambda <- lambda
         }
         currentModel <- purrr::partial(getModel(modelCode), y = y)
@@ -184,21 +199,21 @@ hybridModel <- function(y, models = "aefnst",
       fitModel
     }
     modelResults <- unwrapParallelModels(fitModels, expandedModels)
-  } else{# serial execution
+  } else {# serial execution
     modelResults <- list()
-    for(modelCode in expandedModels){
+    for (modelCode in expandedModels) {
       modelName <- getModelName(modelCode)
-      if(verbose){
+      if (verbose) {
         message("Fitting the ", modelName, " model")
       }
       # thetam() currently does not handle arguments
-      if(modelCode == "f"){
+      if (modelCode == "f") {
          modelResults[[modelName]] <- thetam(y)
-      } else{ # All other models handle lambda and additional arguments
+      } else { # All other models handle lambda and additional arguments
         argsAdditional <- modelArguments[[modelCode]]
-        if(is.null(argsAdditional)){
+        if (is.null(argsAdditional)) {
           argsAdditional <- list(lambda = lambda)
-        } else if(is.null(argsAdditional$lambda)){
+        } else if (is.null(argsAdditional$lambda)) {
           argsAdditional$lambda <- lambda
         }
         currentModel <- purrr::partial(getModel(modelCode), y = y)
@@ -214,17 +229,17 @@ hybridModel <- function(y, models = "aefnst",
   # Set the model weights
   includedModels <- names(modelResults)
   numModels <- length(expandedModels)
-  if(weights == "equal"){
+  if (weights == "equal") {
     modelResults$weights <- rep(1 / numModels, numModels)
-  } else if(weights %in% c("insample.errors", "cv.errors")){
+  } else if (weights %in% c("insample.errors", "cv.errors")) {
     modelResults$weights <- rep(0, numModels)
     modResults <- modelResults
 
-    if(weights == "cv.errors"){
-      for(modelCode in expandedModels){
+    if (weights == "cv.errors") {
+      for (modelCode in expandedModels) {
         modelName <- getModelName(modelCode)
         currentModel <- getModel(modelCode)
-        if(verbose){
+        if (verbose) {
           message("Cross validating the ", modelName, " model")
         }
         modResults[[modelName]] <- cvts(y, FUN = currentModel,
@@ -252,11 +267,11 @@ hybridModel <- function(y, models = "aefnst",
   }
 
   # Check for valid weights when weights = "insample.errors" and submodels produce perfect fits
-  if(is.element(NaN, modelResults$weights) & weights %in% c("insample.errors", "cv.errors")){
+  if (is.element(NaN, modelResults$weights) & weights %in% c("insample.errors", "cv.errors")) {
     wrnMsg <- paste0("At least one model perfectly fit the series, so accuracy measures cannot",
                      " be used for weights. Reverting to weights = \"equal\".")
     warning(wrnMsg)
-    modelResults$weights <- rep(1/ length(includedModels),
+    modelResults$weights <- rep(1 / length(includedModels),
                                 length(includedModels))
   }
   names(modelResults$weights) <- includedModels
@@ -276,13 +291,13 @@ hybridModel <- function(y, models = "aefnst",
 
   # Save which models used xreg
   xregs <- list()
-  if("a" %in% expandedModels){
+  if ("a" %in% expandedModels) {
     xregs$auto.arima <- ifelse("xreg" %in% names(a.args) && !is.null(a.args$xreg), TRUE, FALSE)
   }
-  if("n" %in% expandedModels){
+  if ("n" %in% expandedModels) {
     xregs$nnetar <- ifelse("xreg" %in% names(n.args) && !is.null(n.args$xreg), TRUE, FALSE)
   }
-  if("s" %in% expandedModels){
+  if ("s" %in% expandedModels) {
     methodArima <- "method" %in% names(s.args) && s.args$method == "arima"
     xregs$stlm <- ifelse("xreg" %in% names(s.args) && !is.null(s.args$xreg) && methodArima,
                          TRUE, FALSE)
