@@ -80,8 +80,10 @@ thetam <- function(y) {
 #' plot(fc1)
 #' @author Peter Ellis
 #' @seealso \code{\link{thetam}}
-forecast.thetam <- function(object, h = ifelse(object$m > 1, 2 * object$m, 10),
-                            level = c(80, 95), fan = FALSE, ...) {
+forecast.thetam <- function(object,
+                            h = ifelse(object$m > 1, 2 * object$m, 10),
+                            level = c(80, 95),
+                            fan = FALSE, ...) {
    chkDots(...)
    if (fan) {
       level <- seq(51, 99, by = 3)

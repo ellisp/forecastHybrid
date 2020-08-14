@@ -46,7 +46,8 @@ tsCombine <- function(...) {
 #' @author Ganesh Krishnan
 #' @examples
 #' tsSubsetWithIndices(AirPassengers, c(3:10))
-tsSubsetWithIndices <- function(x, indices) {
+tsSubsetWithIndices <- function(x,
+                                indices) {
   xtime <- time(x)
   minIndex <- min(indices)
   maxIndex <- max(indices)
@@ -100,7 +101,8 @@ getModelName <- function(modelCharacter) {
 #' @param expandedModels A character vector from the \code{models} argument of \link{hybridModel}
 #' @details See usage inside the \code{hybridModel} function.
 #' @seealso \code{\link{hybridModel}}
-unwrapParallelModels <- function(fitModels, expandedModels) {
+unwrapParallelModels <- function(fitModels,
+                                 expandedModels) {
   modelResults <- list()
   for (i in seq_along(expandedModels)) {
     model <- expandedModels[i]
@@ -167,7 +169,8 @@ removeModels <- function(y, models) {
 #'
 #' @param parallel A logic to indicate if parallel processing should be used
 #' @param num.cores An integer for the number of threads to use
-checkParallelArguments <- function(parallel, num.cores) {
+checkParallelArguments <- function(parallel,
+                                   num.cores) {
   # Validate cores and parallel arguments
   if (!is.logical(parallel)) {
     stop("The parallel argument must be TRUE/FALSE.")
@@ -205,7 +208,8 @@ prepareTimeseries <- function(y) {
 #'
 #' @param modelArguments A list of containing the model arguments
 #' @param models A character vector containing all the model codes
-checkModelArgs <- function(modelArguments, models) {
+checkModelArgs <- function(modelArguments,
+                           models) {
   expandedModels <- models
   for (i in seq_along(modelArguments)) {
     modelCode <- names(modelArguments)[i]

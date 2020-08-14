@@ -256,9 +256,8 @@ hybridModel <- function(y, models = "aefnst",
     cvHorizon <- ifelse(weights != "cv.errors", 1, cvHorizon)
 
     # Set the weights
-    modelResults$weights <- sapply(expandedModels,
-                                   function(x) accuracy(modResults[[getModelName(x)]])[cvHorizon,
-                                                                                       errorMethod])
+    weightFunction <- function(x) accuracy(modResults[[getModelName(x)]])[cvHorizon, errorMethod]
+    modelResults$weights <- sapply(expandedModels, weightFunction)
 
     # Scale the weights
     inverseErrors <- 1 / modelResults$weights
@@ -269,7 +268,7 @@ hybridModel <- function(y, models = "aefnst",
   # Check for valid weights when weights = "insample.errors" and submodels produce perfect fits
   if (is.element(NaN, modelResults$weights) & weights %in% c("insample.errors", "cv.errors")) {
     wrnMsg <- paste0("At least one model perfectly fit the series, so accuracy measures cannot",
-                     " be used for weights. Reverting to weights = \"equal\".")
+                     " be used for weights. Reverting to weights = \"equal\".") # nolint
     warning(wrnMsg)
     modelResults$weights <- rep(1 / length(includedModels),
                                 length(includedModels))

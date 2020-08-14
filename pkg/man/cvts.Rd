@@ -29,10 +29,9 @@ cvts(
 \item{FCFUN}{a function that process point forecasts for the model function. This defaults to \code{\link{forecast}}. Custom functions are allowed. See details and examples.
 See details.}
 
-\item{rolling}{should a rolling procedure be used? If TRUE, non-overlapping windows of size \code{maxHorizon}
-will be used for fitting each model. If FALSE, the size of the dataset used for training
-will grow
-by one each iteration.}
+\item{rolling}{should a rolling procedure be used? If TRUE, non-overlapping windows
+of size \code{maxHorizon} will be used for fitting each model. If FALSE, the size
+of the dataset used for training will grow by one each iteration.}
 
 \item{windowSize}{length of the window to build each model. When \code{rolling == FALSE},
 the each model will be
@@ -42,7 +41,8 @@ of this length and grow by one each iteration.}
 
 \item{maxHorizon}{maximum length of the forecast horizon to use for computing errors.}
 
-\item{horizonAverage}{should the final errors be an average over all forecast horizons up to \code{maxHorizon} instead of producing
+\item{horizonAverage}{should the final errors be an average over all forecast horizons
+up to \code{maxHorizon} instead of producing
 metrics for each individual horizon?}
 
 \item{xreg}{External regressors to be used to fit the model. Only used if FUN accepts xreg
@@ -69,14 +69,16 @@ loaded, these can be passed here so that they can be passed to parallel socket w
 Perform cross validation on a time series.
 }
 \details{
-Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
-without serial correlation since observations \eqn{x_t}{x[t]} and \eqn{x_{t+n}}{x[t+n]} are not independent. The \code{cvts()} function overcomes
+Cross validation of time series data is more complicated than regular
+k-folds or leave-one-out cross validation of datasets
+without serial correlation since observations \eqn{x_t}{x[t]} and \eqn{x_{t+n}}{x[t+n]}
+are not independent. The \code{cvts()} function overcomes
 this obstacle using two methods: 1) rolling cross validation where an initial training window
 is used along with a forecast horizon
 and the initial window used for training grows by one observation each round until the training
 window and the forecast horizon capture the
-entire series or 2) a non-rolling approach where a fixed training length is used that is shifted forward by the forecast horizon
-after each iteration.
+entire series or 2) a non-rolling approach where a fixed training length is used that
+is shifted forward by the forecast horizon after each iteration.
 
 For the rolling approach, training points are heavily recycled, both in terms of used for fitting
 and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}.
@@ -99,8 +101,10 @@ a custom model and forecast.
 
 For small time series (default \code{length <= 500}), all of the individual fit models
 are included in the final
-\code{cvts} object that is returned. This can grow quite large since functions such as \code{auto.arima} will
-save fitted values, residual values, summary statistics, coefficient matrices, etc. Setting \code{saveModels = FALSE}
+\code{cvts} object that is returned. This can grow quite large since functions
+such as \code{auto.arima} will
+save fitted values, residual values, summary statistics, coefficient matrices, etc.
+Setting \code{saveModels = FALSE}
 can be safely done if there is no need to examine individual models fit at every stage
 of cross validation since the
 forecasts from each fold and the associated residuals are always saved.

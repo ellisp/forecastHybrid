@@ -19,7 +19,9 @@
 #' @seealso \code{\link[thief]{thief}}
 #' @seealso \code{\link{hybridModel}}
 #'
-thiefModel <- function(y, models = "aefnt", h = 2 * frequency(y),
+thiefModel <- function(y,
+                       models = "aefnt",
+                       h = 2 * frequency(y),
                        comb=c("struc", "mse", "ols", "bu", "shr", "sam"),
                        verbose = FALSE) {
 

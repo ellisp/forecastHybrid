@@ -25,7 +25,7 @@ is.hybridModel <- function(x) {
 fitted.hybridModel <- function(object,
                                individual = FALSE,
                                ...) {
-  #chkDots(...)
+  chkDots(...)
   if(individual){
     results <- list()
     for(model in object$models){
@@ -50,7 +50,7 @@ fitted.hybridModel <- function(object,
 residuals.hybridModel <- function(object,
                                   individual = FALSE,
                                   ...){
-  #chkDots(...)
+  chkDots(...)
   if (individual) {
     results <- list()
     for (model in object$models) {
@@ -84,11 +84,11 @@ accuracy.hybridModel <- function(object,
                                  individual = FALSE,
                                  ...,
                                  f = NULL) {
+  chkDots(...)
   if (!is.null(f)) {
     warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.")
     object <- f
   }
-  #chkDots(...)
   if (individual) {
     results <- list()
     for(model in object$models){
@@ -115,7 +115,10 @@ accuracy.hybridModel <- function(object,
 #' @export
 #' @author David Shaub
 #' 
-accuracy.cvts <- function(object, ..., f = NULL) {
+accuracy.cvts <- function(object,
+                          ...,
+                          f = NULL) {
+  chkDots(...)
   if (!is.null(f)) {
     warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.")
     object <- f
@@ -151,8 +154,9 @@ summary.hybridModel <- function(x) {
 #' @export
 #' @details Print the names of the individual component models and their weights.
 #'
-print.hybridModel <- function(x, ...) {
-  #chkDots(...)
+print.hybridModel <- function(x,
+                              ...) {
+  chkDots(...)
   cat("Hybrid forecast model comprised of the following models: ")
   cat(x$models, sep = ", ")
   cat("\n")
@@ -202,7 +206,7 @@ plot.hybridModel <- function(x,
                              ggplot = FALSE,
                              ...) {
    type <- match.arg(type)
-   #chkDots(...)
+   chkDots(...)
    plotModels <- x$models
    if (type == "fit") {
       if (ggplot) {

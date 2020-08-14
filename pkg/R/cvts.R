@@ -9,17 +9,17 @@
 #' @param FUN the model function used. Custom functions are allowed. See details and examples.
 #' @param FCFUN a function that process point forecasts for the model function. This defaults to \code{\link{forecast}}. Custom functions are allowed. See details and examples.
 #' See details.
-#' @param rolling should a rolling procedure be used? If TRUE, non-overlapping windows of size \code{maxHorizon}
-#' will be used for fitting each model. If FALSE, the size of the dataset used for training
-#' will grow
-#' by one each iteration.
+#' @param rolling should a rolling procedure be used? If TRUE, non-overlapping windows
+#' of size \code{maxHorizon} will be used for fitting each model. If FALSE, the size
+#' of the dataset used for training will grow by one each iteration.
 #' @param windowSize length of the window to build each model. When \code{rolling == FALSE},
 #' the each model will be
 #' fit to a time series of this length, and when \code{rolling == TRUE} the first model will
 #' be fit to a series
 #' of this length and grow by one each iteration.
 #' @param maxHorizon maximum length of the forecast horizon to use for computing errors.
-#' @param horizonAverage should the final errors be an average over all forecast horizons up to \code{maxHorizon} instead of producing
+#' @param horizonAverage should the final errors be an average over all forecast horizons
+#' up to \code{maxHorizon} instead of producing
 #' metrics for each individual horizon?
 #' @param xreg External regressors to be used to fit the model. Only used if FUN accepts xreg
 #' as an argument. FCFUN is also expected to accept it (see details)
@@ -36,14 +36,16 @@
 #' loaded, these can be passed here so that they can be passed to parallel socket workers
 #' @param ... Other arguments to be passed to the model function FUN
 #'
-#' @details Cross validation of time series data is more complicated than regular k-folds or leave-one-out cross validation of datasets
-#' without serial correlation since observations \eqn{x_t}{x[t]} and \eqn{x_{t+n}}{x[t+n]} are not independent. The \code{cvts()} function overcomes
+#' @details Cross validation of time series data is more complicated than regular
+#' k-folds or leave-one-out cross validation of datasets
+#' without serial correlation since observations \eqn{x_t}{x[t]} and \eqn{x_{t+n}}{x[t+n]}
+#' are not independent. The \code{cvts()} function overcomes
 #' this obstacle using two methods: 1) rolling cross validation where an initial training window
 #' is used along with a forecast horizon
 #' and the initial window used for training grows by one observation each round until the training
 #' window and the forecast horizon capture the
-#' entire series or 2) a non-rolling approach where a fixed training length is used that is shifted forward by the forecast horizon
-#' after each iteration.
+#' entire series or 2) a non-rolling approach where a fixed training length is used that
+#' is shifted forward by the forecast horizon after each iteration.
 #'
 #' For the rolling approach, training points are heavily recycled, both in terms of used for fitting
 #' and in generating forecast errors at each of the forecast horizons from \code{1:maxHorizon}.
@@ -66,8 +68,10 @@
 #'
 #' For small time series (default \code{length <= 500}), all of the individual fit models
 #' are included in the final
-#' \code{cvts} object that is returned. This can grow quite large since functions such as \code{auto.arima} will
-#' save fitted values, residual values, summary statistics, coefficient matrices, etc. Setting \code{saveModels = FALSE}
+#' \code{cvts} object that is returned. This can grow quite large since functions
+#' such as \code{auto.arima} will
+#' save fitted values, residual values, summary statistics, coefficient matrices, etc.
+#' Setting \code{saveModels = FALSE}
 #' can be safely done if there is no need to examine individual models fit at every stage
 #' of cross validation since the
 #' forecasts from each fold and the associated residuals are always saved.
@@ -140,10 +144,10 @@ cvts <- function(x,
   # This can be useful for methods that estimate the model and forecasts in one step
   # e.g. GMDH() from the "GMDH" package or thetaf()/meanf()/rwf() from "forecast". In this case,
   # no model function is used but the forecast function is applied in FCFUN
-  FUN <- ifelse(is.null(FUN), function(x) x, FUN)
+  FUN <- ifelse(is.null(FUN), function(x) x, FUN) # nolint
 
   # Default forecast function
-  FCFUN <- ifelse(is.null(FCFUN), forecast, FCFUN)
+  FCFUN <- ifelse(is.null(FCFUN), forecast, FCFUN) # nolint
 
   f <- frequency(x)
   tspx <- tsp(x)
@@ -218,7 +222,7 @@ cvts <- function(x,
                    as.integer((length(x) - windowSize) / maxHorizon))
   resultsMat <- matrix(NA, nrow = numRow, ncol = maxHorizon)
 
-  forecasts <- fits <- vector("list", nrow(resultsMat))
+  forecasts <- vector("list", nrow(resultsMat))
   slices <- tsPartition(x, rolling, windowSize, maxHorizon)
 
 
@@ -247,8 +251,8 @@ cvts <- function(x,
     tsTest <- tsSubsetWithIndices(x, testIndices)
 
     if (xregUse) {
-      xregTrain <- xreg[trainIndices, ,drop = FALSE]
-      xregTest <- xreg[testIndices, ,drop = FALSE]
+      xregTrain <- xreg[trainIndices, , drop = FALSE]
+      xregTest <- xreg[testIndices, , drop = FALSE]
       mod <- do.call(FUN, list(tsTrain, xreg = xregTrain, ...))
       fc <- FCFUN(mod, xreg = xregTest, h = maxHorizon)
     } else {
@@ -328,7 +332,10 @@ cvts <- function(x,
 #' tsPartition(AirPassengers, rolling = TRUE, windowSize = 10, maxHorizon = 2)
 #'
 
-tsPartition <- function(x, rolling, windowSize, maxHorizon) {
+tsPartition <- function(x,
+                        rolling,
+                        windowSize,
+                        maxHorizon) {
   numPartitions <- ifelse(rolling,
                           length(x) - windowSize - maxHorizon + 1,
                           as.integer((length(x) - windowSize) / maxHorizon))
@@ -376,7 +383,8 @@ tsPartition <- function(x, rolling, windowSize, maxHorizon) {
 #'
 #' extractForecasts(cv)
 #'
-extractForecasts <- function(cv, horizon = 1) {
+extractForecasts <- function(cv,
+                             horizon = 1) {
       if (horizon > cv$params$maxHorizon)
          stop("Cannot extract forecasts with a horizon greater than the model maxHorizon")
       pointfList <- Map(function(fcast) {
