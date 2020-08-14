@@ -18,7 +18,8 @@
 #' @param PI should prediction intervals be produced? If a \code{nnetar} model is in the ensemble,
 #' this can be quite slow, so disabling prediction intervals will speed up the forecast generation.
 #' If \code{FALSE}, the arguments \code{level} and \code{fan} are ignored.
-#' @param PI.combination Method for combining the prediction intervals from each of the component forecasts. Supplying \code{"mean"}
+#' @param PI.combination Method for combining the prediction intervals from each of the
+#' forecasts. Supplying \code{"mean"}
 #' will simply average each of the lower/upper intervals from each model without using the model
 #' weights used for the point forecasts. The default value \code{"extreme"} will take
 #' the most pessimistic intervals (i.e. the highest upper interval from all the component models
@@ -60,9 +61,9 @@ forecast.hybridModel <- function(object,
                                  h = ifelse(object$frequency > 1, 2 * object$frequency, 10),
                                  xreg = NULL,
                                  level = c(80, 95),
-                                 PI = TRUE,
+                                 PI = TRUE, # nolint
                                  fan = FALSE,
-                                 PI.combination = c("extreme", "mean"),
+                                 PI.combination = c("extreme", "mean"), # nolint
                                  ...) {
 
   chkDots(...)
@@ -124,7 +125,7 @@ forecast.hybridModel <- function(object,
     if (!object$xreg$auto.arima) {
       xregA <- NULL
       }
-    forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xregA, level = level, ...)
+    forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xregA, level = level, ...) # nolint
     forecasts$pointForecasts[, "auto.arima"] <- forecasts$auto.arima$mean
   }
   if ("ets" %in% includedModels) {

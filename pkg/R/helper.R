@@ -138,23 +138,23 @@ removeModels <- function(y, models) {
     expandedModels <- expandedModels[expandedModels != "e"]
   }
   if (is.element("f", expandedModels) && length(y) <= frequency(y)) {
-    warning("The theta model requires more than one seasonal period of data. The theta model will not be used.")
+    warning("The theta model requires more than one seasonal period of data. The theta model will not be used.") # nolint
     expandedModels <- expandedModels[expandedModels != "f"]
   }
 
   if (is.element("s", expandedModels)) {
     if (frequency(y) < 2L) {
-      warning("The stlm model requires that the input data be a seasonal ts object. The stlm model will not be used.")
+      warning("The stlm model requires that the input data be a seasonal ts object. The stlm model will not be used.") # nolint
       expandedModels <- expandedModels[expandedModels != "s"]
     }
     if (frequency(y) * 2L >= length(y)) {
-      warning("The stlm model requres a series more than twice as long as the seasonal period. The stlm model will not be used.")
+      warning("The stlm model requres a series more than twice as long as the seasonal period. The stlm model will not be used.") # nolint
       expandedModels <- expandedModels[expandedModels != "s"]
     }
   }
   if (is.element("n", expandedModels)) {
     if (frequency(y) * 2L >= length(y)) {
-      warning("The nnetar model requres a series more than twice as long as the seasonal period. The nnetar model will not be used.")
+      warning("The nnetar model requres a series more than twice as long as the seasonal period. The nnetar model will not be used.") # nolint
       expandedModels <- expandedModels[expandedModels != "n"]
     }
   }
@@ -170,7 +170,7 @@ removeModels <- function(y, models) {
 #' @param parallel A logic to indicate if parallel processing should be used
 #' @param num.cores An integer for the number of threads to use
 checkParallelArguments <- function(parallel,
-                                   num.cores) {
+                                   num.cores) { # nolint
   # Validate cores and parallel arguments
   if (!is.logical(parallel)) {
     stop("The parallel argument must be TRUE/FALSE.")

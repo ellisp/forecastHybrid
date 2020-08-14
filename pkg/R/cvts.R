@@ -7,8 +7,8 @@
 #' @export
 #' @param x the input time series.
 #' @param FUN the model function used. Custom functions are allowed. See details and examples.
-#' @param FCFUN a function that process point forecasts for the model function. This defaults to \code{\link{forecast}}. Custom functions are allowed. See details and examples.
-#' See details.
+#' @param FCFUN a function that process point forecasts for the model function. This defaults
+#' to \code{\link{forecast}}. Custom functions are allowed. See details and examples. See details.
 #' @param rolling should a rolling procedure be used? If TRUE, non-overlapping windows
 #' of size \code{maxHorizon} will be used for fitting each model. If FALSE, the size
 #' of the dataset used for training will grow by one each iteration.
@@ -120,8 +120,8 @@
 #' @importFrom parallel stopCluster
 #' @importFrom foreach foreach
 cvts <- function(x,
-                 FUN = NULL,
-                 FCFUN = NULL,
+                 FUN = NULL, # nolint
+                 FCFUN = NULL, # nolint
                  rolling = FALSE,
                  windowSize = 84,
                  maxHorizon = 5,
@@ -130,7 +130,7 @@ cvts <- function(x,
                  saveModels = ifelse(length(x) > 500, FALSE, TRUE),
                  saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
                  verbose = TRUE,
-                 num.cores = 2L,
+                 num.cores = 2L, # nolint
                  extraPackages = NULL,
                  ...) {
 
@@ -397,6 +397,6 @@ extractForecasts <- function(cv,
       pointf <- Reduce(tsCombine, pointfList)
 
       #Ensure all points in the original series are represented (makes it easy for comparisons)
-      template <- replace(cv$x, c(1:length(cv$x)), NA)
+      template <- replace(cv$x, c(seq_len(length(cv$x))), NA)
       return(tsCombine(pointf, template))
 }

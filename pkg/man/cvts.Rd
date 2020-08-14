@@ -26,8 +26,8 @@ cvts(
 
 \item{FUN}{the model function used. Custom functions are allowed. See details and examples.}
 
-\item{FCFUN}{a function that process point forecasts for the model function. This defaults to \code{\link{forecast}}. Custom functions are allowed. See details and examples.
-See details.}
+\item{FCFUN}{a function that process point forecasts for the model function. This defaults
+to \code{\link{forecast}}. Custom functions are allowed. See details and examples. See details.}
 
 \item{rolling}{should a rolling procedure be used? If TRUE, non-overlapping windows
 of size \code{maxHorizon} will be used for fitting each model. If FALSE, the size

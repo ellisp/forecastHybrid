@@ -80,7 +80,7 @@ thetam <- function(y) {
 #' plot(fc1)
 #' @author Peter Ellis
 #' @seealso \code{\link{thetam}}
-forecast.thetam <- function(object,
+forecast.thetam <- function(object, # nolint
                             h = ifelse(object$m > 1, 2 * object$m, 10),
                             level = c(80, 95),
                             fan = FALSE, ...) {

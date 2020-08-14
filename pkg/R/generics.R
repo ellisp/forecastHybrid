@@ -6,7 +6,7 @@
 #' @param x the input object.
 #' @return A boolean indicating if the object is a \code{hybridModel} is returned.
 #'
-is.hybridModel <- function(x) {
+is.hybridModel <- function(x) { # nolint
   inherits(x, "hybridModel")
 }
 
@@ -26,9 +26,9 @@ fitted.hybridModel <- function(object,
                                individual = FALSE,
                                ...) {
   chkDots(...)
-  if(individual){
+  if (individual) {
     results <- list()
-    for(model in object$models){
+    for (model in object$models) {
       results[[model]] <- fitted(object[[model]])
     }
     return(results)
@@ -49,7 +49,7 @@ fitted.hybridModel <- function(object,
 #'
 residuals.hybridModel <- function(object,
                                   individual = FALSE,
-                                  ...){
+                                  ...) {
   chkDots(...)
   if (individual) {
     results <- list()
@@ -80,18 +80,18 @@ residuals.hybridModel <- function(object,
 #'
 #' @author David Shaub
 #'
-accuracy.hybridModel <- function(object,
+accuracy.hybridModel <- function(object, # nolint
                                  individual = FALSE,
                                  ...,
                                  f = NULL) {
   chkDots(...)
   if (!is.null(f)) {
-    warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.")
+    warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.") # nolint
     object <- f
   }
   if (individual) {
     results <- list()
-    for(model in object$models){
+    for (model in object$models) {
       results[[model]] <- forecast::accuracy(object[[model]])
     }
     return(results)
@@ -114,19 +114,19 @@ accuracy.hybridModel <- function(object,
 #' is calculated for each forecast horizon up to \code{maxHorizon}
 #' @export
 #' @author David Shaub
-#' 
-accuracy.cvts <- function(object,
+#'
+accuracy.cvts <- function(object, # nolint
                           ...,
                           f = NULL) {
   chkDots(...)
   if (!is.null(f)) {
-    warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.")
+    warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.") # nolint
     object <- f
   }
-  ME <- colMeans(object$residuals)
-  RMSE <- apply(object$residuals, MARGIN = 2,
-                FUN = function(x){sqrt(sum(x ^ 2)/ length(x))})
-  MAE <- colMeans(abs(object$residuals))
+  ME <- colMeans(object$residuals) # nolint
+  RMSE <- apply(object$residuals, MARGIN = 2, # nolint
+                FUN = function(x) sqrt(sum(x ^ 2) / length(x)))
+  MAE <- colMeans(abs(object$residuals)) # nolint
   results <- data.frame(ME, RMSE, MAE)
   rownames(results) <- paste("Forecast Horizon ", rownames(results))
   # MASE TODO
@@ -231,7 +231,6 @@ plot.hybridModel <- function(x,
         ggplot(data = plotFrame,
                aes(x = date, y = as.numeric(value), col = variable)) +
         geom_line() + scale_y_continuous(name = "y")
-         
       } else {
          # Set the highest and lowest axis scale
          ymax <- max(sapply(plotModels,

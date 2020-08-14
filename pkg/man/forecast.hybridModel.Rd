@@ -36,7 +36,8 @@ If \code{FALSE}, the arguments \code{level} and \code{fan} are ignored.}
 \item{fan}{if \code{TRUE}, level is set to \code{seq(51, 99, by = 3)}. This is suitable
 for fan plots.}
 
-\item{PI.combination}{Method for combining the prediction intervals from each of the component forecasts. Supplying \code{"mean"}
+\item{PI.combination}{Method for combining the prediction intervals from each of the
+forecasts. Supplying \code{"mean"}
 will simply average each of the lower/upper intervals from each model without using the model
 weights used for the point forecasts. The default value \code{"extreme"} will take
 the most pessimistic intervals (i.e. the highest upper interval from all the component models

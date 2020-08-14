@@ -291,7 +291,7 @@ hybridModel <- function(y, models = "aefnst",
   # Save which models used xreg
   xregs <- list()
   if ("a" %in% expandedModels) {
-    xregs$auto.arima <- ifelse("xreg" %in% names(a.args) && !is.null(a.args$xreg), TRUE, FALSE)
+    xregs$auto.arima <- ifelse("xreg" %in% names(a.args) && !is.null(a.args$xreg), TRUE, FALSE) # nolint
   }
   if ("n" %in% expandedModels) {
     xregs$nnetar <- ifelse("xreg" %in% names(n.args) && !is.null(n.args$xreg), TRUE, FALSE)
