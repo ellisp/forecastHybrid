@@ -34,10 +34,8 @@ of size \code{maxHorizon} will be used for fitting each model. If FALSE, the siz
 of the dataset used for training will grow by one each iteration.}
 
 \item{windowSize}{length of the window to build each model. When \code{rolling == FALSE},
-the each model will be
-fit to a time series of this length, and when \code{rolling == TRUE} the first model will
-be fit to a series
-of this length and grow by one each iteration.}
+the each model will be fit to a time series of this length, and when \code{rolling == TRUE}
+the first model will be fit to a series of this length and grow by one each iteration.}
 
 \item{maxHorizon}{maximum length of the forecast horizon to use for computing errors.}
 

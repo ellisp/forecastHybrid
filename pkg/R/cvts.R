@@ -1,3 +1,32 @@
+#' Validate that CV window parameters are valid
+#'
+#' Validate that CV window parameters are valid
+#' @param x the input time series.
+#' @param windowSize length of the window to build each model. When \code{rolling == FALSE},
+#' the each model will be fit to a time series of this length, and when \code{rolling == TRUE}
+#' the first model will be fit to a series of this length and grow by one each iteration.
+#' @param maxHorizon maximum length of the forecast horizon to use for computing errors.
+checkCVArguments <- function(x,
+                             windowSize,
+                             maxHorizon) {
+  if (any(sapply(c(x, windowSize, maxHorizon), FUN = function(x) !is.numeric(x)))) {
+    stop("The arguments x, windowSize, and maxHorizon must all be numeric.")
+  }
+
+  if (any(c(windowSize, maxHorizon) < 1L)) {
+    stop("The arguments windowSize, and maxHorizon must be positive integers.")
+  }
+
+  if (any(c(windowSize, maxHorizon) %% 1L != 0)) {
+    stop("The arguments windowSize, and maxHorizon must be positive integers.")
+  }
+
+  # Ensure at least two periods are tested
+  if (windowSize + 2 * maxHorizon > length(x)) {
+    stop("The time series must be longer than windowSize + 2 * maxHorizon.")
+  }
+}
+
 #' Cross validation for time series
 #'
 #' Perform cross validation on a time series.
@@ -13,10 +42,8 @@
 #' of size \code{maxHorizon} will be used for fitting each model. If FALSE, the size
 #' of the dataset used for training will grow by one each iteration.
 #' @param windowSize length of the window to build each model. When \code{rolling == FALSE},
-#' the each model will be
-#' fit to a time series of this length, and when \code{rolling == TRUE} the first model will
-#' be fit to a series
-#' of this length and grow by one each iteration.
+#' the each model will be fit to a time series of this length, and when \code{rolling == TRUE}
+#' the first model will be fit to a series of this length and grow by one each iteration.
 #' @param maxHorizon maximum length of the forecast horizon to use for computing errors.
 #' @param horizonAverage should the final errors be an average over all forecast horizons
 #' up to \code{maxHorizon} instead of producing
@@ -155,22 +182,7 @@ cvts <- function(x,
     x <- ts(x, frequency = f)
   }
 
-  if (any(sapply(c(x, windowSize, maxHorizon), FUN = function(x) !is.numeric(x)))) {
-    stop("The arguments x, windowSize, and maxHorizon must all be numeric.")
-  }
-
-  if (any(c(windowSize, maxHorizon) < 1L)) {
-    stop("The arguments windowSize, and maxHorizon must be positive integers.")
-  }
-
-  if (any(c(windowSize, maxHorizon) %% 1L != 0)) {
-    stop("The arguments windowSize, and maxHorizon must be positive integers.")
-  }
-
-  # Ensure at least two periods are tested
-  if (windowSize + 2 * maxHorizon > length(x)) {
-    stop("The time series must be longer than windowSize + 2 * maxHorizon.")
-  }
+  checkCVArguments(x = x, windowSize = windowSize, maxHorizon = maxHorizon)
 
   # Check if fitting function accepts xreg when xreg is not NULL
   xregUse <- FALSE

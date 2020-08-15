@@ -112,7 +112,7 @@
 #'
 #' @author David Shaub
 #'
-hybridModel <- function(y,
+hybridModel <- function(y, # nolint
                         models = "aefnst",
                         lambda = NULL, # nolint
                         a.args = NULL, # nolint

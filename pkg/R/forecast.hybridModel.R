@@ -57,7 +57,7 @@
 #' }
 #'@author David Shaub
 #'
-forecast.hybridModel <- function(object,
+forecast.hybridModel <- function(object, # nolint
                                  h = ifelse(object$frequency > 1, 2 * object$frequency, 10),
                                  xreg = NULL,
                                  level = c(80, 95),
