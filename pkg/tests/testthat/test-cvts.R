@@ -33,6 +33,7 @@ if (require(forecast) & require(testthat)) {
     # maxHorizon must be > 0
     expect_error(cvts(AirPassengers, maxHorizon = 0))
   })
+
   test_that("Testing valid inputs", {
      expect_error(cvts(USAccDeaths, FUN = thetam, FCFUN = forecast, rolling = FALSE,
                        windowSize = 48, maxHorizon = 12), NA)
@@ -40,6 +41,7 @@ if (require(forecast) & require(testthat)) {
                        windowSize = 48, maxHorizon = 12, verbose = FALSE), NA)
      expect_error(cvts(rnorm(94), saveModels = FALSE, saveForecasts = FALSE), NA)
   })
+
   test_that("Testing accuracy.cvts()", {
     inputSeries <- ts(rnorm(8), f = 2)
     cv <- cvts(inputSeries, windowSize = 4, maxHorizon = 2)
@@ -62,22 +64,23 @@ if (require(forecast) & require(testthat)) {
       cv <- cvts(AirPassengers, FUN = ets, FCFUN = forecast, rolling = FALSE, windowSize = 12,
                  maxHorizon = 12, model = "MAM")
 
-      #fcLast <- cv$forecasts[[11]]
       etsFit <- ets(window(AirPassengers, end = c(1959, 12)), model = "MAM")
 
       ## The call objects alone are different seemingly because of the do.call used in cvts
+      # so tests for identical result objects won't work
       etsWithCall <- forecast(etsFit, 12)
       etsWithoutCall <- etsWithCall[setdiff(names(etsWithCall), c("model", "call"))]
       fcLastWithoutCall <- cv$forecasts[[11]][setdiff(names(cv$forecasts[[11]]),
                                                          c("model", "call"))]
-
-      #expect_identical(etsWithoutCall, fcLastWithoutCall)
-      # use a more relaxed test for now
+      # Fitted values and confidence intervals should be the same, however
+      expect_true(all.equal(fcLastWithoutCall$lower, etsWithoutCall$lower))
       expect_true(all.equal(fcLastWithoutCall$mean, etsWithoutCall$mean))
+      expect_true(all.equal(fcLastWithoutCall$upper, etsWithoutCall$upper))
+      expect_true(all.equal(fcLastWithoutCall$method, etsWithoutCall$method))
+      expect_true(all.equal(fitted(fcLastWithoutCall), fitted(etsWithoutCall)))
    })
 
    test_that("Extract forecasts works", {
-
       cv <- cvts(AirPassengers, FUN = naiveForecast, FCFUN = forecastFunction, rolling = TRUE,
                  windowSize = 1, maxHorizon = 1)
 
@@ -88,7 +91,6 @@ if (require(forecast) & require(testthat)) {
    })
 
    test_that("Time series partitions work", {
-
        slices <- tsPartition(AirPassengers, TRUE, 1, 1)
        trainIndices <- Map(function(x) x$trainIndices, slices)
        allTrainIndices <- Reduce(c, trainIndices)
@@ -126,6 +128,7 @@ if (require(forecast) & require(testthat)) {
        xregsLast <- xregsAllModels[[length(xregsAllModels)]]
        expect_equal(xreg[1:(length(series) - maxHorizon)], as.numeric(xregsLast))
    })
+
    test_that("custom FUN and FCFUN", {
      # stlm from "forecast" package
      FUN <- function(x) forecast::stlm(x) # nolint
@@ -146,6 +149,7 @@ if (require(forecast) & require(testthat)) {
      series <- ts(rnorm(6), f = 2)
      expect_error(cvts(series, FCFUN = FCFUN, windowSize = 4, maxHorizon = 1), NA)
    })
+
    test_that("examples from docs", {
      cvmod2 <- cvts(USAccDeaths, FUN = ets,
                     saveModels = FALSE, saveForecasts = FALSE,
@@ -158,6 +162,7 @@ if (require(forecast) & require(testthat)) {
                     maxHorizon = 12)
      expect_true(length(cvmod3) == 6)
    })
+
    test_that("parity when 1 vs 2 cores used", {
     series <- ts(rnorm(10), f = 2)
     cvSerial <- cvts(series, FUN = stlm, windowSize = 6, maxHorizon = 2, num.cores = 1)

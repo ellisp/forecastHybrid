@@ -94,11 +94,8 @@ if (require(forecast) & require(testthat)) {
     expect_error(forecast(aa, xreg = newXreg, PI = FALSE), NA)
     expect_true(length(forecast(aa, xreg = newXreg, PI = FALSE)$mean) == nrow(newXreg))
     expect_true(class(forecast(aa, xreg = newXreg, PI = FALSE)) == "forecast")
-    # Prediction intervals for nnetar are nondeterministic, so this will fail
-    # Testing this is slow, so leave it out for now
-    # method1 <- forecast(aa, xreg = mm,  h = nrow(mm), level = 0.9)$upper
-    # method2 <- forecast(aa, xreg = mm,  h = nrow(mm), level = 90)$upper
-    # expect_true(all(method1 == method2))
+    # Prediction intervals for nnetar are nondeterministic; moreover, constructing the
+    # PI are slow, so we won't run tests for this.
     expect_error(forecast(aa, xreg = mm, level = 110))
     # Fan should generate 17 prediction intervals
     fc <- forecast(aa, xreg = newXreg, h = nrow(newXreg), fan = TRUE)

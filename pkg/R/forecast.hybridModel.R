@@ -214,15 +214,6 @@ forecast.hybridModel <- function(object,
      forecasts$lower <- lower
      forecasts$upper <- upper
   }
-
-  # Build the mean forecast as a ts object
-  #tsp.x <- tsp(object$x)
-  #   if (!is.null(tsp.x)) {
-  #     start.f <- tsp(object$x)[2] + 1/object$frequency
-  #   } else{
-  #     start.f <- length(object$x) + 1
-  #   }
-  #   stop.f <- start.f + h / object$frequency
   forecasts$mean <- finalForecast
 
   # Add the fitted and residuals values

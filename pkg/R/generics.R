@@ -86,7 +86,8 @@ accuracy.hybridModel <- function(object, # nolint
                                  f = NULL) {
   chkDots(...)
   if (!is.null(f)) {
-    warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.") # nolint
+    warning("Using `f` as the argument for `accuracy()` is deprecated.",
+            "Please use `object` instead.")
     object <- f
   }
   if (individual) {
@@ -120,7 +121,8 @@ accuracy.cvts <- function(object, # nolint
                           f = NULL) {
   chkDots(...)
   if (!is.null(f)) {
-    warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.") # nolint
+    warning("Using `f` as the argument for `accuracy()` is deprecated.",
+            " Please use `object` instead.")
     object <- f
   }
   ME <- colMeans(object$residuals) # nolint
@@ -166,6 +168,76 @@ print.hybridModel <- function(x,
   }
 }
 
+#' Plot the component models of a hybridModel object
+#'
+#' Plot a representation of the hybridModel.
+#' @param x an object of class hybridModel to plot.
+#' @param ggplot should the \code{\link{autoplot}} function be used (when available) for the plots?
+#' @param ... other arguments passed to \link{plot}.
+#' @importFrom ggplot2 autoplot ggplot
+plotModelObjects <- function(x,
+                             ggplot,
+                             ...) {
+  chkDots(...)
+  plotModels <- x$models[x$models != "stlm" & x$models != "nnetar"]
+  for (i in seq_along(plotModels)) {
+     # bats, tbats, and nnetar aren't supported by autoplot
+     if (ggplot && !(plotModels[i] %in% c("tbats", "bats", "nnetar"))) {
+        autoplot(x[[plotModels[i]]])
+     } else if (!ggplot) {
+        plot(x[[plotModels[i]]])
+     }
+  }
+}
+
+#' Plot the fitted values of a hybridModel object
+#'
+#' Plot a fitted values of the hybridModel.
+#' @param x an object of class hybridModel to plot.
+#' @param ggplot should the \code{\link{autoplot}} function be used (when available) for the plots?
+#' @param ... other arguments passed to \link{plot}.
+#' @importFrom ggplot2 ggplot aes geom_line scale_y_continuous
+plotFitted <- function(x,
+                       ggplot,
+                       ...) {
+  chkDots(...)
+  plotModels <- x$models
+  if (ggplot) {
+    plotFrame <- data.frame(matrix(0, nrow = length(x$x), ncol = 0))
+    for (i in plotModels) {
+      plotFrame[i] <- fitted(x[[i]])
+    }
+    names(plotFrame) <- plotModels
+    plotFrame$date <- as.Date(time(x$x))
+    # Appease R CMD check for undeclared variable
+    variable <- NULL
+    value <- NULL
+    # If anyone knows a cleaner way to transform this "wide" data to "long" data for plotting
+    # with ggplot2 without using additional packages, let me know.
+    pf <- matrix(as.matrix(plotFrame[, plotModels]), ncol = 1)
+    pf <- data.frame(date = plotFrame$date,
+                     variable = factor(rep(plotModels,
+                                           each = nrow(plotFrame)),
+                                       levels = plotModels),
+                     value = pf)
+    plotFrame <- pf[order(pf$variable, pf$date), ]
+    ggplot(data = plotFrame,
+           aes(x = date, y = as.numeric(value), col = variable)) +
+    geom_line() + scale_y_continuous(name = "y")
+  } else {
+    # Set the highest and lowest axis scale
+    ymax <- max(sapply(plotModels,
+                      FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
+    ymin <- min(sapply(plotModels,
+                      FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
+    range <- ymax - ymin
+    plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range), ...)
+    for (i in seq_along(plotModels)) {
+      lines(fitted(x[[plotModels[i]]]), col = i + 1)
+    }
+    legend("top", plotModels, fill = 2:(length(plotModels) + 1), horiz = TRUE)
+  }
+}
 #' Plot a hybridModel object
 #'
 #' Plot a representation of the hybridModel.
@@ -199,61 +271,15 @@ print.hybridModel <- function(x,
 #' @export
 #'
 #' @author David Shaub
-#' @importFrom ggplot2 ggplot aes autoplot geom_line scale_y_continuous
-#'
 plot.hybridModel <- function(x,
                              type = c("fit", "models"),
                              ggplot = FALSE,
                              ...) {
    type <- match.arg(type)
    chkDots(...)
-   plotModels <- x$models
    if (type == "fit") {
-      if (ggplot) {
-        plotFrame <- data.frame(matrix(0, nrow = length(x$x), ncol = 0))
-        for (i in plotModels) {
-          plotFrame[i] <- fitted(x[[i]])
-        }
-        names(plotFrame) <- plotModels
-        plotFrame$date <- as.Date(time(x$x))
-        # Appease R CMD check for undeclared variable
-        variable <- NULL
-        value <- NULL
-        # If anyone knows a cleaner way to transform this "wide" data to "long" data for plotting
-        # with ggplot2 without using additional packages, let me know.
-        pf <- matrix(as.matrix(plotFrame[, plotModels]), ncol = 1)
-        pf <- data.frame(date = plotFrame$date,
-                         variable = factor(rep(plotModels,
-                                               each = nrow(plotFrame)),
-                                           levels = plotModels),
-                         value = pf)
-        plotFrame <- pf[order(pf$variable, pf$date), ]
-        ggplot(data = plotFrame,
-               aes(x = date, y = as.numeric(value), col = variable)) +
-        geom_line() + scale_y_continuous(name = "y")
-      } else {
-         # Set the highest and lowest axis scale
-         ymax <- max(sapply(plotModels,
-                            FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
-         ymin <- min(sapply(plotModels,
-                            FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
-         range <- ymax - ymin
-         plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range), ...)
-         #title(main = "Plot of original series (black) and fitted component models", outer = TRUE)
-         for (i in seq_along(plotModels)) {
-            lines(fitted(x[[plotModels[i]]]), col = i + 1)
-         }
-         legend("top", plotModels, fill = 2:(length(plotModels) + 1), horiz = TRUE)
-      }
+     plotFitted(x = x, ggplot = ggplot)
    } else if (type == "models") {
-      plotModels <- x$models[x$models != "stlm" & x$models != "nnetar"]
-      for (i in seq_along(plotModels)) {
-         # bats, tbats, and nnetar aren't supported by autoplot
-         if (ggplot && !(plotModels[i] %in% c("tbats", "bats", "nnetar"))) {
-            autoplot(x[[plotModels[i]]])
-         } else if (!ggplot) {
-            plot(x[[plotModels[i]]])
-         }
-      }
+     plotModelObjects(x = x, ggplot = ggplot)
    }
 }

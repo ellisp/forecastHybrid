@@ -94,9 +94,9 @@ if (require(forecast) & require(testthat)) {
     hm <- hybridModel(wineind)
     # Disable these for now because fails on r-devel
     # Less than orignal, messy function call
-    #expect_true(format(object.size(hm)) < "6035456 bytes")
+    expect_true(format(object.size(hm)) < "6035456 bytes")
     # No worse than improved function call
-    #expect_true(format(object.size(hm)) <= "322352 bytes")
+    # previously tested withexpect_true(format(object.size(hm)) <= "322352 bytes")
   })
 
   test_that("Testing model matching", {
@@ -128,6 +128,7 @@ if (require(forecast) & require(testthat)) {
       xreg <- matrix(rnorm(len * length(cols)), nrow = len)
       colnames(xreg) <- cols
       # Ignore nnetar for now since it isn't reproducible
+      # TODO: add nnetar to xreg tests
       models <- "aefstz"
       hm <- hybridModel(testSeries, models = models,
                         a.args = list(xreg = xreg), lambda = 0.2,
@@ -151,7 +152,6 @@ if (require(forecast) & require(testthat)) {
       # Ensure xreg is correct
       expect_true(all(hm$auto.arima$xreg == xreg))
       expect_true(hm$xreg$auto.arima)
-      #expect_true(!hm$xreg$nnetar)
       expect_true(!hm$xreg$stlm)
       # Ensure other fields are correct
       expect_true(length(hm$models) == nchar(models))
@@ -160,7 +160,6 @@ if (require(forecast) & require(testthat)) {
       expect_true("ARIMA" %in% class(hm$auto.arima))
       expect_true("ets" == class(hm$ets))
       expect_true("thetam" %in% class(hm$thetam))
-      #expect_true("nnetar" == class(hm$nnetar))# TODO: is it multiple classes?
       expect_true("stlm" %in% class(hm$stlm))
       expect_true("forecast" %in% class(hm$snaive))
 

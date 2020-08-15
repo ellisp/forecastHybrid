@@ -116,12 +116,7 @@ unwrapParallelModels <- function(fitModels,
 #' @param y The input time series
 #' @param models The model codes to test
 removeModels <- function(y, models) {
-  expandedModels <- models
-
-  # Only allow legal models
-  if (length(expandedModels) > 7L) {
-    stop("Invalid models specified.")
-  }
+  expandedModels <- unique(models)
   # All characters must be valid
   validModels <- c("a", "e", "f", "n", "s", "t", "z")
   if (!all(expandedModels %in% validModels)) {
@@ -138,23 +133,27 @@ removeModels <- function(y, models) {
     expandedModels <- expandedModels[expandedModels != "e"]
   }
   if (is.element("f", expandedModels) && length(y) <= frequency(y)) {
-    warning("The theta model requires more than one seasonal period of data. The theta model will not be used.") # nolint
+    warning("The theta model requires more than one seasonal period of data.",
+            " The theta model will not be used.")
     expandedModels <- expandedModels[expandedModels != "f"]
   }
 
   if (is.element("s", expandedModels)) {
     if (frequency(y) < 2L) {
-      warning("The stlm model requires that the input data be a seasonal ts object. The stlm model will not be used.") # nolint
+      warning("The stlm model requires that the input data be a seasonal ts object.",
+              " The stlm model will not be used.")
       expandedModels <- expandedModels[expandedModels != "s"]
     }
     if (frequency(y) * 2L >= length(y)) {
-      warning("The stlm model requres a series more than twice as long as the seasonal period. The stlm model will not be used.") # nolint
+      warning("The stlm model requres a series more than twice as long as the seasonal period.",
+              " The stlm model will not be used.")
       expandedModels <- expandedModels[expandedModels != "s"]
     }
   }
   if (is.element("n", expandedModels)) {
     if (frequency(y) * 2L >= length(y)) {
-      warning("The nnetar model requres a series more than twice as long as the seasonal period. The nnetar model will not be used.") # nolint
+      warning("The nnetar model requres a series more than twice as long as the seasonal period.",
+              " The nnetar model will not be used.")
       expandedModels <- expandedModels[expandedModels != "n"]
     }
   }
