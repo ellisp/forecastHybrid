@@ -86,7 +86,8 @@ accuracy.hybridModel <-  function(object,
                                f = NULL){
   if(!is.null(f)){
     warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.")
-    object <- f}
+    object <- f
+    }
   #chkDots(...)
   if(individual){
     results <- list()
