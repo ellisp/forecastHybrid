@@ -80,10 +80,10 @@ residuals.hybridModel <- function(object,
 #'
 #' @author David Shaub
 #'
-accuracy.hybridModel <- function(object,
-                                 individual = FALSE,
-                                 ...,
-                                 f = NULL){
+accuracy.hybridModel <-  function(object,
+                               individual = FALSE,
+                               ...,
+                               f = NULL){
   if(!is.null(f)){
     warning("Using `f` as the argument for `accuracy()` is deprecated. Please use `object` instead.")
     object <- f
@@ -92,7 +92,7 @@ accuracy.hybridModel <- function(object,
   if(individual){
     results <- list()
     for(model in object$models){
-      results[[model]] <- forecast::accuracy(object[[model]])
+      results[[model]] <- forecast::accuracy(fitted(object[[model]]),object$x)
     }
     return(results)
   }
