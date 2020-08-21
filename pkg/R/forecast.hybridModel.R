@@ -156,7 +156,7 @@ forecast.hybridModel <- function(object,
     forecasts$pointForecasts[, "snaive"] <- forecasts$snaive$mean
   }
   if("arfima" %in% includedModels){
-    forecasts$arfima <- arfima(object$x, h = h, level = level, ...)
+    forecasts$arfima <- forecast(object$arfima, h = h, level = level, ...)
     forecasts$pointForecasts[, "arfima"] <- forecasts$arfima$mean
   }
 
