@@ -306,3 +306,4 @@ hybridModel <- function(y, models = "aefnst",
   modelResults$residuals <- resid
   return(modelResults)
 }
+

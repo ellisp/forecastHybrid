@@ -50,12 +50,12 @@ Ignored if NULL. Otherwise, data transformed before model is estimated.}
 \item{z.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{snaive}}. See details.}
 
 \item{x.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{arfima}}. See details.}
-  
+
 \item{weights}{method for weighting the forecasts of the various contributing
 models.  Defaults to \code{equal}, which has shown to be robust and better
 in many cases than giving more weight to models with better in-sample performance. Cross validated errors--implemented with \code{link{cvts}}
 should produce the best forecast, but the model estimation is also the slowest. Note that extra arguments
-passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} are not used
+passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, \code{x.args} and \code{t.args} are not used
 during cross validation. See further explanation in \code{\link{cvts}}.
 Weights utilizing in-sample errors are also available but not recommended.}
 
@@ -118,7 +118,7 @@ a series well with a seasonal period longer than 24 and will ignore the seasonal
 \examples{
 \dontrun{
 
-# Fit an auto.arima, ets, thetam, nnetar, stlm, arfima and tbats model
+# Fit an auto.arima, ets, thetam, nnetar, stlm, arfima, and tbats model
 # on the time series with equal weights
 mod1 <- hybridModel(AirPassengers)
 plot(forecast(mod1))
