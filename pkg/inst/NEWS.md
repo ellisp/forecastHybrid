@@ -1,4 +1,4 @@
-# Version 5.0.19 [2020-08-11]
+# Version 5.0.19 [2020-08-27]
 * Fix `residuals.hybridModel()` and added tests.
 * Linting of package with the "lintr" package
 * `Makefile` targets for building and package development.

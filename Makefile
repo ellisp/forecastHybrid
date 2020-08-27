@@ -9,5 +9,5 @@ check_win: clean
 lint:
 	cd pkg && R --vanilla -q -e 'library(lintr);lint_package(linters = with_defaults(line_length_linter(100), object_name_linter(styles = "camelCase")))'
 
-build: check
+build: clean
 	cd pkg && R CMD build .

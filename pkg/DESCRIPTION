@@ -1,7 +1,7 @@
 Package: forecastHybrid
 Title: Convenient Functions for Ensemble Time Series Forecasts
 Version: 5.0.19
-Date: 2020-08-11
+Date: 2020-08-27
 Authors@R: c(
    person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
    person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("aut"))
