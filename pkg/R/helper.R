@@ -74,7 +74,7 @@ tsSubsetWithIndices <- function(x,
 #' @seealso \code{\link{hybridModel}}
 getModel <- function(modelCharacter) {
   models <- c("a" = auto.arima, "e" = ets, "f" = thetam, "n" = nnetar,
-              "s" = stlm, "t" = tbats, "z" = snaive)
+              "s" = stlm, "t" = tbats, "z" = snaive, "x"=arfima)
   return(models[[modelCharacter]])
 }
 
@@ -91,7 +91,7 @@ getModel <- function(modelCharacter) {
 #' @seealso \code{\link{hybridModel}}
 getModelName <- function(modelCharacter) {
   models <- c("a" = "auto.arima", "e" = "ets", "f" = "thetam", "n" = "nnetar",
-              "s" = "stlm", "t" = "tbats", "z" = "snaive")
+              "s" = "stlm", "t" = "tbats", "x" = "arfima", "z" = "snaive")
   return(as.character(models[modelCharacter]))
 }
 
@@ -118,7 +118,7 @@ unwrapParallelModels <- function(fitModels,
 removeModels <- function(y, models) {
   expandedModels <- unique(models)
   # All characters must be valid
-  validModels <- c("a", "e", "f", "n", "s", "t", "z")
+  validModels <- c("a", "e", "f", "n", "s", "t", "x", "z")
   if (!all(expandedModels %in% validModels)) {
     stop("Invalid models specified.")
   }

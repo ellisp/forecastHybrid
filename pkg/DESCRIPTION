@@ -8,7 +8,7 @@ Authors@R: c(
    )
 Description: Convenient functions for ensemble forecasts in R combining
     approaches from the 'forecast' package. Forecasts generated from auto.arima(), ets(),
-    thetaf(), nnetar(), stlm(), tbats(), and snaive() can be combined with equal weights, weights
+    thetaf(), nnetar(), stlm(), tbats(), snaive() and arfima() can be combined with equal weights, weights
     based on in-sample errors (introduced by Bates & Granger (1969) <doi:10.1057/jors.1969.103>),
     or cross-validated weights. Cross validation for time series data with user-supplied models
     and forecasting functions is also supported to evaluate model accuracy.

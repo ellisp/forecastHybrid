@@ -13,6 +13,7 @@ hybridModel(
   n.args = NULL,
   s.args = NULL,
   t.args = NULL,
+  x.args = NULL,
   z.args = NULL,
   weights = c("equal", "insample.errors", "cv.errors"),
   errorMethod = c("RMSE", "MAE", "MASE"),
@@ -53,6 +54,9 @@ See details.}
 \item{t.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{tbats}}.
 See details.}
 
+\item{x.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{arfima}}.
+See details.}
+
 \item{z.args}{an optional \code{list} of arguments to pass to \code{\link[forecast]{snaive}}.
 See details.}
 
@@ -61,9 +65,9 @@ models.  Defaults to \code{equal}, which has shown to be robust and better
 in many cases than giving more weight to models with better in-sample performance.
 Cross validated errors--implemented with \code{link{cvts}}
 should produce the best forecast, but the model estimation is also the slowest. Note that
-extra arguments
-passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} are
-not used during cross validation. See further explanation in \code{\link{cvts}}.
+extra arguments passed in \code{a.args}, \code{e.args}, \code{n.args}, \code{s.args},
+\code{x.args}, and \code{t.args} are not used during cross validation. See further explanation
+in \code{\link{cvts}}.
 Weights utilizing in-sample errors are also available but not recommended.}
 
 \item{errorMethod}{method of measuring accuracy to use if weights are not
@@ -106,8 +110,8 @@ Create a hybrid time series model with two to five component models.
 The \code{hybridModel} function fits multiple individual model specifications
 to allow easy creation of ensemble forecasts. While default settings for the individual
 component models work quite well in most cases, fine control can be exerted by passing detailed
-arguments to the component models in the
-\code{a.args}, \code{e.args}, \code{n.args}, \code{s.args}, and \code{t.args} lists.
+arguments to the component models in the \code{a.args}, \code{e.args}, \code{n.args},
+\code{s.args}, \code{x.args}, and \code{t.args} lists.
 Note that if \code{xreg} is passed to the \code{a.args}, \code{n.args}, or
 \code{s.args} component models it must now be passed as a matrix. In "forecastHybrid"
 versions earlier than 4.0.15 it would instead be passed in as a dataframe, but for consistency
@@ -129,7 +133,7 @@ In this case, \code{hybridModel()} will also drop the \code{ets} model from the 
 \examples{
 \dontrun{
 
-# Fit an auto.arima, ets, thetam, nnetar, stlm, and tbats model
+# Fit an auto.arima, ets, thetam, nnetar, stlm, arfima, and tbats model
 # on the time series with equal weights
 mod1 <- hybridModel(AirPassengers)
 plot(forecast(mod1))
