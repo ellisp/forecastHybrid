@@ -74,7 +74,7 @@ tsSubsetWithIndices <- function(x,
 #' @seealso \code{\link{hybridModel}}
 getModel <- function(modelCharacter) {
   models <- c("a" = auto.arima, "e" = ets, "f" = thetam, "n" = nnetar,
-              "s" = stlm, "t" = tbats, "z" = snaive, "x"=arfima)
+              "s" = stlm, "t" = tbats, "x" = arfima, "z" = snaive)
   return(models[[modelCharacter]])
 }
 

@@ -316,4 +316,3 @@ hybridModel <- function(y, # nolint
   modelResults$residuals <- resid
   return(modelResults)
 }
-

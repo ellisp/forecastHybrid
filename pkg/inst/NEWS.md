@@ -1,3 +1,7 @@
+# Version 5.1.20 [Unreleased]
+* Add the `arfima` model as a possibility to the ensemble by using the model code `x`.
+* Require `forecast` 8.13.
+
 # Version 5.0.19 [2020-08-27]
 * Fix `residuals.hybridModel()` and added tests.
 * Linting of package with the "lintr" package
