@@ -18,14 +18,16 @@
 #' Jan-Dec 2015 and Aug 2015-Dec 2016 respectively. In that case, there is overlap between
 #' t1 and t2. The return value will depend on the order in which the arguments are provided.
 #' If the function call is tsCombine(t1, t2), the overlapping portion of t1 and t2
-#' (Aug-Dec 2015 in this example), would have values from t1 as long as they are not NA.
-#' If the call is tsCombine(t2, t1), it will have values from t2 as long as they are not NA.
+#' (Aug-Dec 2015 in this example), would have values from t1 as long as they are not \code{NA}.
+#' If the call is tsCombine(t2, t1), it will have values from t2 as long as they are not \code{NA}.
 #'
 #' @author Ganesh Krishnan
 #' @examples
 #' tsCombine(window(AirPassengers, end = c(1951, 12)), window(AirPassengers, start = c(1952, 1)))
 tsCombine <- function(...) {
-  chkDots(...)
+  # chkDots will throw warnings in the tests. Since this function does not use any named arguments,
+  # does it even make sense to test it? We probably can remove it.
+  # chkDots(...)
   combinedDf <- ts.union(..., dframe = TRUE)
   combinedTs <- ts.union(..., dframe = FALSE)
   coalesced <- apply(combinedDf, 1,

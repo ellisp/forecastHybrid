@@ -65,9 +65,10 @@ forecast.hybridModel <- function(object, # nolint
                                  fan = FALSE,
                                  PI.combination = c("extreme", "mean"), # nolint
                                  ...) {
-
-  chkDots(...)
   # Check inputs
+  # Although chkDots() has an `allowed` argument, in R 4.3.3 it is still not implemented.
+  # If it is implemented in a later version, we can probably enable the check.
+  # chkDots(..., allowed = "npaths")
   if (!is.hybridModel(object)) {
     stop("The object must be constructed from hybridModel().")
   }

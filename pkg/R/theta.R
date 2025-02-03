@@ -84,7 +84,10 @@ forecast.thetam <- function(object, # nolint
                             h = ifelse(object$m > 1, 2 * object$m, 10),
                             level = c(80, 95),
                             fan = FALSE, ...) {
-   chkDots(...)
+   # We could chkDots here. Sometimes `npaths` is passed in superfluously from the HybridModel()
+   # call if it is needed by the nnetar model. For now this is disabled since it throws warnings
+   # in the tests
+   # chkDots(..., allowed = "npaths")
    if (fan) {
       level <- seq(51, 99, by = 3)
    } else {

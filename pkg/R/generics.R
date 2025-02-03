@@ -18,7 +18,7 @@ is.hybridModel <- function(x) { # nolint
 #' @param individual if \code{TRUE}, return the fitted values of the component models instead
 #' of the fitted values for the whole ensemble model.
 #' @param ... other arguments (ignored).
-#' @seealso \code{\link{accuracy}}
+#' @seealso \code{\link[forecast]{accuracy}}
 #' @return The fitted values of the ensemble or individual component models.
 #' @export
 #'
@@ -44,7 +44,7 @@ fitted.hybridModel <- function(object,
 #' @param individual If \code{TRUE}, return the residuals of the component models instead
 #' of the residuals for the whole ensemble model.
 #' @param ... Other arguments (ignored).
-#' @seealso \code{\link{accuracy}}
+#' @seealso \code{\link[forecast]{accuracy}}
 #' @return The residuals of the ensemble or individual component models.
 #'
 residuals.hybridModel <- function(object,
@@ -172,7 +172,8 @@ print.hybridModel <- function(x,
 #'
 #' Plot a representation of the hybridModel.
 #' @param x an object of class hybridModel to plot.
-#' @param ggplot should the \code{\link{autoplot}} function be used (when available) for the plots?
+#' @param ggplot should the \code{\link[forecast]{autoplot}} function be used (when available)
+#' for the plots?
 #' @param ... other arguments passed to \link{plot}.
 #' @importFrom ggplot2 autoplot ggplot
 plotModelObjects <- function(x,
@@ -194,7 +195,7 @@ plotModelObjects <- function(x,
 #'
 #' Plot a fitted values of the hybridModel.
 #' @param x an object of class hybridModel to plot.
-#' @param ggplot should the \code{\link{autoplot}} function be used (when available) for the plots?
+#' @param ggplot should the \code{\link[forecast]{autoplot}} function be used (when available) for the plots?
 #' @param ... other arguments passed to \link{plot}.
 #' @importFrom ggplot2 ggplot aes geom_line scale_y_continuous
 plotFitted <- function(x,
@@ -251,7 +252,7 @@ plotFitted <- function(x,
 #' \code{\link[forecast]{plot.tbats}}. Note: no plot
 #' methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
 #' \code{type = "models"}.
-#' @param ggplot should the \code{\link{autoplot}} function
+#' @param ggplot should the \code{\link[forecast]{autoplot}} function
 #' be used (when available) for the plots?
 #' @param ... other arguments passed to \link{plot}.
 #' @seealso \code{\link{hybridModel}}
