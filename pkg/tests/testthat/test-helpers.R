@@ -29,10 +29,32 @@ if (require(forecast) & require(testthat)) {
   })
 
   test_that("Testing tsSubsetWithIndices()", {
-    expect_true(all(head(wineind) == tsSubsetWithIndices(wineind, 1:5)))
+    expect_true(class(tsSubsetWithIndices(wineind, 3:17)) == "ts")
+    expect_true(all(head(wineind, 5) == tsSubsetWithIndices(wineind, 1:5)))
+    expect_equal(head(wineind, 5), tsSubsetWithIndices(wineind, 1:5))
+
     # Invalid subset outside of range
     expect_error(tsSubsetWithIndices(wineind, length(wineind) + 1))
+
     # Non-continuous indices
     expect_error(tsSubsetWithIndices(wineind, 4:1))
+    })
+  test_that("Testing tsCombine", {
+    ts1 <- tsSubsetWithIndices(AirPassengers, 1:50)
+    ts2 <- tsSubsetWithIndices(AirPassengers, 50:100)
+    ts3 <- tsSubsetWithIndices(AirPassengers, 101:144)
+    combined_ts <- tsCombine(ts1, ts2, ts3)
+
+    expect_true(class(combined_ts) == "ts")
+    expect_true(length(combined_ts) == length(AirPassengers))
+    expect_true(all(combined_ts == AirPassengers))
+    expect_equal(combined_ts, AirPassengers)
+
+    # Test that a recursive combine works as well
+    r_combined_ts <- tsCombine(ts1, tsCombine(ts2, ts3))
+    expect_true(class(r_combined_ts) == "ts")
+    expect_true(length(r_combined_ts) == length(AirPassengers))
+    expect_true(all(r_combined_ts == AirPassengers))
+    expect_equal(r_combined_ts, AirPassengers)
     })
 }
