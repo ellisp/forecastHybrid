@@ -16,7 +16,7 @@ If \code{type = "models"}, use the regular plot methods from the component model
 methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
 \code{type = "models"}.}
 
-\item{ggplot}{should the \code{\link{autoplot}} function
+\item{ggplot}{should the \code{\link[forecast]{autoplot}} function
 be used (when available) for the plots?}
 
 \item{...}{other arguments passed to \link{plot}.}

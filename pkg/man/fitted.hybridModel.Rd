@@ -21,5 +21,5 @@ The fitted values of the ensemble or individual component models.
 Extract the model fitted values from the \code{hybridModel} object.
 }
 \seealso{
-\code{\link{accuracy}}
+\code{\link[forecast]{accuracy}}
 }
