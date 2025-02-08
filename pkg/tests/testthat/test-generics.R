@@ -1,5 +1,5 @@
 # Unit tests on the generic function
-if (require(forecast) & require(testthat)) {
+if (require(forecast) && require(testthat)) {
   numObs <- 100L
   context("Testing generic functions")
   set.seed(2345)

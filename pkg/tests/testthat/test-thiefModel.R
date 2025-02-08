@@ -1,4 +1,4 @@
-if (require(forecast) & require(testthat)) {
+if (require(forecast) && require(testthat)) {
   test_that("Testing thiefModel()", {
     h <- 2
     set.seed(42)

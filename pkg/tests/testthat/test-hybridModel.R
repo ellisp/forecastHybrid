@@ -1,5 +1,5 @@
 # Unit tests on the hybridModel function
-if (require(forecast) & require(testthat)) {
+if (require(forecast) && require(testthat)) {
   context("Testing input for hybridModel()")
   test_that("Testing invalid inputs", {
     # Invalid arguments for models
@@ -108,12 +108,12 @@ if (require(forecast) & require(testthat)) {
 
   context("Testing cv.errors")
   test_that("Testing hybridModel(weights = \"cv.errors\")", {
-  set.seed(33)
-  inputSeries <- ts(rnorm(12), f = 2)
-  expect_error(cvMod <- hybridModel(inputSeries, weights = "cv.errors",
-                                    windowSize = 8, cvHorizon = 2), NA)
-  expect_equal(length(cvMod$weights),
-               length(unique(cvMod$weights)))
+    set.seed(33)
+    inputSeries <- ts(rnorm(12), f = 2)
+    expect_error(cvMod <- hybridModel(inputSeries, weights = "cv.errors",
+                                      windowSize = 8, cvHorizon = 2), NA)
+    expect_equal(length(cvMod$weights),
+                 length(unique(cvMod$weights)))
   })
 
   test_that("Testing the hybridModel object", {
@@ -195,7 +195,7 @@ if (require(forecast) & require(testthat)) {
       if (weight == "insample.errors") {
         expect_warning(hm <- hybridModel(inputSeries, models = models,
                                          weights = weight))
-      } else{
+      } else {
         hm <- hybridModel(inputSeries, models = models, weights = weight)
       }
       expect_true(sum(hm$weights) - 1 < tol)

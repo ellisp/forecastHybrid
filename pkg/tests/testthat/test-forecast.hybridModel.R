@@ -1,5 +1,5 @@
 # Unit tests on the hybridModel function
-if (require(forecast) & require(testthat)) {
+if (require(forecast) && require(testthat)) {
   context("Testing input for forecast.hybridModel()")
   test_that("Testing invalid inputs", {
     inputSeries <- ts(rnorm(24), f = 2)
@@ -16,9 +16,9 @@ if (require(forecast) & require(testthat)) {
     expect_error(forecast(object = hModel, xreg = "1"))
     # matrix should be numeric
     expect_error(forecast(object = hModel, h = 5,
-                                     xreg = matrix("a", nrow = 5, ncol = 2)))
-#~     expect_error(forecast(object = hModel, h = 5,
-#~                                      xreg = 1:12))
+                          xreg = matrix("a", nrow = 5, ncol = 2)))
+    #~     expect_error(forecast(object = hModel, h = 5,
+    #~                                      xreg = 1:12))
     # s3 forecast method should take a hybridModel object only
     expect_error(forecast.hybridModel("a"))
   })
@@ -101,9 +101,9 @@ if (require(forecast) & require(testthat)) {
     fc <- forecast(aa, xreg = newXreg, h = nrow(newXreg), fan = TRUE)
     expect_true(ncol(fc$upper) == 17)
     expect_true(ncol(fc$lower) == 17)
-    })
+  })
 
-    test_that("More forecast xreg tests", {
+  test_that("More forecast xreg tests", {
     # forecast xreg with multiple meaningful xreg
     set.seed(5)
     len <- 240 # should be mod 4 for building the xreg
@@ -124,7 +124,7 @@ if (require(forecast) & require(testthat)) {
     aa <- auto.arima(tsTrain)
     aaXreg <- auto.arima(tsTrain, xreg = xregTrain)
     expect_true(accuracy(forecast(aaXreg, xreg = xregTrain))[1, "MASE"] <
-                accuracy(forecast(aa))[1, "MASE"])
+                  accuracy(forecast(aa))[1, "MASE"])
     hm <- hybridModel(tsTrain, models = "as", s.args = list(method = "arima"))
 
     h <- nrow(xregTest)
@@ -132,18 +132,18 @@ if (require(forecast) & require(testthat)) {
     expect_true(length(hmFc$mean) == h)
     # Test with several different xregs
     for (colIndex in list(1, 2, 1:2)) {
-        xrTrain <- as.matrix(xregTrain[, colIndex])
-        xrTest <- as.matrix(xregTest[, colIndex])
-        hmXreg <- hybridModel(tsTrain, models = "as",
-                              a.args = list(xreg = xrTrain),
-                              s.args = list(xreg = xrTrain, method = "arima"))
-        # Base models should work
-        expect_error(forecast(hmXreg$auto.arima, xreg = xrTest), NA)
-        expect_error(forecast(hmXreg$stlm, xreg = xrTest), NA)
-        hmXregFc <- forecast(hmXreg, xreg = xrTest)
-        expect_true(length(hmFc$mean) == length(hmXregFc$mean))
-        # Model with xreg should be better than model without
-        expect_true(AIC(hmXreg$auto.arima) < AIC(hm$auto.arima))
+      xrTrain <- as.matrix(xregTrain[, colIndex])
+      xrTest <- as.matrix(xregTest[, colIndex])
+      hmXreg <- hybridModel(tsTrain, models = "as",
+                            a.args = list(xreg = xrTrain),
+                            s.args = list(xreg = xrTrain, method = "arima"))
+      # Base models should work
+      expect_error(forecast(hmXreg$auto.arima, xreg = xrTest), NA)
+      expect_error(forecast(hmXreg$stlm, xreg = xrTest), NA)
+      hmXregFc <- forecast(hmXreg, xreg = xrTest)
+      expect_true(length(hmFc$mean) == length(hmXregFc$mean))
+      # Model with xreg should be better than model without
+      expect_true(AIC(hmXreg$auto.arima) < AIC(hm$auto.arima))
     }
 
     # single feature xreg should return same results when passed as matrix or numeric
@@ -152,7 +152,7 @@ if (require(forecast) & require(testthat)) {
     xreg <- rnorm(len)
     xregMat <- matrix(xreg)
     hmMat <- hybridModel(dat, "as", a.args = list(xreg = xregMat),
-                          s.args = list(xreg = xregMat, method = "arima"))
+                         s.args = list(xreg = xregMat, method = "arima"))
     matFc <- forecast(hmMat, h = h, xreg = xregMat)
     fc <- forecast(hmMat, h = h, xreg = xreg)
     # Forecasts where the new xreg is a matrix or numeric should match
@@ -160,7 +160,7 @@ if (require(forecast) & require(testthat)) {
 
     # a model trained with a vector xreg should produce the same forecasts when using a matrix xreg
     hm <- hybridModel(dat, "as", a.args = list(xreg = xreg),
-                  s.args = list(xreg = xreg, method = "arima"))
+                      s.args = list(xreg = xreg, method = "arima"))
     fc <- forecast(hm, h = h, xreg = xreg)
     expect_true(all.equal(fc$mean, matFc$mean))
     matFc <- forecast(hm, xreg = xregMat)

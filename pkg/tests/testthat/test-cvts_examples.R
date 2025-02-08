@@ -1,5 +1,5 @@
 # Unit tests on the cvts function
-if (require(forecast) & require(testthat)) {
+if (require(forecast) && require(testthat)) {
   context("Testing cvts() examples")
 
   test_that("Testing skipped examples", {
@@ -25,4 +25,4 @@ if (require(forecast) & require(testthat)) {
     expect_equal(length(cvmod3$forecasts), 2)
     expect_equal(dim(residuals(cvmod3)), c(2, 2))
   })
- }
+}
