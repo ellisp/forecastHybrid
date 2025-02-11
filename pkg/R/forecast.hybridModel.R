@@ -67,8 +67,8 @@ forecast.hybridModel <- function(object, # nolint
                                  ...) {
   # Check inputs
   # Although chkDots() has an `allowed` argument, in R 4.3.3 it is still not implemented.
-  # If it is implemented in a later version, we can probably enable the check.
-  # chkDots(..., allowed = "npaths")
+  # If it is implemented in a later version, we can probably enable
+  # the check. chkDots(..., allowed = "npaths")
   if (!is.hybridModel(object)) {
     stop("The object must be constructed from hybridModel().")
   }
@@ -125,7 +125,7 @@ forecast.hybridModel <- function(object, # nolint
     xregA <- xreg
     if (!object$xreg$auto.arima) {
       xregA <- NULL
-      }
+    }
     forecasts$auto.arima <- forecast(object$auto.arima, h = h, xreg = xregA, level = level, ...) # nolint
     forecasts$pointForecasts[, "auto.arima"] <- forecasts$auto.arima$mean
   }
@@ -134,8 +134,8 @@ forecast.hybridModel <- function(object, # nolint
     forecasts$pointForecasts[, "ets"] <- forecasts$ets$mean
   }
   if ("thetam" %in% includedModels) {
-     forecasts$thetam <- forecast(object$thetam, h = h, level = level, ...)
-     forecasts$pointForecasts[, "thetam"] <- forecasts$thetam$mean
+    forecasts$thetam <- forecast(object$thetam, h = h, level = level, ...)
+    forecasts$pointForecasts[, "thetam"] <- forecasts$thetam$mean
   }
   if ("nnetar" %in% includedModels) {
     # Only apply the xreg if it was used in the original model
@@ -194,30 +194,30 @@ forecast.hybridModel <- function(object, # nolint
       upperFunction <- max
       lowerFunction <- min
     }
-     nint <- length(level)
-     upper <- lower <- matrix(NA, ncol = nint, nrow = length(finalForecast))
+    nint <- length(level)
+    upper <- lower <- matrix(NA, ncol = nint, nrow = length(finalForecast))
 
-     piModels <- object$models
-     # Produce each upper/lower limit
-     for (i in 1:nint) {
-        # Produce the upper/lower limit for each model for a given level
-        tmpUpper <- tmpLower <- matrix(NA, nrow = h, ncol = length(piModels))
-        j2 <- 1
-        for (mod in piModels) {
-           tmpUpper[, j2] <- as.numeric(matrix(forecasts[[mod]]$upper, nrow = h)[, i])
-           tmpLower[, j2] <- as.numeric(matrix(forecasts[[mod]]$lower, nrow = h)[, i])
-           j2 <- j2 + 1
-        }
-        # Apply the function for reconciling the prediction intervals
-        upper[, i] <- apply(tmpUpper, 1, FUN = upperFunction)
-        lower[, i] <- apply(tmpLower, 1, FUN = lowerFunction)
-     }
-     if (!is.finite(max(upper)) || !is.finite(min(lower))) {
-        warning("Prediction intervals are not finite.")
-     }
-     colnames(lower) <- colnames(upper) <- paste0(level, "%")
-     forecasts$lower <- lower
-     forecasts$upper <- upper
+    piModels <- object$models
+    # Produce each upper/lower limit
+    for (i in 1:nint) {
+      # Produce the upper/lower limit for each model for a given level
+      tmpUpper <- tmpLower <- matrix(NA, nrow = h, ncol = length(piModels))
+      j2 <- 1
+      for (mod in piModels) {
+        tmpUpper[, j2] <- as.numeric(matrix(forecasts[[mod]]$upper, nrow = h)[, i])
+        tmpLower[, j2] <- as.numeric(matrix(forecasts[[mod]]$lower, nrow = h)[, i])
+        j2 <- j2 + 1
+      }
+      # Apply the function for reconciling the prediction intervals
+      upper[, i] <- apply(tmpUpper, 1, FUN = upperFunction)
+      lower[, i] <- apply(tmpLower, 1, FUN = lowerFunction)
+    }
+    if (!is.finite(max(upper)) || !is.finite(min(lower))) {
+      warning("Prediction intervals are not finite.")
+    }
+    colnames(lower) <- colnames(upper) <- paste0(level, "%")
+    forecasts$lower <- lower
+    forecasts$upper <- upper
   }
   forecasts$mean <- finalForecast
 

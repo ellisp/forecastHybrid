@@ -191,8 +191,9 @@ cvts <- function(x,
     if (any(grepl("xreg", names(fitArgs)))) {
       xregUse <- TRUE
       xreg <- as.matrix(xreg)
-    } else
+    } else {
       warning("Ignoring xreg parameter since fitting function does not accept xreg")
+    }
   }
 
 
@@ -355,23 +356,22 @@ tsPartition <- function(x,
   slices <- rep(list(NA), numPartitions)
   start <- 1
 
-    for (i in 1:numPartitions) {
-        if (rolling) {
-            trainIndices <- seq(start, start + windowSize - 1, 1)
-            testIndices <-  seq(start + windowSize, start + windowSize + maxHorizon - 1)
-            start <- start + 1
-        }
-        ## Sample the correct slice for nonrolling
-        else {
-            trainIndices <- seq(start, start + windowSize - 1 + maxHorizon * (i - 1), 1)
-            testIndices <- seq(start + windowSize + maxHorizon * (i - 1),
-                               start + windowSize - 1 + maxHorizon * i)
-        }
-
-        slices[[i]] <- list(trainIndices = trainIndices, testIndices = testIndices)
+  for (i in 1:numPartitions) {
+    if (rolling) {
+      trainIndices <- seq(start, start + windowSize - 1, 1)
+      testIndices <-  seq(start + windowSize, start + windowSize + maxHorizon - 1)
+      start <- start + 1
+    } else {
+      ## Sample the correct slice for nonrolling
+      trainIndices <- seq(start, start + windowSize - 1 + maxHorizon * (i - 1), 1)
+      testIndices <- seq(start + windowSize + maxHorizon * (i - 1),
+                         start + windowSize - 1 + maxHorizon * i)
     }
 
-    return(slices)
+    slices[[i]] <- list(trainIndices = trainIndices, testIndices = testIndices)
+  }
+
+  return(slices)
 }
 
 #' Extract cross validated rolling forecasts
@@ -397,18 +397,18 @@ tsPartition <- function(x,
 #'
 extractForecasts <- function(cv,
                              horizon = 1) {
-      if (horizon > cv$params$maxHorizon)
-         stop("Cannot extract forecasts with a horizon greater than the model maxHorizon")
-      pointfList <- Map(function(fcast) {
-         pointf <- fcast$mean
-         window(pointf, start = time(pointf)[horizon],
-                end = time(pointf)[horizon])
-         },
-         cv$forecasts)
+  if (horizon > cv$params$maxHorizon)
+    stop("Cannot extract forecasts with a horizon greater than the model maxHorizon")
+  pointfList <- Map(function(fcast) {
+    pointf <- fcast$mean
+    window(pointf, start = time(pointf)[horizon],
+           end = time(pointf)[horizon])
+  },
+  cv$forecasts)
 
-      pointf <- Reduce(tsCombine, pointfList)
+  pointf <- Reduce(tsCombine, pointfList)
 
-      #Ensure all points in the original series are represented (makes it easy for comparisons)
-      template <- replace(cv$x, c(seq_len(length(cv$x))), NA)
-      return(tsCombine(pointf, template))
+  #Ensure all points in the original series are represented (makes it easy for comparisons)
+  template <- replace(cv$x, c(seq_len(length(cv$x))), NA)
+  return(tsCombine(pointf, template))
 }

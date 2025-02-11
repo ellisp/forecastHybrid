@@ -189,7 +189,7 @@ hybridModel <- function(y, # nolint
                                   .packages = c("forecast", "forecastHybrid")) %dopar% {
       # thetam() currently does not handle arguments
       if (modelCode == "f") {
-         fitModel <- thetam(y)
+        fitModel <- thetam(y)
       } else { # All other models handle lambda and additional arguments
         argsAdditional <- modelArguments[[modelCode]]
         if (is.null(argsAdditional)) {
@@ -212,7 +212,7 @@ hybridModel <- function(y, # nolint
       }
       # thetam() currently does not handle arguments
       if (modelCode == "f") {
-         modelResults[[modelName]] <- thetam(y)
+        modelResults[[modelName]] <- thetam(y)
       } else { # All other models handle lambda and additional arguments
         argsAdditional <- modelArguments[[modelCode]]
         if (is.null(argsAdditional)) {
@@ -270,7 +270,7 @@ hybridModel <- function(y, # nolint
   }
 
   # Check for valid weights when weights = "insample.errors" and submodels produce perfect fits
-  if (is.element(NaN, modelResults$weights) & weights %in% c("insample.errors", "cv.errors")) {
+  if (is.element(NaN, modelResults$weights) && weights %in% c("insample.errors", "cv.errors")) {
     wrnMsg <- paste0("At least one model perfectly fit the series, so accuracy measures cannot",
                      " be used for weights. Reverting to weights = \"equal\".") # nolint
     warning(wrnMsg)
@@ -286,7 +286,7 @@ hybridModel <- function(y, # nolint
   # Apply the weights to construct the fitted values
   fits <- sapply(includedModels, FUN = function(x) fitted(modelResults[[x]]))
   fitsWeightsMatrix <- matrix(rep(modelResults$weights[includedModels],
-                              times = nrow(fits)),
+                                  times = nrow(fits)),
                               nrow = nrow(fits), byrow = TRUE)
   fits <- rowSums(fits * fitsWeightsMatrix)
   resid <- y - fits

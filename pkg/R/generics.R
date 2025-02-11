@@ -182,12 +182,12 @@ plotModelObjects <- function(x,
   chkDots(...)
   plotModels <- x$models[x$models != "stlm" & x$models != "nnetar"]
   for (i in seq_along(plotModels)) {
-     # bats, tbats, and nnetar aren't supported by autoplot
-     if (ggplot && !(plotModels[i] %in% c("tbats", "bats", "nnetar"))) {
-        autoplot(x[[plotModels[i]]])
-     } else if (!ggplot) {
-        plot(x[[plotModels[i]]])
-     }
+    # bats, tbats, and nnetar aren't supported by autoplot
+    if (ggplot && !(plotModels[i] %in% c("tbats", "bats", "nnetar"))) {
+      autoplot(x[[plotModels[i]]])
+    } else if (!ggplot) {
+      plot(x[[plotModels[i]]])
+    }
   }
 }
 
@@ -195,7 +195,8 @@ plotModelObjects <- function(x,
 #'
 #' Plot a fitted values of the hybridModel.
 #' @param x an object of class hybridModel to plot.
-#' @param ggplot should the \code{\link[forecast]{autoplot}} function be used (when available) for the plots?
+#' @param ggplot should the \code{\link[forecast]{autoplot}} function be used (when available)
+#' for the plots?
 #' @param ... other arguments passed to \link{plot}.
 #' @importFrom ggplot2 ggplot aes geom_line scale_y_continuous
 plotFitted <- function(x,
@@ -224,13 +225,13 @@ plotFitted <- function(x,
     plotFrame <- pf[order(pf$variable, pf$date), ]
     ggplot(data = plotFrame,
            aes(x = date, y = as.numeric(value), col = variable)) +
-    geom_line() + scale_y_continuous(name = "y")
+      geom_line() + scale_y_continuous(name = "y")
   } else {
     # Set the highest and lowest axis scale
     ymax <- max(sapply(plotModels,
-                      FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
+                       FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
     ymin <- min(sapply(plotModels,
-                      FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
+                       FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
     range <- ymax - ymin
     plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range), ...)
     for (i in seq_along(plotModels)) {
@@ -276,11 +277,11 @@ plot.hybridModel <- function(x,
                              type = c("fit", "models"),
                              ggplot = FALSE,
                              ...) {
-   type <- match.arg(type)
-   chkDots(...)
-   if (type == "fit") {
-     plotFitted(x = x, ggplot = ggplot)
-   } else if (type == "models") {
-     plotModelObjects(x = x, ggplot = ggplot)
-   }
+  type <- match.arg(type)
+  chkDots(...)
+  if (type == "fit") {
+    plotFitted(x = x, ggplot = ggplot)
+  } else if (type == "models") {
+    plotModelObjects(x = x, ggplot = ggplot)
+  }
 }

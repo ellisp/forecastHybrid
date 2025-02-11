@@ -26,8 +26,7 @@
 #' tsCombine(window(AirPassengers, end = c(1951, 12)), window(AirPassengers, start = c(1952, 1)))
 tsCombine <- function(...) {
   # chkDots will throw warnings in the tests. Since this function does not use any named arguments,
-  # does it even make sense to test it? We probably can remove it.
-  # chkDots(...)
+  # does it even make sense to test it? We probably can remove it. chkDots(...)
   combinedDf <- ts.union(..., dframe = TRUE)
   combinedTs <- ts.union(..., dframe = FALSE)
   coalesced <- apply(combinedDf, 1,
