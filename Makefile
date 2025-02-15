@@ -7,7 +7,7 @@ check: clean
 check_win: clean document
 	cd pkg && R --vanilla -q -e 'devtools::check_win_devel()'
 lint:
-	cd pkg && R --vanilla -q -e 'library(lintr);lint_package(linters = with_defaults(line_length_linter(100), object_name_linter(styles = "camelCase")))'
+	cd pkg && R --vanilla -q -e 'library(lintr);lint_package(linters = linters_with_defaults(line_length_linter(100), object_name_linter(styles = "camelCase")))'
 vignette:
 	cd pkg && R --vanilla -q -e 'devtools::build_vignettes("vignettes")'
 document:
