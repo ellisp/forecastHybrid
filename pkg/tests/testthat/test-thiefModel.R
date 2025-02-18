@@ -1,18 +1,18 @@
-if (require(forecast) && require(testthat)) {
+if (require(testthat)) {
   test_that("Testing thiefModel()", {
-    h <- 2
-    set.seed(42)
-    series <- ts(rnorm(16), f = 4)
+    h <- 2L
+    set.seed(42L)
+    series <- ts(rnorm(16L), f = 4L)
     fc <- thiefModel(series, h = h)
-    expect_true(class(fc) == "forecast")
-    expect_true(length(fc$mean) == h)
+    expect_s3_class(fc, "forecast")
+    expect_length(fc$mean, h)
 
     # Test with non-default combination and models
-    h <- 5
+    h <- 5L
     series <- AirPassengers
     fc <- thiefModel(y = series, models = "ef", h = h, comb = "ols")
-    expect_true(class(fc) == "forecast")
-    expect_true(length(fc$mean) == h)
-    expect_true(all(fc$mean > 0))
+    expect_s3_class(fc, "forecast")
+    expect_length(fc$mean, h)
+    expect_true(all(fc$mean > 0L))
   })
 }

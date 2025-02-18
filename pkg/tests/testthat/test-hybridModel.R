@@ -89,7 +89,7 @@ if (require(forecast) && require(testthat)) {
     set.seed(42)
     dat <- ts(rnorm(52 * 3), f = 52)
     expect_warning(hm <- hybridModel(y = dat, models = "fs"), NA)
-    expect_true(length(forecast(hm)$mean) == 52 * 2)
+    expect_length(forecast(hm)$mean, 52 * 2)
     # Test for messy function call
     hm <- hybridModel(wineind)
     # Disable these for now because fails on r-devel
@@ -111,9 +111,8 @@ if (require(forecast) && require(testthat)) {
     set.seed(33)
     inputSeries <- ts(rnorm(12), f = 2)
     expect_error(cvMod <- hybridModel(inputSeries, weights = "cv.errors",
-                                      windowSize = 8, cvHorizon = 2), NA)
-    expect_equal(length(cvMod$weights),
-                 length(unique(cvMod$weights)))
+                                      windowSize = 8, cvHorizon = 2), NA) # nolint: implicit_assignment_linter
+    expect_length(cvMod$weights, length(unique(cvMod$weights)))
   })
 
   test_that("Testing the hybridModel object", {
@@ -135,33 +134,33 @@ if (require(forecast) && require(testthat)) {
                         parallel = parallel)
       for (obj in hm) {
         expect_true(all(class(obj) != "NULL"))
-        expect_true(!is.null(obj))
+        expect_false(is.null(obj))
       }
       # Ensure numeric values
-      expect_true(is.numeric(hm$fitted))
-      expect_true(is.numeric(hm$residuals))
-      expect_true(is.numeric(hm$x))
-      expect_true(length(hm$fitted) == length(testSeries))
-      expect_true(length(hm$residuals) == length(testSeries))
-      expect_true(length(hm$x) == length(testSeries))
+      expect_true(is.numeric(hm$fitted)) # nolint: expect_type_linter
+      expect_true(is.numeric(hm$residuals)) # nolint: expect_type_linter
+      expect_true(is.numeric(hm$x)) # nolint: expect_type_linter
+      expect_length(hm$fitted, length(testSeries))
+      expect_length(hm$residuals, length(testSeries))
+      expect_length(hm$x, length(testSeries))
       expect_true(all(hm$weights >= 0))
       # Weights should sum to 1 but allow tolerance
-      expect_true(sum(hm$weights) - 1 < tol)
-      expect_true(length(hm$weights) == nchar(models))
-      expect_true(hm$frequency == freq)
+      expect_lt(sum(hm$weights) - 1, tol)
+      expect_length(hm$weights, nchar(models))
+      expect_identical(hm$frequency, freq)
       # Ensure xreg is correct
       expect_true(all(hm$auto.arima$xreg == xreg))
       expect_true(hm$xreg$auto.arima)
-      expect_true(!hm$xreg$stlm)
+      expect_false(hm$xreg$stlm)
       # Ensure other fields are correct
-      expect_true(length(hm$models) == nchar(models))
+      expect_length(hm$models, nchar(models))
       expect_true(all(names(hm$weights) == hm$models))
       # Ensure the models are of the expected classes
-      expect_true("ARIMA" %in% class(hm$auto.arima))
-      expect_true("ets" == class(hm$ets))
+      expect_true(is.Arima(hm$auto.arima))
+      expect_true(is.ets(hm$ets))
       expect_true("thetam" %in% class(hm$thetam))
-      expect_true("stlm" %in% class(hm$stlm))
-      expect_true("forecast" %in% class(hm$snaive))
+      expect_true(is.stlm(hm$stlm))
+      expect_true(is.forecast(hm$snaive))
 
       # Base forecasts should work
       expect_error(forecast(hm$auto.arima, xreg = xreg), NA)
@@ -174,12 +173,12 @@ if (require(forecast) && require(testthat)) {
     tol <- 10^-8
     parallelFitted <- modelComparison[["TRUE"]]$fitted
     serialFitted <- modelComparison[["FALSE"]]$fitted
-    expect_true(sum(abs(parallelFitted - serialFitted), na.rm = TRUE) < tol)
+    expect_lt(sum(abs(parallelFitted - serialFitted), na.rm = TRUE), tol)
     expect_true(all(is.na(serialFitted) == is.na(parallelFitted)))
 
     parallelResiduals <- modelComparison[["TRUE"]]$residuals
     serialResiduals <- modelComparison[["FALSE"]]$residuals
-    expect_true(sum(abs(parallelResiduals - serialResiduals), na.rm = TRUE) < tol)
+    expect_lt(sum(abs(parallelResiduals - serialResiduals), na.rm = TRUE), tol)
     expect_true(all(is.na(serialResiduals) == is.na(parallelResiduals)))
   })
 
@@ -193,15 +192,15 @@ if (require(forecast) && require(testthat)) {
     results <- list()
     for (weight in weights) {
       if (weight == "insample.errors") {
-        expect_warning(hm <- hybridModel(inputSeries, models = models,
+        expect_warning(hm <- hybridModel(inputSeries, models = models, # nolint: implicit_assignmnet_linter
                                          weights = weight))
       } else {
         hm <- hybridModel(inputSeries, models = models, weights = weight)
       }
-      expect_true(sum(hm$weights) - 1 < tol)
+      expect_lt(sum(hm$weights) - 1, tol)
       expect_true(all(hm$weights >= 0))
       expect_true(all(hm$weights <= 1))
-      expect_true(length(hm$weights) == nchar(models))
+      expect_length(hm$weights, nchar(models))
       results[[weight]] <- hm
     }
     # Test that weights are not equal
@@ -223,6 +222,6 @@ if (require(forecast) && require(testthat)) {
                             n.args = list(xreg = trainXreg),
                             s.args = list(xreg = trainXreg, method = "arima"))
     expect_true(all.equal(names(beaverhm$xreg), c("auto.arima", "nnetar", "stlm")))
-    expect_true(all(beaverhm$xreg == TRUE))
+    expect_true(all(unlist(beaverhm$xreg)))
   })
 }

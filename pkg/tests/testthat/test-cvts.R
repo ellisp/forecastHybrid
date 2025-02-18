@@ -5,7 +5,7 @@ if (require(forecast) && require(testthat)) {
     result$series <- train
     result$forecast <- train[length(train)]
     class(result) <- "naive_model"
-    return(result)
+    result
   }
 
   forecastFunction <- function(model, h = 12) {
@@ -16,7 +16,7 @@ if (require(forecast) && require(testthat)) {
     tsp(result$mean) <- c(tsp(model$series)[2] + 1 / freq, tsp(model$series)[2] + h / freq,
                           freq)
     class(result) <- "forecast"
-    return(result)
+    result
   }
 
   context("Testing input for cvts()")
@@ -57,8 +57,8 @@ if (require(forecast) && require(testthat)) {
 
     forecasts <- vapply(cv$forecasts, function(x) x[[2]], numeric(1))
     trainSeries <- vapply(cv$forecasts, function(x) x[[1]]$series, numeric(1))
-    expect_equal(AirPassengers[1:(length(AirPassengers) - 1)], trainSeries)
-    expect_equal(AirPassengers[1:(length(AirPassengers) - 1)], forecasts)
+    expect_identical(AirPassengers[1:(length(AirPassengers) - 1)], trainSeries)
+    expect_identical(AirPassengers[1:(length(AirPassengers) - 1)], forecasts)
   })
 
   test_that("Additional parameters can be passed to fitting functions", {
@@ -85,8 +85,8 @@ if (require(forecast) && require(testthat)) {
     cv <- cvts(AirPassengers, FUN = naiveForecast, FCFUN = forecastFunction, rolling = TRUE,
                windowSize = 1, maxHorizon = 1)
 
-    laggedForecasts <- window(lag(extractForecasts(cv, 1)), start = c(1949, 1))
-    orig <- window(AirPassengers, end = c(1960, 11))
+    laggedForecasts <- window(lag(extractForecasts(cv, 1)), start = c(1949L, 1L))
+    orig <- window(AirPassengers, end = c(1960L, 11L))
 
     expect_equal(laggedForecasts, orig)
   })
@@ -95,11 +95,11 @@ if (require(forecast) && require(testthat)) {
     slices <- tsPartition(AirPassengers, TRUE, 1, 1)
     trainIndices <- Map(function(x) x$trainIndices, slices)
     allTrainIndices <- Reduce(c, trainIndices)
-    expect_equal(allTrainIndices, seq(1, length(AirPassengers) - 1, 1))
+    expect_identical(allTrainIndices, seq(1L, length(AirPassengers) - 1, 1L))
 
     testIndices <- Map(function(x) x$testIndices, slices)
     allTestIndices <- Reduce(c, testIndices)
-    expect_equal(allTestIndices, seq(2, length(AirPassengers), 1))
+    expect_identical(allTestIndices, seq(2L, length(AirPassengers), 1L))
   })
 
   test_that("xreg is properly used", {
@@ -115,7 +115,7 @@ if (require(forecast) && require(testthat)) {
     cv <- cvts(series, nnetar, xreg = NULL, windowSize = windowSize, maxHorizon = maxHorizon)
     xregForEachModel <- Map(function(x) x$xreg, cv$models)
     xregAllModels <- Reduce(c, xregForEachModel)
-    expect_identical(xregAllModels, NULL)
+    expect_null(xregAllModels)
 
     ## Ensure xreg is used when a model accepts xreg and xreg is a vector
     series <- ts(rnorm(144), f = 2)
@@ -127,7 +127,7 @@ if (require(forecast) && require(testthat)) {
 
     xregsAllModels <- Map(function(x) x$xreg, cv$models)
     xregsLast <- xregsAllModels[[length(xregsAllModels)]]
-    expect_equal(xreg[1:(length(series) - maxHorizon)], as.numeric(xregsLast))
+    expect_identical(xreg[1:(length(series) - maxHorizon)], as.numeric(xregsLast))
   })
 
   test_that("custom FUN and FCFUN", {
@@ -145,7 +145,7 @@ if (require(forecast) && require(testthat)) {
       pred <- predict(mod, newx)
       result <- list()
       result$mean <- pred
-      return(result)
+      result
     }
     series <- ts(rnorm(6), f = 2)
     expect_error(cvts(series, FCFUN = FCFUN, windowSize = 4, maxHorizon = 1), NA)
@@ -155,25 +155,25 @@ if (require(forecast) && require(testthat)) {
     cvmod2 <- cvts(USAccDeaths, FUN = ets,
                    saveModels = FALSE, saveForecasts = FALSE,
                    windowSize = 36, maxHorizon = 12)
-    expect_true(length(cvmod2) == 6)
+    expect_length(cvmod2, 6L)
 
     cvmod3 <- cvts(AirPassengers, FUN = hybridModel,
                    FCFUN = function(mod, h) forecast(mod, h = h, PI = FALSE),
                    rolling = FALSE, windowSize = 48,
                    maxHorizon = 12)
-    expect_true(length(cvmod3) == 6)
+    expect_length(cvmod3, 6L)
   })
 
   test_that("parity when 1 vs 2 cores used", {
     series <- ts(rnorm(10), f = 2)
     cvSerial <- cvts(series, FUN = stlm, windowSize = 6, maxHorizon = 2, num.cores = 1)
     cvParallel <- cvts(series, FUN = stlm, windowSize = 6, maxHorizon = 2, num.cores = 2)
-    expect_true(all(names(cvSerial) == names(cvParallel)))
-    expect_true(is.null(cvSerial$xreg))
-    expect_true(is.null(cvParallel$xreg))
-    expect_true(identical(cvSerial$x, cvParallel$x))
-    expect_true(identical(cvSerial$residuals, cvParallel$residuals))
-    expect_true(identical(cvSerial$forecasts, cvParallel$forecasts))
+    expect_identical(names(cvSerial), names(cvParallel))
+    expect_null(cvSerial$xreg)
+    expect_null(cvParallel$xreg)
+    expect_identical(cvSerial$x, cvParallel$x)
+    expect_identical(cvSerial$residuals, cvParallel$residuals)
+    expect_identical(cvSerial$forecasts, cvParallel$forecasts)
     expect_true(all.equal(length(cvSerial$models), length(cvParallel$models), 3))
   })
 }
