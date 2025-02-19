@@ -70,7 +70,7 @@ forecast.hybridModel <- function(object, # nolint
   # If it is implemented in a later version, we can probably enable
   # the check. chkDots(..., allowed = "npaths")
   if (!is.hybridModel(object)) {
-    stop("The object must be constructed from hybridModel().")
+    stop("The object must be constructed from hybridModel().", call. = FALSE)
   }
 
   # apply nrow(xreg) to h if h isn't provided and xreg is
@@ -81,24 +81,24 @@ forecast.hybridModel <- function(object, # nolint
   # xreg should be a matrix and have same number of observations as the horizon
   if (!is.null(xreg)) {
     if (!is.matrix(xreg) && !is.numeric(xreg) && !is.data.frame(xreg)) {
-      stop("The supplied xreg must be numeric, matrix, or data.frame.")
+      stop("The supplied xreg must be numeric, matrix, or data.frame.", call. = FALSE)
     }
     xreg <- as.matrix(xreg)
     if (!is.numeric(xreg)) {
-      stop("The supplied xreg must be numeric.")
+      stop("The supplied xreg must be numeric.", call. = FALSE)
     }
     if (is.null(h) || nrow(xreg) != h) {
-      warning("The number of rows in xreg should match h. Setting h to nrow(xreg).")
+      warning("The number of rows in xreg should match h. Setting h to nrow(xreg).", call. = FALSE)
       h <- nrow(xreg)
     }
   }
 
   # Check the forecast horizon
   if (!is.numeric(h)) {
-    stop("The forecast horizon h must be a positive integer.")
+    stop("The forecast horizon h must be a positive integer.", call. = FALSE)
   }
   if (!as.logical((h %% 1L == 0L)) || h <= 0L) {
-    stop("The forecast horizon h must be a positive integer.")
+    stop("The forecast horizon h must be a positive integer.", call. = FALSE)
   }
 
   # Allow for fan prediction intervals
@@ -108,7 +108,7 @@ forecast.hybridModel <- function(object, # nolint
     if (min(level) > 0 && max(level) < 1) {
       level <- 100 * level
     } else if (min(level) < 0 || max(level) > 99.99) {
-      stop("Prediction interval out of range")
+      stop("Prediction interval out of range", call. = FALSE)
     }
   }
 
@@ -182,7 +182,7 @@ forecast.hybridModel <- function(object, # nolint
   fitsWeightsMatrix <- matrix(rep(forecastWeights, times = nrow(fits)),
                               nrow = nrow(fits), byrow = TRUE)
   fits <- rowSums(fits * fitsWeightsMatrix)
-  resid <- object$x - fits
+  resids <- object$x - fits
 
   # Construct the prediction intervals
   if (PI) {
@@ -213,7 +213,7 @@ forecast.hybridModel <- function(object, # nolint
       lower[, i] <- apply(tmpLower, 1, FUN = lowerFunction)
     }
     if (!is.finite(max(upper)) || !is.finite(min(lower))) {
-      warning("Prediction intervals are not finite.")
+      warning("Prediction intervals are not finite.", call. = FALSE)
     }
     colnames(lower) <- colnames(upper) <- paste0(level, "%")
     forecasts$lower <- lower
@@ -224,16 +224,16 @@ forecast.hybridModel <- function(object, # nolint
   # Add the fitted and residuals values
   if (is.ts(object$x)) {
     fits <- ts(fits)
-    resid <- ts(resid)
-    tsp(fits) <- tsp(resid) <- tsp(object$x)
+    resids <- ts(resids)
+    tsp(fits) <- tsp(resids) <- tsp(object$x)
   }
   forecasts$fitted <- fits
-  forecasts$residuals <- resid
+  forecasts$residuals <- resids
 
   # Build a forecast object
   forecasts$x <- forecasts[[object$models[1]]]$x
   forecasts$method <- paste0(object$models, " with weight ", round(object$weights, 3))
   forecasts$level <- level
   class(forecasts) <- "forecast"
-  return(forecasts)
+  forecasts
 }

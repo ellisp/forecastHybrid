@@ -9,21 +9,22 @@
 checkCVArguments <- function(x,
                              windowSize,
                              maxHorizon) {
-  if (any(sapply(c(x, windowSize, maxHorizon), FUN = function(x) !is.numeric(x)))) {
-    stop("The arguments x, windowSize, and maxHorizon must all be numeric.")
+  if (any(sapply(c(x, windowSize, maxHorizon),
+                 FUN = function(x) !is.numeric(x)))) { # nolint: unnecessary_lambda_linter
+    stop("The arguments x, windowSize, and maxHorizon must all be numeric.", call. = FALSE)
   }
 
   if (any(c(windowSize, maxHorizon) < 1L)) {
-    stop("The arguments windowSize, and maxHorizon must be positive integers.")
+    stop("The arguments windowSize, and maxHorizon must be positive integers.", call. = FALSE)
   }
 
   if (any(c(windowSize, maxHorizon) %% 1L != 0)) {
-    stop("The arguments windowSize, and maxHorizon must be positive integers.")
+    stop("The arguments windowSize, and maxHorizon must be positive integers.", call. = FALSE)
   }
 
   # Ensure at least two periods are tested
   if (windowSize + 2 * maxHorizon > length(x)) {
-    stop("The time series must be longer than windowSize + 2 * maxHorizon.")
+    stop("The time series must be longer than windowSize + 2 * maxHorizon.", call. = FALSE)
   }
 }
 
@@ -154,8 +155,8 @@ cvts <- function(x,
                  maxHorizon = 5,
                  horizonAverage = FALSE,
                  xreg = NULL,
-                 saveModels = ifelse(length(x) > 500, FALSE, TRUE),
-                 saveForecasts = ifelse(length(x) > 500, FALSE, TRUE),
+                 saveModels = length(x) <= 500,
+                 saveForecasts = length(x) <= 500,
                  verbose = TRUE,
                  num.cores = 2L, # nolint
                  extraPackages = NULL,
@@ -188,11 +189,11 @@ cvts <- function(x,
   xregUse <- FALSE
   if (!is.null(xreg)) {
     fitArgs <- formals(FUN)
-    if (any(grepl("xreg", names(fitArgs)))) {
+    if (any(grepl("xreg", names(fitArgs), fixed = TRUE))) {
       xregUse <- TRUE
       xreg <- as.matrix(xreg)
     } else {
-      warning("Ignoring xreg parameter since fitting function does not accept xreg")
+      warning("Ignoring xreg parameter since fitting function does not accept xreg", call. = FALSE)
     }
   }
 
@@ -354,24 +355,24 @@ tsPartition <- function(x,
                           as.integer((length(x) - windowSize) / maxHorizon))
 
   slices <- rep(list(NA), numPartitions)
-  start <- 1
+  startIdx <- 1
 
   for (i in 1:numPartitions) {
     if (rolling) {
-      trainIndices <- seq(start, start + windowSize - 1, 1)
-      testIndices <-  seq(start + windowSize, start + windowSize + maxHorizon - 1)
-      start <- start + 1
+      trainIndices <- seq(startIdx, startIdx + windowSize - 1, 1)
+      testIndices <-  seq(startIdx + windowSize, startIdx + windowSize + maxHorizon - 1)
+      startIdx <- startIdx + 1
     } else {
       ## Sample the correct slice for nonrolling
-      trainIndices <- seq(start, start + windowSize - 1 + maxHorizon * (i - 1), 1)
-      testIndices <- seq(start + windowSize + maxHorizon * (i - 1),
-                         start + windowSize - 1 + maxHorizon * i)
+      trainIndices <- seq(startIdx, startIdx + windowSize - 1 + maxHorizon * (i - 1), 1)
+      testIndices <- seq(startIdx + windowSize + maxHorizon * (i - 1),
+                         startIdx + windowSize - 1 + maxHorizon * i)
     }
 
     slices[[i]] <- list(trainIndices = trainIndices, testIndices = testIndices)
   }
 
-  return(slices)
+  slices
 }
 
 #' Extract cross validated rolling forecasts
@@ -398,7 +399,7 @@ tsPartition <- function(x,
 extractForecasts <- function(cv,
                              horizon = 1) {
   if (horizon > cv$params$maxHorizon)
-    stop("Cannot extract forecasts with a horizon greater than the model maxHorizon")
+    stop("Cannot extract forecasts with a horizon greater than the model maxHorizon", call. = FALSE)
   pointfList <- Map(function(fcast) {
     pointf <- fcast$mean
     window(pointf, start = time(pointf)[horizon],

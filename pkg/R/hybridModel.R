@@ -137,8 +137,8 @@ hybridModel <- function(y, # nolint
   ##############################################################################
   # Validate input
   ##############################################################################
-  modelArguments <- list("a" = a.args, "e" = e.args, "f" = NULL, "n" = n.args,
-                         "s" = s.args, "t" = t.args, "x" = x.args, "z" = z.args)
+  modelArguments <- list(a = a.args, e = e.args, f = NULL, n = n.args,
+                         s = s.args, t = t.args, x = x.args, z = z.args)
 
   # Validate and clean the input timeseries
   y <- prepareTimeseries(y = y)
@@ -149,12 +149,12 @@ hybridModel <- function(y, # nolint
   if (weights == "insample.errors") {
     wrnMsg <- paste0("Using insample.error weights is not recommended for accuracy and ",
                      "may be deprecated in the future.")
-    warning(wrnMsg)
+    warning(wrnMsg, call. = FALSE)
   }
   errorMethod <- match.arg(errorMethod)
 
   # Match the specified models
-  expandedModels <- sort(unique(tolower(unlist(strsplit(models, split = "")))))
+  expandedModels <- sort(unique(tolower(unlist(strsplit(models, split = "", fixed = TRUE)))))
   # Check models and data length to ensure enough data: remove models that require more data
   expandedModels <- removeModels(y = y, models = expandedModels)
 
@@ -165,7 +165,7 @@ hybridModel <- function(y, # nolint
   checkModelArgs(modelArguments = modelArguments, models = expandedModels)
 
   if (weights == "cv.errors" && errorMethod == "MASE") {
-    warning("cv errors currently do not support MASE. Reverting to RMSE.")
+    warning("cv errors currently do not support MASE. Reverting to RMSE.", call. = FALSE)
     errorMethod <- "RMSE"
   }
 
@@ -273,7 +273,7 @@ hybridModel <- function(y, # nolint
   if (is.element(NaN, modelResults$weights) && weights %in% c("insample.errors", "cv.errors")) {
     wrnMsg <- paste0("At least one model perfectly fit the series, so accuracy measures cannot",
                      " be used for weights. Reverting to weights = \"equal\".") # nolint
-    warning(wrnMsg)
+    warning(wrnMsg, call. = FALSE)
     modelResults$weights <- rep(1 / length(includedModels),
                                 length(includedModels))
   }
@@ -289,21 +289,20 @@ hybridModel <- function(y, # nolint
                                   times = nrow(fits)),
                               nrow = nrow(fits), byrow = TRUE)
   fits <- rowSums(fits * fitsWeightsMatrix)
-  resid <- y - fits
+  resids <- y - fits
   tsp(fits) <- tsp(y)
 
   # Save which models used xreg
   xregs <- list()
   if ("a" %in% expandedModels) {
-    xregs$auto.arima <- ifelse("xreg" %in% names(a.args) && !is.null(a.args$xreg), TRUE, FALSE) # nolint
+    xregs$auto.arima <- "xreg" %in% names(a.args) && !is.null(a.args$xreg) # nolint
   }
   if ("n" %in% expandedModels) {
-    xregs$nnetar <- ifelse("xreg" %in% names(n.args) && !is.null(n.args$xreg), TRUE, FALSE)
+    xregs$nnetar <- "xreg" %in% names(n.args) && !is.null(n.args$xreg)
   }
   if ("s" %in% expandedModels) {
     methodArima <- "method" %in% names(s.args) && s.args$method == "arima"
-    xregs$stlm <- ifelse("xreg" %in% names(s.args) && !is.null(s.args$xreg) && methodArima,
-                         TRUE, FALSE)
+    xregs$stlm <- "xreg" %in% names(s.args) && !is.null(s.args$xreg) && methodArima
   }
 
   # Prepare the hybridModel object
@@ -313,6 +312,6 @@ hybridModel <- function(y, # nolint
   modelResults$xreg <- xregs
   modelResults$models <- includedModels
   modelResults$fitted <- fits
-  modelResults$residuals <- resid
+  modelResults$residuals <- resids
   return(modelResults)
 }

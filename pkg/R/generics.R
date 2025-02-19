@@ -87,7 +87,7 @@ accuracy.hybridModel <- function(object, # nolint
   chkDots(...)
   if (!is.null(f)) {
     warning("Using `f` as the argument for `accuracy()` is deprecated.",
-            "Please use `object` instead.")
+            "Please use `object` instead.", call. = FALSE)
     object <- f
   }
   if (individual) {
@@ -122,7 +122,7 @@ accuracy.cvts <- function(object, # nolint
   chkDots(...)
   if (!is.null(f)) {
     warning("Using `f` as the argument for `accuracy()` is deprecated.",
-            " Please use `object` instead.")
+            " Please use `object` instead.", call. = FALSE)
     object <- f
   }
   ME <- colMeans(object$residuals) # nolint
@@ -216,13 +216,13 @@ plotFitted <- function(x,
     value <- NULL
     # If anyone knows a cleaner way to transform this "wide" data to "long" data for plotting
     # with ggplot2 without using additional packages, let me know.
-    pf <- matrix(as.matrix(plotFrame[, plotModels]), ncol = 1)
-    pf <- data.frame(date = plotFrame$date,
-                     variable = factor(rep(plotModels,
-                                           each = nrow(plotFrame)),
-                                       levels = plotModels),
-                     value = pf)
-    plotFrame <- pf[order(pf$variable, pf$date), ]
+    pfTransform <- matrix(as.matrix(plotFrame[, plotModels]), ncol = 1)
+    pfTransform <- data.frame(date = plotFrame$date,
+                              variable = factor(rep(plotModels,
+                                                    each = nrow(plotFrame)),
+                                                levels = plotModels),
+                              value = pfTransform)
+    plotFrame <- pfTransform[order(pfTransform$variable, pfTransform$date), ]
     ggplot(data = plotFrame,
            aes(x = date, y = as.numeric(value), col = variable)) +
       geom_line() + scale_y_continuous(name = "y")
@@ -232,8 +232,8 @@ plotFitted <- function(x,
                        FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
     ymin <- min(sapply(plotModels,
                        FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
-    range <- ymax - ymin
-    plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range), ...)
+    yRange <- ymax - ymin
+    plot(x$x, ylim = c(ymin - 0.05 * yRange, ymax + 0.25 * yRange), ...)
     for (i in seq_along(plotModels)) {
       lines(fitted(x[[plotModels[i]]]), col = i + 1)
     }

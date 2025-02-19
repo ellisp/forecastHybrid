@@ -32,7 +32,7 @@ thiefModel <- function(y,
   y <- prepareTimeseries(y = y)
   # Match the specified models
   # Note: models that only work with seasonal data (e.g. stlm()) will not work
-  models <- sort(unique(tolower(unlist(strsplit(models, split = "")))))
+  models <- sort(unique(tolower(unlist(strsplit(models, split = "", fixed = TRUE)))))
   # Check models and data length to ensure enough data: remove models that
   # require more data
   models <- removeModels(y = y, models = models)
@@ -49,7 +49,7 @@ thiefModel <- function(y,
   for (modelChar in models) {
     modelName <- getModelName(modelChar)
     if (verbose) {
-      message("Fitting the ", modelName <- getModelName(modelChar), " model")
+      message("Fitting the ", modelName, " model")
     }
     FUN <- getModel(modelChar) # nolint
     FCFUN <- function(y1, h1) forecast(object = FUN(y = y1), h = h1) # nolint
@@ -64,13 +64,13 @@ thiefModel <- function(y,
   ##############################################################################
 
 
-  fits <- sapply(forecasts, FUN = function(x) fitted(x))
-  weights <- rep(1 / length(models), length(models)) # equal weights for now
-  weightMatrix <- matrix(rep(weights, times = nrow(fits)),
+  fits <- sapply(forecasts, FUN = fitted)
+  modelWeights <- rep(1 / length(models), length(models)) # equal weights for now
+  weightMatrix <- matrix(rep(modelWeights, times = nrow(fits)),
                          nrow = nrow(fits), byrow = TRUE)
   fit <- rowSums(fits * weightMatrix)
 
-  weightMatrix <- matrix(rep(weights, times = h),
+  weightMatrix <- matrix(rep(modelWeights, times = h),
                          nrow = h, byrow = TRUE)
   fc <- sapply(forecasts, FUN = function(x) x$mean)
   fc <- ts(rowSums(fc * weightMatrix))

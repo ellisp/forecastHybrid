@@ -19,17 +19,17 @@
 #' @seealso \code{\link{forecast.thetam}}
 thetam <- function(y) {
   if (any(class(y) %in% c("data.frame", "list", "matrix", "mts"))) {
-    stop("y should be a univariate time series")
+    stop("y should be a univariate time series", call. = FALSE)
   }
   if (!is.numeric(y)) {
-    stop("y should be numeric")
+    stop("y should be numeric", call. = FALSE)
   }
   y <- as.ts(y)
 
   n <- length(y)
   m <- frequency(y)
   if (n <= m) {
-    stop("there is not enough data to run the theta model")
+    stop("there is not enough data to run the theta model", call. = FALSE)
   }
   if (m > 1) {
     r <- as.numeric(stats::acf(y, lag.max = m, plot = FALSE)$acf)[-1]
@@ -59,7 +59,7 @@ thetam <- function(y) {
   object$method <- "Theta"
   class(object) <- c("thetam", "ets")
 
-  return(object)
+  object
 }
 
 #' Forecast using a Theta model
@@ -93,12 +93,12 @@ forecast.thetam <- function(object, # nolint
     if (min(level) > 0 && max(level) < 1)
       level <- 100 * level
     else if (min(level) < 0 || max(level) > 99.99)
-      stop("Confidence limit out of range")
+      stop("Confidence limit out of range", call. = FALSE)
   }
   fcast <- forecast.ets(object, h = h, level = level, fan = fan)
   alpha <- fcast$model$par["alpha"]
-  update <- object$drift * (0:(h - 1) + (1 - (1 - alpha) ^ length(object$x)) / alpha)
-  fcast$mean <- fcast$mean + update
+  updateValue <- object$drift * (0:(h - 1) + (1 - (1 - alpha) ^ length(object$x)) / alpha)
+  fcast$mean <- fcast$mean + updateValue
   if (object$seasonal) {
     fcast$mean <- fcast$mean * rep(object$seasadj, trunc(1 + h / object$m))[1:h]
   }
@@ -110,7 +110,7 @@ forecast.thetam <- function(object, # nolint
     fcast$lower[, i] <- fcast$mean - zt * fcastSE
     fcast$upper[, i] <- fcast$mean + zt * fcastSE
   }
-  return(fcast)
+  fcast
 }
 
 #' Plot components from Theta model
