@@ -205,19 +205,18 @@ plot(woolyrnq)
 
 We can also use custom functions, for example `fcast()` from the "GMDH" package. We must be very careful that our custom forecast function still produces an expected "forecast" S3 class object and that the ts object start, end, and frequency properties are preserved.
 ```{r, custom_cvts, cache=TRUE}
-library(GMDH)
 gmdhForecast <- function(x, h) {
   fc <- GMDH::fcast(x, f.number = h)
   # GMDH doesn't produce a ts object with correct attributes, so we build it
-  end <- tsp(x)[2]
+  endVal <- tsp(x)[2]
   freq <- frequency(x)
   # Set the correct start, end, and frequency for the ts forecast object
-  tsProperties <- c(end + 1 / freq, end + h / freq, freq)
+  tsProperties <- c(endVal + 1 / freq, endVal + h / freq, freq)
   tsp(fc$mean) <- tsProperties
   tsp(fc$upper) <- tsProperties
   tsp(fc$lower) <- tsProperties
   class(fc) <- "forecast"
-  return(fc)
+  fc
 }
 series <- subset(woolyrnq, end = 12)
 gmdhcv <- cvts(series, FCFUN = gmdhForecast, windowSize = 10, maxHorizon = 1)
@@ -229,14 +228,14 @@ customMod <- function(x) {
   result$series <- x
   result$last <- tail(x, n = 1)
   class(result) <- "customMod"
-  return(result)
+  result
 }
 forecast.customMod <- function(x, h = 12) {
   result <- list()
   result$model <- x
   result$mean <- rep(x$last, h)
   class(result) <- "forecast"
-  return(result)
+  result
 }
 series <- subset(AirPassengers, end = 94)
 cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)
