@@ -23,7 +23,7 @@ install.packages("forecastHybrid")
 
 The latest development version can be installed using the "devtools" package.
 ```{r github_install, eval = FALSE}
-devtools::install_github("ellisp/forecastHybrid/pkg")
+devtools::install_git("https://gitlab.com/dashaub/forecastHybrid", subdir = "pkg")
 ```
 
 Version updates to CRAN will be published frequently after new features are implemented, so the development version is not recommended unless you plan to modify the code.
@@ -31,7 +31,7 @@ Version updates to CRAN will be published frequently after new features are impl
 # Basic usage
 First load the package.
 ```{r load_library, message = FALSE}
-library(forecastHybrid)
+library(forecastHybrid) # nolint: undesirable_function_linter
 ```
 
 ## Quick start
