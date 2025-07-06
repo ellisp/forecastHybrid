@@ -1,4 +1,4 @@
-# Version 5.1.20 [Unreleased]
+# Version 5.1.20 [2025-07-03]
 * Main project repo is now hosted on [Gitlab](https://gitlab.com/dashaub/forecastHybrid/). The [GitHub](https://github.com/ellisp/forecastHybrid) repo may not be the most up to date.
 * Added second GPG signing key davidshaub@alumni.harvard.edu to package in addition to deprecated davidshaub@gmx.com key in `inst` directory.
 * Add the `arfima` model as a possibility to the ensemble by using the model code `x`.
