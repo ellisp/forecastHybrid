@@ -138,7 +138,7 @@ test_that("custom FUN and FCFUN", {
   expect_error(cvts(wineind, FUN = FUN, FCFUN = FCFUN, windowSize = windowSize), NA)
   # lm from "stats" package
   FCFUN <- function(x, h) { # nolint
-    dat <- data.frame(x = seq_len(length(x)), y = x)
+    dat <- data.frame(x = seq_along(x), y = x)
     mod <- lm(y ~ x, data = dat)
     newx <- data.frame(x = (length(x) + 1):(length(x) + h))
     pred <- predict(mod, newx)

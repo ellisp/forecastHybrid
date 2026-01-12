@@ -410,6 +410,6 @@ extractForecasts <- function(cv,
   pointf <- Reduce(tsCombine, pointfList)
 
   #Ensure all points in the original series are represented (makes it easy for comparisons)
-  template <- replace(cv$x, c(seq_len(length(cv$x))), NA)
+  template <- replace(cv$x, c(seq_along(cv$x)), NA)
   return(tsCombine(pointf, template))
 }
