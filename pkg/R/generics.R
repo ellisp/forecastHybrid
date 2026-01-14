@@ -33,7 +33,7 @@ fitted.hybridModel <- function(object,
     }
     return(results)
   }
-  return(object$fitted)
+  object$fitted
 }
 
 #' Extract Model Residuals
@@ -58,7 +58,7 @@ residuals.hybridModel <- function(object,
     }
     return(results)
   }
-  return(object$residuals)
+  object$residuals
 }
 
 
@@ -97,7 +97,7 @@ accuracy.hybridModel <- function(object, # nolint
     }
     return(results)
   }
-  return(forecast::accuracy(object$fitted, getResponse(object)))
+  forecast::accuracy(object$fitted, getResponse(object))
 }
 
 #' Accuracy measures for cross-validated time series
@@ -133,7 +133,7 @@ accuracy.cvts <- function(object, # nolint
   rownames(results) <- paste("Forecast Horizon ", rownames(results))
   # MASE TODO
   # Will require actual/fitted/residuals
-  return(results)
+  results
 }
 
 

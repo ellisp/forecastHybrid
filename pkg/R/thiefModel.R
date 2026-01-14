@@ -82,5 +82,5 @@ thiefModel <- function(y,
   forecasts$residuals <- y - fit
   forecasts$method <- "THieF-FCFUN"
   class(forecasts) <- "forecast"
-  return(forecasts)
+  forecasts
 }

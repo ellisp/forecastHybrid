@@ -313,5 +313,5 @@ hybridModel <- function(y, # nolint
   modelResults$models <- includedModels
   modelResults$fitted <- fits
   modelResults$residuals <- resids
-  return(modelResults)
+  modelResults
 }
