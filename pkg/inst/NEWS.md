@@ -1,3 +1,8 @@
+# Version 5.1.21 [2025-01-14]
+* Support the new `fc_model` objects from `forecast` package version 9
+* Safer handling of series in `cvts()`
+* Linting to use implicit returns
+
 # Version 5.1.20 [2025-07-03]
 * Main project repo is now hosted on [Gitlab](https://gitlab.com/dashaub/forecastHybrid/). The [GitHub](https://github.com/ellisp/forecastHybrid) repo may not be the most up to date.
 * Added second GPG signing key davidshaub@alumni.harvard.edu to package in addition to deprecated davidshaub@gmx.com key in `inst` directory.
