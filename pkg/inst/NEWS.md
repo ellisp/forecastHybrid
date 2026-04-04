@@ -1,6 +1,16 @@
-# Version 5.1.20 [Unreleased]
+# Version 5.1.21 [2026-01-14]
+* Support the new `fc_model` objects from `forecast` package version 9
+* Safer handling of series in `cvts()`
+* Linting to use implicit returns
+
+# Version 5.1.20 [2025-07-03]
+* Main project repo is now hosted on [Gitlab](https://gitlab.com/dashaub/forecastHybrid/). The [GitHub](https://github.com/ellisp/forecastHybrid) repo may not be the most up to date.
+* Added second GPG signing key davidshaub@alumni.harvard.edu to package in addition to deprecated davidshaub@gmx.com key in `inst` directory.
 * Add the `arfima` model as a possibility to the ensemble by using the model code `x`.
 * Require `forecast` 8.13.
+* Run `chkDots()` where possible but remove it from functions that will throw warnings when running tests (`tsCombine()`, `forecast.thetam()`, and `forecast.hybridModel()`).
+* Add tests for `tsCombine()` and more tests for `tsSubsetWithIndices()`
+* Documentation links not specify exact packages for function to avoid ambiguity.
 
 # Version 5.0.19 [2020-08-27]
 * Fix `residuals.hybridModel()` and added tests.

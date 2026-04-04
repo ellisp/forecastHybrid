@@ -1,9 +1,9 @@
 Package: forecastHybrid
 Title: Convenient Functions for Ensemble Time Series Forecasts
-Version: 5.0.19
-Date: 2020-08-27
+Version: 5.1.21
+Date: 2026-01-14
 Authors@R: c(
-   person("David", "Shaub", email = "davidshaub@gmx.com", role = c("aut", "cre")),
+   person("David", "Shaub", email = "davidshaub@alumni.harvard.edu", role = c("aut", "cre")),
    person("Peter", "Ellis", email = "peter.ellis2013nz@gmail.com", role = c("aut"))
    )
 Description: Convenient functions for ensemble forecasts in R combining
@@ -13,15 +13,15 @@ Description: Convenient functions for ensemble forecasts in R combining
     or cross-validated weights. Cross validation for time series data with user-supplied models
     and forecasting functions is also supported to evaluate model accuracy.
 Depends:
-    R (>= 3.1.1),
-    forecast (>= 8.13),
+    R (>= 4.0.4),
+    forecast (>= 8.16),
     thief
 Imports:
-    doParallel (>= 1.0.10),
-    foreach (>= 1.4.3),
-    ggplot2 (>= 2.2.0),
-    purrr (>= 0.2.5),
-    zoo (>= 1.7)
+    doParallel (>= 1.0.16),
+    foreach (>= 1.5.1),
+    ggplot2 (>= 3.3.6),
+    purrr (>= 0.3.5),
+    zoo (>= 1.8)
 Suggests:
     GMDH,
     knitr,
@@ -33,7 +33,7 @@ License: GPL-3
 URL: https://gitlab.com/dashaub/forecastHybrid, https://github.com/ellisp/forecastHybrid
 BugReports: https://github.com/ellisp/forecastHybrid/issues
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.3
 ByteCompile: true
 NeedsCompilation: no
 Encoding: UTF-8

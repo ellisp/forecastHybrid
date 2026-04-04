@@ -9,7 +9,8 @@ plotModelObjects(x, ggplot, ...)
 \arguments{
 \item{x}{an object of class hybridModel to plot.}
 
-\item{ggplot}{should the \code{\link{autoplot}} function be used (when available) for the plots?}
+\item{ggplot}{should the \code{\link[forecast]{autoplot}} function be used (when available)
+for the plots?}
 
 \item{...}{other arguments passed to \link{plot}.}
 }

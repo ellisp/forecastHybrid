@@ -21,5 +21,5 @@ The residuals of the ensemble or individual component models.
 Extract the model residuals from the \code{hybridModel} object.
 }
 \seealso{
-\code{\link{accuracy}}
+\code{\link[forecast]{accuracy}}
 }

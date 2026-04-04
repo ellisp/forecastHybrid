@@ -18,40 +18,40 @@
 #' plot(mod1)
 #' @seealso \code{\link{forecast.thetam}}
 thetam <- function(y) {
-   if (any(class(y) %in% c("data.frame", "list", "matrix", "mts"))) {
-      stop("y should be a univariate time series")
-   }
-   if (!is.numeric(y)) {
-      stop("y should be numeric")
-   }
-   y <- as.ts(y)
+  if (any(class(y) %in% c("data.frame", "list", "matrix", "mts"))) {
+    stop("y should be a univariate time series", call. = FALSE)
+  }
+  if (!is.numeric(y)) {
+    stop("y should be numeric", call. = FALSE)
+  }
+  y <- as.ts(y)
 
-   n <- length(y)
-   m <- frequency(y)
-   if (n <= m) {
-      stop("there is not enough data to run the theta model")
-   }
-   if (m > 1) {
-      r <- as.numeric(stats::acf(y, lag.max = m, plot = FALSE)$acf)[-1]
-      stat <- sqrt((1 + 2 * sum(r[-m] ^ 2)) / n)
-      seasonal <- (abs(r[m]) / stat > stats::qnorm(0.95))
-   }  else {
-      seasonal <- FALSE
-   }
+  n <- length(y)
+  m <- frequency(y)
+  if (n <= m) {
+    stop("there is not enough data to run the theta model", call. = FALSE)
+  }
+  if (m > 1) {
+    r <- as.numeric(stats::acf(y, lag.max = m, plot = FALSE)$acf)[-1]
+    stat <- sqrt((1 + 2 * sum(r[-m] ^ 2)) / n)
+    seasonal <- (abs(r[m]) / stat > stats::qnorm(0.95))
+  }  else {
+    seasonal <- FALSE
+  }
 
-   origy <- y
+  origy <- y
 
-   if (seasonal) {
-      decomp <- stats::decompose(y, type = "multiplicative")
-      y <- forecast::seasadj(decomp)
-   }
+  if (seasonal) {
+    decomp <- stats::decompose(y, type = "multiplicative")
+    y <- forecast::seasadj(decomp)
+  }
 
-   object <- forecast::ets(y, model = "ANN", opt.crit = "mse")
+  object <- forecast::ets(y, model = "ANN", opt.crit = "mse")
 
-   if (seasonal) {
-      object$seasadj <- utils::tail(decomp$seasonal, m)
-      object$seasadjhist <- decomp$seasona
-   }
+  if (seasonal) {
+    object$seasadj <- utils::tail(decomp$seasonal, m)
+    object$seasadjhist <- decomp$seasona
+  }
 
    object$seasonal <- seasonal
    object$x <- origy
@@ -59,7 +59,7 @@ thetam <- function(y) {
    object$method <- "Theta"
    class(object) <- c("fc_model", "thetam", "ets")
 
-   return(object)
+  object
 }
 
 #' Forecast using a Theta model
@@ -84,31 +84,33 @@ forecast.thetam <- function(object, # nolint
                             h = ifelse(object$m > 1, 2 * object$m, 10),
                             level = c(80, 95),
                             fan = FALSE, ...) {
-   chkDots(...)
-   if (fan) {
-      level <- seq(51, 99, by = 3)
-   } else {
-      if (min(level) > 0 & max(level) < 1)
-         level <- 100 * level
-      else if (min(level) < 0 | max(level) > 99.99)
-         stop("Confidence limit out of range")
-   }
-   fcast <- forecast.ets(object, h = h, level = level, fan = fan)
-   alpha <- fcast$model$par["alpha"]
-   update <- object$drift * (0:(h - 1) + (1 - (1 - alpha) ^ length(object$x)) / alpha)
-   fcast$mean <- fcast$mean + update
-   if (object$seasonal) {
-      fcast$mean <- fcast$mean * rep(object$seasadj, trunc(1 + h / object$m))[1:h]
-   }
-   fcastSE <- sqrt(fcast$model$sigma) * sqrt((0:(h - 1)) * alpha ^ 2 + 1)
-   nconf <- length(level)
-   fcast$lower <- fcast$upper <- matrix(NA, nrow = h, ncol = nconf)
-   for (i in 1:nconf) {
-      zt <- -qnorm(0.5 - level[i] / 200)
-      fcast$lower[, i] <- fcast$mean - zt * fcastSE
-      fcast$upper[, i] <- fcast$mean + zt * fcastSE
-   }
-   return(fcast)
+  # We could chkDots here. Sometimes `npaths` is passed in superfluously from the HybridModel()
+  # call if it is needed by the nnetar model. For now this is disabled since it throws warnings
+  # in the tests chkDots(..., allowed = "npaths")
+  if (fan) {
+    level <- seq(51, 99, by = 3)
+  } else {
+    if (min(level) > 0 && max(level) < 1)
+      level <- 100 * level
+    else if (min(level) < 0 || max(level) > 99.99)
+      stop("Confidence limit out of range", call. = FALSE)
+  }
+  fcast <- forecast.ets(object, h = h, level = level, fan = fan)
+  alpha <- fcast$model$par["alpha"]
+  updateValue <- object$drift * (0:(h - 1) + (1 - (1 - alpha) ^ length(object$x)) / alpha)
+  fcast$mean <- fcast$mean + updateValue
+  if (object$seasonal) {
+    fcast$mean <- fcast$mean * rep(object$seasadj, trunc(1 + h / object$m))[1:h]
+  }
+  fcastSE <- sqrt(fcast$model$sigma) * sqrt((0:(h - 1)) * alpha ^ 2 + 1)
+  nconf <- length(level)
+  fcast$lower <- fcast$upper <- matrix(NA, nrow = h, ncol = nconf)
+  for (i in 1:nconf) {
+    zt <- -qnorm(0.5 - level[i] / 200)
+    fcast$lower[, i] <- fcast$mean - zt * fcastSE
+    fcast$upper[, i] <- fcast$mean + zt * fcastSE
+  }
+  fcast
 }
 
 #' Plot components from Theta model
@@ -131,24 +133,21 @@ forecast.thetam <- function(object, # nolint
 #' @author Peter Ellis
 #' @seealso \code{\link{thetam}}
 plot.thetam <- function(x, ...) {
-   chkDots(...)
-   # Note that "states" from an object created by ets is one element longer than observed data.
-   y <- x$x
-   n <- length(y)
-   alpha <- x$par["alpha"]
-   linear <- x$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(x$x)) / alpha)
-   if (x$seasonal) {
-      plotdata <- cbind(
-         observed = y,
-         state = x$states[-1, 1],
-         seasonal = x$seasadjhist,
-         linear = linear
-   )} else {
-      plotdata <- cbind(
-         observed = y,
-         state = x$states[-1, 1],
-         linear = linear
-      )
-   }
-   plot(plotdata, main = paste("Decomposition by Theta method"), ...)
+  chkDots(...)
+  # Note that "states" from an object created by ets is one element longer than observed data.
+  y <- x$x
+  n <- length(y)
+  alpha <- x$par["alpha"]
+  linear <- x$drift * (0:(n - 1) + (1 - (1 - alpha) ^ length(x$x)) / alpha)
+  if (x$seasonal) {
+    plotdata <- cbind(observed = y,
+                      state = x$states[-1, 1],
+                      seasonal = x$seasadjhist,
+                      linear = linear)
+  } else {
+    plotdata <- cbind(observed = y,
+                      state = x$states[-1, 1],
+                      linear = linear)
+  }
+  plot(plotdata, main = paste("Decomposition by Theta method"), ...)
 }

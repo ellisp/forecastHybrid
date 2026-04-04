@@ -1,4 +1,4 @@
-Sys.setenv("R_TESTS" = "")
-if (require(testthat) & require(forecast)) {
-  test_check("forecastHybrid")
-  }
+library(forecastHybrid) # nolint: unused_import_linter
+library(testthat)
+
+test_check("forecastHybrid")

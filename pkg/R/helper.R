@@ -18,20 +18,20 @@
 #' Jan-Dec 2015 and Aug 2015-Dec 2016 respectively. In that case, there is overlap between
 #' t1 and t2. The return value will depend on the order in which the arguments are provided.
 #' If the function call is tsCombine(t1, t2), the overlapping portion of t1 and t2
-#' (Aug-Dec 2015 in this example), would have values from t1 as long as they are not NA.
-#' If the call is tsCombine(t2, t1), it will have values from t2 as long as they are not NA.
+#' (Aug-Dec 2015 in this example), would have values from t1 as long as they are not \code{NA}.
+#' If the call is tsCombine(t2, t1), it will have values from t2 as long as they are not \code{NA}.
 #'
 #' @author Ganesh Krishnan
 #' @examples
 #' tsCombine(window(AirPassengers, end = c(1951, 12)), window(AirPassengers, start = c(1952, 1)))
 tsCombine <- function(...) {
-  chkDots(...)
+  # chkDots will throw warnings in the tests. Since this function does not use any named arguments,
+  # does it even make sense to test it? We probably can remove it. chkDots(...)
   combinedDf <- ts.union(..., dframe = TRUE)
   combinedTs <- ts.union(..., dframe = FALSE)
   coalesced <- apply(combinedDf, 1,
                      function(x) ifelse(all(is.na(x)), NA, x[min(which(!is.na(x)))]))
-  ret <- ts(coalesced, start = start(combinedTs), frequency = frequency(combinedTs))
-  return(ret)
+  ts(coalesced, start = start(combinedTs), frequency = frequency(combinedTs))
 }
 
 #' Subset time series with provided indices
@@ -53,12 +53,12 @@ tsSubsetWithIndices <- function(x,
   maxIndex <- max(indices)
 
   if (maxIndex > length(xtime)) {
-    stop("Max subset index cannot exceed time series length")
+    stop("Max subset index cannot exceed time series length", call. = FALSE)
   }
-  if (all(seq(minIndex, maxIndex, 1) != indices)) {
-    stop("Time series can only be subset with continuous indices")
+  if (length(indices) != length(minIndex:maxIndex) || !all(minIndex:maxIndex == indices)) {
+    stop("Time series can only be subset with continuous indices", call. = FALSE)
   }
-  return(window(x, start = xtime[minIndex], end = xtime[maxIndex]))
+  window(x, start = xtime[minIndex], end = xtime[maxIndex])
 }
 
 #' Return a forecast model function for a given model character
@@ -73,9 +73,9 @@ tsSubsetWithIndices <- function(x,
 #' forecastHybrid:::getModel("z")
 #' @seealso \code{\link{hybridModel}}
 getModel <- function(modelCharacter) {
-  models <- c("a" = auto.arima, "e" = ets, "f" = thetam, "n" = nnetar,
-              "s" = stlm, "t" = tbats, "x" = arfima, "z" = snaive)
-  return(models[[modelCharacter]])
+  models <- c(a = auto.arima, e = ets, f = thetam, n = nnetar,
+              s = stlm, t = tbats, x = arfima, z = snaive)
+  models[[modelCharacter]]
 }
 
 #' Translate character to model name
@@ -90,9 +90,9 @@ getModel <- function(modelCharacter) {
 #' forecastHybrid:::getModelName("z")
 #' @seealso \code{\link{hybridModel}}
 getModelName <- function(modelCharacter) {
-  models <- c("a" = "auto.arima", "e" = "ets", "f" = "thetam", "n" = "nnetar",
-              "s" = "stlm", "t" = "tbats", "x" = "arfima", "z" = "snaive")
-  return(as.character(models[modelCharacter]))
+  models <- c(a = "auto.arima", e = "ets", f = "thetam", n = "nnetar",
+              s = "stlm", t = "tbats", x = "arfima", z = "snaive")
+  as.character(models[modelCharacter])
 }
 
 #' Helper function used to unpack the fitted model objects from a list
@@ -108,7 +108,7 @@ unwrapParallelModels <- function(fitModels,
     model <- expandedModels[i]
     modelResults[[getModelName(model)]] <- fitModels[[i]]
   }
-  return(modelResults)
+  modelResults
 }
 
 #' Helper function to remove models that require more data
@@ -120,48 +120,48 @@ removeModels <- function(y, models) {
   # All characters must be valid
   validModels <- c("a", "e", "f", "n", "s", "t", "x", "z")
   if (!all(expandedModels %in% validModels)) {
-    stop("Invalid models specified.")
+    stop("Invalid models specified.", call. = FALSE)
   }
   if (!length(expandedModels)) {
-    stop("At least one component model type must be specified.")
+    stop("At least one component model type must be specified.", call. = FALSE)
   }
 
   # Check for problems for specific models (e.g. long seasonality for ets and non-seasonal
   # for stlm or nnetar)
   if (is.element("e", expandedModels) && frequency(y) > 24) {
-    warning("frequency(y) > 24. The ets model will not be used.")
+    warning("frequency(y) > 24. The ets model will not be used.", call. = FALSE)
     expandedModels <- expandedModels[expandedModels != "e"]
   }
   if (is.element("f", expandedModels) && length(y) <= frequency(y)) {
     warning("The theta model requires more than one seasonal period of data.",
-            " The theta model will not be used.")
+            " The theta model will not be used.", call. = FALSE)
     expandedModels <- expandedModels[expandedModels != "f"]
   }
 
   if (is.element("s", expandedModels)) {
     if (frequency(y) < 2L) {
       warning("The stlm model requires that the input data be a seasonal ts object.",
-              " The stlm model will not be used.")
+              " The stlm model will not be used.", call. = FALSE)
       expandedModels <- expandedModels[expandedModels != "s"]
     }
     if (frequency(y) * 2L >= length(y)) {
       warning("The stlm model requres a series more than twice as long as the seasonal period.",
-              " The stlm model will not be used.")
+              " The stlm model will not be used.", call. = FALSE)
       expandedModels <- expandedModels[expandedModels != "s"]
     }
   }
   if (is.element("n", expandedModels)) {
     if (frequency(y) * 2L >= length(y)) {
       warning("The nnetar model requres a series more than twice as long as the seasonal period.",
-              " The nnetar model will not be used.")
+              " The nnetar model will not be used.", call. = FALSE)
       expandedModels <- expandedModels[expandedModels != "n"]
     }
   }
   # A model run should include at least two component models
   if (length(expandedModels) < 2L) {
-    stop("A hybridModel must contain at least two component models.")
+    stop("A hybridModel must contain at least two component models.", call. = FALSE)
   }
-  return(expandedModels)
+  expandedModels
 }
 
 #' Helper function to check the that the parallel arguments are valid
@@ -172,13 +172,13 @@ checkParallelArguments <- function(parallel,
                                    num.cores) { # nolint
   # Validate cores and parallel arguments
   if (!is.logical(parallel)) {
-    stop("The parallel argument must be TRUE/FALSE.")
+    stop("The parallel argument must be TRUE/FALSE.", call. = FALSE) # nolint: nonportable_path_linter
   }
   if (!is.numeric(num.cores)) {
-    stop("The number of cores specified must be an integer greater than zero.")
+    stop("The number of cores specified must be an integer greater than zero.", call. = FALSE) # nolint: nonportable_path_linter
   }
   if (as.logical((num.cores %% 1L)) || num.cores <= 0L) {
-    stop("The number of cores specified must be an integer greater than zero.")
+    stop("The number of cores specified must be an integer greater than zero.", call. = FALSE)
   }
 }
 
@@ -189,18 +189,17 @@ prepareTimeseries <- function(y) {
   # The dependent variable must be numeric and not a matrix/dataframe
   forbiddenTypes <- c("data.frame", "data.table", "matrix")
   if (!is.numeric(y) || all(class(y) %in% forbiddenTypes)) {
-    stop("The time series must be numeric and may not be a matrix or dataframe object.")
+    stop("The time series must be numeric and may not be a matrix or dataframe object.",
+         call. = FALSE)
   }
   if (!length(y)) {
-    stop("The time series must have observations")
+    stop("The time series must have observations", call. = FALSE)
   }
 
   if (length(y) < 1) {
-    stop("The time series must have an observations")
+    stop("The time series must have an observations", call. = FALSE)
   }
-  y <- as.ts(y)
-
-  return(y)
+  as.ts(y)
 }
 
 #' Helper function to test all the model arguments (e.g. a.args, e.args, etc)
@@ -216,7 +215,7 @@ checkModelArgs <- function(modelArguments,
     if (!is.null(currentArg) && !is.element(modelCode, expandedModels)) {
       argsName <- paste0(modelCode, ".args")
       warning(getModelName(modelCode), " was not selected in the models argument, but",
-              argsName, " was passed. Ignoring ", argsName)
+              argsName, " was passed. Ignoring ", argsName, call. = FALSE)
     }
   }
 }

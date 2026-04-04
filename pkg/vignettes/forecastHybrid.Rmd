@@ -2,8 +2,8 @@
 title: "Using the \"forecastHybrid\" package"
 author: "David Shaub"
 date: "`r Sys.Date()`"
-output: 
-  html_document: 
+output:
+  html_document:
     keep_md: yes
     toc: yes
 vignette: >
@@ -23,7 +23,7 @@ install.packages("forecastHybrid")
 
 The latest development version can be installed using the "devtools" package.
 ```{r github_install, eval = FALSE}
-devtools::install_github("ellisp/forecastHybrid/pkg")
+devtools::install_git("https://gitlab.com/dashaub/forecastHybrid", subdir = "pkg")
 ```
 
 Version updates to CRAN will be published frequently after new features are implemented, so the development version is not recommended unless you plan to modify the code.
@@ -31,7 +31,7 @@ Version updates to CRAN will be published frequently after new features are impl
 # Basic usage
 First load the package.
 ```{r load_library, message = FALSE}
-library(forecastHybrid)
+library(forecastHybrid) # nolint: undesirable_function_linter
 ```
 
 ## Quick start
@@ -39,7 +39,8 @@ If you don't have time to read the whole guide and want to get started immediate
 ```{r quickstart, cache = TRUE}
 quickModel <- hybridModel(USAccDeaths)
 forecast(quickModel)
-plot(forecast(quickModel), main = "Forecast from auto.arima, ets, thetam, nnetar, stlm, and tbats model")
+plot(forecast(quickModel),
+     main = "Forecast from auto.arima, ets, thetam, nnetar, stlm, and tbats model")
 ```
 
 ## Fitting a model
@@ -48,7 +49,7 @@ The workhorse function of the package is ```hybridModel()```, a function that co
 ```{r basic_model, cache = TRUE}
 
 # Build a hybrid forecast on a simulated dataset using auto.arima, ets, and tbats models.
-# Each model is given equal weight 
+# Each model is given equal weight
 set.seed(12345)
 series <- ts(rnorm(18), f = 2)
 hm1 <- hybridModel(y = series, models = "aet", weights = "equal")
@@ -56,7 +57,7 @@ hm1 <- hybridModel(y = series, models = "aet", weights = "equal")
 
 The individual component models are stored inside the ```hybridModel``` objects and can viewed in their respective slots, and all the regular methods from the "forecast" package could be applied to these individual component models.
 ```{r individualModels, cache = TRUE}
-# View the individual models 
+# View the individual models
 hm1$auto.arima
 
 # See forecasts from the auto.arima model
@@ -67,12 +68,12 @@ plot(forecast(hm1$auto.arima))
 ### Model diagnostics
 The ```hybridModel()``` function produces an S3 object of class ```forecastHybrid```.
 ```{r object_class, cache = TRUE}
-class(hm1) 
+class(hm1)
 is.hybridModel(hm1)
 ```
 The ```print()``` and ```summary()``` methods print information about the ensemble model including the weights assigned to each individual component model.
 ```{r printSummary, cache = TRUE}
-print(hm1) 
+print(hm1)
 summary(hm1)
 ```
 
@@ -92,11 +93,11 @@ plot(quickModel, type = "models", ggplot = TRUE)
 By default each component model is given equal weight in the final ensemble. Empirically this has been shown to give good performance in ensembles [see @Armstrong2001], but alternative combination methods are available: the inverse root mean square error (```RMSE```), inverse mean absolute error (```MAE```), and inverse mean absolute scaled error (```MASE```). To apply one of these weighting schemes of the component models, pass this value to the ```errorMethod``` argument and pass either ```"insample.errors"``` or ```"cv.errors"``` to the ```weights``` argument.
 ```{r errorMethod, cache = TRUE}
 hm2 <- hybridModel(series, weights = "insample.errors", errorMethod = "MASE", models = "aenst")
-hm2 
+hm2
 ```
 After the model is fit, these weights are stored in the ```weights``` attribute of the model. The user can view and manipulated these weights after the fit is complete. Note that the ```hybridModel()``` function automatically scales weights to sum to one, so a user should similar scale the weights to ensure the forecasts remain unbiased. Furthermore, the vector that replaces ```weights``` must retain names specifying the component model it corresponds to since weights are not assigned by position but rather by component name. Similarly, individual components may also be replaced
 ```{r viewWeights, cache = TRUE}
-hm2$weights 
+hm2$weights
 newWeights <- c(0.1, 0.2, 0.3, 0.1, 0.3)
 names(newWeights) <- c("auto.arima", "ets", "nnetar", "stlm", "tbats")
 hm2$weights <- newWeights
@@ -115,22 +116,22 @@ head(residuals(hm1))
 
 In-sample errors and various accuracy measure can be extracted with the ```accuracy``` method. The "forecastHybrid" package creates an S3 generic from the ```accuracy``` method in the "forecast" package, so ```accuracy``` will continue to function as normal with objects from the "forecast" package, but now special functionality is created for ```hybridModel``` objects. To view the in-sample accuracy for the entire ensemble, a simple call can be made.
 ```{r accuracy_ensemble, cache = TRUE}
-accuracy(hm1) 
+accuracy(hm1)
 ```
 In addition to retrieving the *ensemble's* accuracy, the individual component models' accuracies can be easily viewed by using the ```individual = TRUE``` argument.
 ```{r accuracy_individual, cache = TRUE}
-accuracy(hm1, individual = TRUE) 
+accuracy(hm1, individual = TRUE)
 ```
 
 ## Forecasting
-Now's let's forecast future values. The ```forecast()``` function produce an S3 class ```forecast``` object for the next 48 periods from the ensemble model. 
+Now's let's forecast future values. The ```forecast()``` function produce an S3 class ```forecast``` object for the next 48 periods from the ensemble model.
 ```{r basic_forecast, cache = TRUE}
-hForecast <- forecast(hm1, h = 48) 
+hForecast <- forecast(hm1, h = 48)
 ```
 
 Now plot the forecast for the next 48 periods. The prediction intervals are preserved from the individual component models and currently use the most extreme value from an individual model, producing a conservative estimate for the ensemble's performance.
-```{r plot_forecast, cache = TRUE} 
-plot(hForecast) 
+```{r plot_forecast, cache = TRUE}
+plot(hForecast)
 ```
 
 # Advanced usage
@@ -140,14 +141,14 @@ hm3 <- hybridModel(y = series, models = "aefnst",
                    a.args = list(max.p = 12, max.q = 12, approximation = FALSE),
                    n.args = list(repeats = 50),
                    s.args = list(robust = TRUE),
-                   t.args = list(use.arma.errors = FALSE)) 
+                   t.args = list(use.arma.errors = FALSE))
 ```
 
 Since the ```lambda``` argument is shared between most of the models in the "forecast" framework, it is included as a special parameter that can be used to set the Box-Cox transform in all models instead of settings this individually. For example,
 
 ```{r lambda, cache = TRUE}
 hm4 <- hybridModel(y = wineind, models = "ae", lambda = 0.15)
-hm4$auto.arima$lambda 
+hm4$auto.arima$lambda
 hm4$ets$lambda
 ```
 
@@ -155,7 +156,7 @@ Users can still apply the ```lambda``` argument through the tuning lists, but in
 ```{r advancedLambda, cache = TRUE}
 hm5 <- hybridModel(y = USAccDeaths, models = "aens", lambda = 0.2,
                    a.args = list(lambda = 0.5),
-                   n.args = list(lambda = 0.6)) 
+                   n.args = list(lambda = 0.6))
 hm5$auto.arima$lambda
 hm5$ets$lambda
 hm5$nnetar$lambda
@@ -169,7 +170,7 @@ Covariates can also be supplied to ```auto.arima``` and ```nnetar``` models as i
 ```{r xreg, cache = TRUE}
 # Use the beaver1 dataset with the variable "activ" as a covariate and "temp" as the time series
 # Divide this into a train and test set
-trainSet <- beaver1[1:100, ] 
+trainSet <- beaver1[1:100, ]
 testSet <- beaver1[101:110, ]
 trainXreg <- matrix(trainSet$activ)
 testXreg <- matrix(testSet$activ)
@@ -181,7 +182,7 @@ beaverhm <- hybridModel(ts(trainSet$temp, f = 6),
                         n.args = list(xreg = trainXreg),
                         s.args = list(xreg = trainXreg, method = "arima"))
 # Forecast future values
-beaverfc <- forecast(beaverhm, xreg = testXreg, PI=FALSE)
+beaverfc <- forecast(beaverhm, xreg = testXreg, PI = FALSE)
 
 # View the accuracy of the model
 accuracy(beaverfc, testSet$temp)
@@ -204,38 +205,37 @@ plot(woolyrnq)
 
 We can also use custom functions, for example `fcast()` from the "GMDH" package. We must be very careful that our custom forecast function still produces an expected "forecast" S3 class object and that the ts object start, end, and frequency properties are preserved.
 ```{r, custom_cvts, cache=TRUE}
-library(GMDH)
-GMDHForecast <- function(x, h){
+gmdhForecast <- function(x, h) {
   fc <- GMDH::fcast(x, f.number = h)
   # GMDH doesn't produce a ts object with correct attributes, so we build it
-  end <- tsp(x)[2]
+  endVal <- tsp(x)[2]
   freq <- frequency(x)
   # Set the correct start, end, and frequency for the ts forecast object
-  tsProperties <- c(end + 1 / freq, end + h / freq, freq)
+  tsProperties <- c(endVal + 1 / freq, endVal + h / freq, freq)
   tsp(fc$mean) <- tsProperties
   tsp(fc$upper) <- tsProperties
   tsp(fc$lower) <- tsProperties
   class(fc) <- "forecast"
-  return(fc)
+  fc
 }
 series <- subset(woolyrnq, end = 12)
-gmdhcv <- cvts(series, FCFUN = GMDHForecast, windowSize = 10, maxHorizon = 1)
+gmdhcv <- cvts(series, FCFUN = gmdhForecast, windowSize = 10, maxHorizon = 1)
 ```
 As a final example, suppose we foolish want to implement our own version of `naive()` for performing cross validation. The `FUN` and `FCFUN` could then look like
 ```{r, custom_naive_cvts, cache=TRUE}
-customMod <- function(x){
- result <- list()
- result$series <- x
- result$last <- tail(x, n = 1)
- class(result) <- "customMod"
- return(result)
+customMod <- function(x) {
+  result <- list()
+  result$series <- x
+  result$last <- tail(x, n = 1)
+  class(result) <- "customMod"
+  result
 }
-forecast.customMod <- function(x, h = 12){
- result <- list()
- result$model <- x
- result$mean <- rep(x$last, h)
- class(result) <- "forecast"
- return(result)
+forecast.customMod <- function(x, h = 12) {
+  result <- list()
+  result$model <- x
+  result$mean <- rep(x$last, h)
+  class(result) <- "forecast"
+  result
 }
 series <- subset(AirPassengers, end = 94)
 cvobj <- cvts(series, FUN = customMod, FCFUN = forecast.customMod)

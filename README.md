@@ -228,6 +228,6 @@ https://github.com/ellisp/forecastHybrid},
 
 ```
 ## License
-(c) 2016-2020 David Shaub and Peter Ellis.
+(c) 2016-2025 David Shaub and Peter Ellis.
 
 This package is free software released under the [GPL-3](http://www.gnu.org/licenses/gpl-3.0.en.html) license.

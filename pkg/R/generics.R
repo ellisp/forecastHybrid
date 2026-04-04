@@ -18,7 +18,7 @@ is.hybridModel <- function(x) { # nolint
 #' @param individual if \code{TRUE}, return the fitted values of the component models instead
 #' of the fitted values for the whole ensemble model.
 #' @param ... other arguments (ignored).
-#' @seealso \code{\link{accuracy}}
+#' @seealso \code{\link[forecast]{accuracy}}
 #' @return The fitted values of the ensemble or individual component models.
 #' @export
 #'
@@ -33,7 +33,7 @@ fitted.hybridModel <- function(object,
     }
     return(results)
   }
-  return(object$fitted)
+  object$fitted
 }
 
 #' Extract Model Residuals
@@ -44,7 +44,7 @@ fitted.hybridModel <- function(object,
 #' @param individual If \code{TRUE}, return the residuals of the component models instead
 #' of the residuals for the whole ensemble model.
 #' @param ... Other arguments (ignored).
-#' @seealso \code{\link{accuracy}}
+#' @seealso \code{\link[forecast]{accuracy}}
 #' @return The residuals of the ensemble or individual component models.
 #'
 residuals.hybridModel <- function(object,
@@ -58,7 +58,7 @@ residuals.hybridModel <- function(object,
     }
     return(results)
   }
-  return(object$residuals)
+  object$residuals
 }
 
 
@@ -87,7 +87,7 @@ accuracy.hybridModel <- function(object, # nolint
   chkDots(...)
   if (!is.null(f)) {
     warning("Using `f` as the argument for `accuracy()` is deprecated.",
-            "Please use `object` instead.")
+            "Please use `object` instead.", call. = FALSE)
     object <- f
   }
   if (individual) {
@@ -97,7 +97,7 @@ accuracy.hybridModel <- function(object, # nolint
     }
     return(results)
   }
-  return(forecast::accuracy(object$fitted, getResponse(object)))
+  forecast::accuracy(object$fitted, getResponse(object))
 }
 
 #' Accuracy measures for cross-validated time series
@@ -122,7 +122,7 @@ accuracy.cvts <- function(object, # nolint
   chkDots(...)
   if (!is.null(f)) {
     warning("Using `f` as the argument for `accuracy()` is deprecated.",
-            " Please use `object` instead.")
+            " Please use `object` instead.", call. = FALSE)
     object <- f
   }
   ME <- colMeans(object$residuals) # nolint
@@ -133,7 +133,7 @@ accuracy.cvts <- function(object, # nolint
   rownames(results) <- paste("Forecast Horizon ", rownames(results))
   # MASE TODO
   # Will require actual/fitted/residuals
-  return(results)
+  results
 }
 
 
@@ -172,7 +172,8 @@ print.hybridModel <- function(x,
 #'
 #' Plot a representation of the hybridModel.
 #' @param x an object of class hybridModel to plot.
-#' @param ggplot should the \code{\link{autoplot}} function be used (when available) for the plots?
+#' @param ggplot should the \code{\link[forecast]{autoplot}} function be used (when available)
+#' for the plots?
 #' @param ... other arguments passed to \link{plot}.
 #' @importFrom ggplot2 autoplot ggplot
 plotModelObjects <- function(x,
@@ -181,12 +182,12 @@ plotModelObjects <- function(x,
   chkDots(...)
   plotModels <- x$models[x$models != "stlm" & x$models != "nnetar"]
   for (i in seq_along(plotModels)) {
-     # bats, tbats, and nnetar aren't supported by autoplot
-     if (ggplot && !(plotModels[i] %in% c("tbats", "bats", "nnetar"))) {
-        autoplot(x[[plotModels[i]]])
-     } else if (!ggplot) {
-        plot(x[[plotModels[i]]])
-     }
+    # bats, tbats, and nnetar aren't supported by autoplot
+    if (ggplot && !(plotModels[i] %in% c("tbats", "bats", "nnetar"))) {
+      autoplot(x[[plotModels[i]]])
+    } else if (!ggplot) {
+      plot(x[[plotModels[i]]])
+    }
   }
 }
 
@@ -194,7 +195,8 @@ plotModelObjects <- function(x,
 #'
 #' Plot a fitted values of the hybridModel.
 #' @param x an object of class hybridModel to plot.
-#' @param ggplot should the \code{\link{autoplot}} function be used (when available) for the plots?
+#' @param ggplot should the \code{\link[forecast]{autoplot}} function be used (when available)
+#' for the plots?
 #' @param ... other arguments passed to \link{plot}.
 #' @importFrom ggplot2 ggplot aes geom_line scale_y_continuous
 plotFitted <- function(x,
@@ -214,24 +216,24 @@ plotFitted <- function(x,
     value <- NULL
     # If anyone knows a cleaner way to transform this "wide" data to "long" data for plotting
     # with ggplot2 without using additional packages, let me know.
-    pf <- matrix(as.matrix(plotFrame[, plotModels]), ncol = 1)
-    pf <- data.frame(date = plotFrame$date,
-                     variable = factor(rep(plotModels,
-                                           each = nrow(plotFrame)),
-                                       levels = plotModels),
-                     value = pf)
-    plotFrame <- pf[order(pf$variable, pf$date), ]
+    pfTransform <- matrix(as.matrix(plotFrame[, plotModels]), ncol = 1)
+    pfTransform <- data.frame(date = plotFrame$date,
+                              variable = factor(rep(plotModels,
+                                                    each = nrow(plotFrame)),
+                                                levels = plotModels),
+                              value = pfTransform)
+    plotFrame <- pfTransform[order(pfTransform$variable, pfTransform$date), ]
     ggplot(data = plotFrame,
            aes(x = date, y = as.numeric(value), col = variable)) +
-    geom_line() + scale_y_continuous(name = "y")
+      geom_line() + scale_y_continuous(name = "y")
   } else {
     # Set the highest and lowest axis scale
     ymax <- max(sapply(plotModels,
-                      FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
+                       FUN = function(i) max(fitted(x[[i]]), na.rm = TRUE)))
     ymin <- min(sapply(plotModels,
-                      FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
-    range <- ymax - ymin
-    plot(x$x, ylim = c(ymin - 0.05 * range, ymax + 0.25 * range), ...)
+                       FUN = function(i) min(fitted(x[[i]]), na.rm = TRUE)))
+    yRange <- ymax - ymin
+    plot(x$x, ylim = c(ymin - 0.05 * yRange, ymax + 0.25 * yRange), ...)
     for (i in seq_along(plotModels)) {
       lines(fitted(x[[plotModels[i]]]), col = i + 1)
     }
@@ -251,7 +253,7 @@ plotFitted <- function(x,
 #' \code{\link[forecast]{plot.tbats}}. Note: no plot
 #' methods exist for \code{nnetar} and \code{stlm} objects, so these will not be plotted with
 #' \code{type = "models"}.
-#' @param ggplot should the \code{\link{autoplot}} function
+#' @param ggplot should the \code{\link[forecast]{autoplot}} function
 #' be used (when available) for the plots?
 #' @param ... other arguments passed to \link{plot}.
 #' @seealso \code{\link{hybridModel}}
@@ -275,11 +277,11 @@ plot.hybridModel <- function(x,
                              type = c("fit", "models"),
                              ggplot = FALSE,
                              ...) {
-   type <- match.arg(type)
-   chkDots(...)
-   if (type == "fit") {
-     plotFitted(x = x, ggplot = ggplot)
-   } else if (type == "models") {
-     plotModelObjects(x = x, ggplot = ggplot)
-   }
+  type <- match.arg(type)
+  chkDots(...)
+  if (type == "fit") {
+    plotFitted(x = x, ggplot = ggplot)
+  } else if (type == "models") {
+    plotModelObjects(x = x, ggplot = ggplot)
+  }
 }
