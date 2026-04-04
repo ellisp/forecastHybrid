@@ -1,4 +1,4 @@
-# Version 5.1.21 [2025-01-14]
+# Version 5.1.21 [2026-01-14]
 * Support the new `fc_model` objects from `forecast` package version 9
 * Safer handling of series in `cvts()`
 * Linting to use implicit returns
