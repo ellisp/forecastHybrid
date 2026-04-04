@@ -53,11 +53,11 @@ thetam <- function(y) {
     object$seasadjhist <- decomp$seasona
   }
 
-  object$seasonal <- seasonal
-  object$x <- origy
-  object$drift <- stats::lsfit(0:(n - 1), y)$coef[2] / 2
-  object$method <- "Theta"
-  class(object) <- c("fc_model", "thetam", "ets")
+   object$seasonal <- seasonal
+   object$x <- origy
+   object$drift <- stats::lsfit(0:(n - 1), y)$coef[2] / 2
+   object$method <- "Theta"
+   class(object) <- c("fc_model", "thetam", "ets")
 
   object
 }

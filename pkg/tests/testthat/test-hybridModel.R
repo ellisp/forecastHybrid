@@ -114,12 +114,61 @@ test_that("Testing hybridModel(weights = \"cv.errors\")", {
   expect_length(cvMod$weights, length(unique(cvMod$weights)))
 })
 
-test_that("Testing the hybridModel object", {
-  modelComparison <- list()
-  for (parallel in c(FALSE, TRUE)) {
-    set.seed(4)
-    len <- 20
-    freq <- 2
+  test_that("Testing the hybridModel object", {
+    modelComparison <- list()
+    for (parallel in c(FALSE, TRUE)) {
+      set.seed(4)
+      len <- 20
+      freq <- 2
+      tol <- 10^-8
+      testSeries <- ts(rnorm(len), f = freq)
+      cols <- c("a", "b", "c")
+      xreg <- matrix(rnorm(len * length(cols)), nrow = len)
+      colnames(xreg) <- cols
+      # Ignore nnetar for now since it isn't reproducible
+      # TODO: add nnetar to xreg tests
+      models <- "aefstz"
+      hm <- hybridModel(testSeries, models = models,
+                        a.args = list(xreg = xreg), lambda = 0.2,
+                        parallel = parallel)
+      for (obj in hm) {
+        expect_true(all(class(obj) != "NULL"))
+        expect_true(!is.null(obj))
+      }
+      # Ensure numeric values
+      expect_true(is.numeric(hm$fitted))
+      expect_true(is.numeric(hm$residuals))
+      expect_true(is.numeric(hm$x))
+      expect_true(length(hm$fitted) == length(testSeries))
+      expect_true(length(hm$residuals) == length(testSeries))
+      expect_true(length(hm$x) == length(testSeries))
+      expect_true(all(hm$weights >= 0))
+      # Weights should sum to 1 but allow tolerance
+      expect_true(sum(hm$weights) - 1 < tol)
+      expect_true(length(hm$weights) == nchar(models))
+      expect_true(hm$frequency == freq)
+      # Ensure xreg is correct
+      expect_true(all(hm$auto.arima$xreg == xreg))
+      expect_true(hm$xreg$auto.arima)
+      expect_true(!hm$xreg$stlm)
+      # Ensure other fields are correct
+      expect_true(length(hm$models) == nchar(models))
+      expect_true(all(names(hm$weights) == hm$models))
+      # Ensure the models are of the expected classes
+      expect_true("ARIMA" %in% class(hm$auto.arima))
+      expect_true("ets" %in% class(hm$ets))
+      expect_true("thetam" %in% class(hm$thetam))
+      expect_true("stlm" %in% class(hm$stlm))
+      expect_true("forecast" %in% class(hm$snaive))
+
+      # Base forecasts should work
+      expect_error(forecast(hm$auto.arima, xreg = xreg), NA)
+      # Test forecast
+      h <- nrow(xreg)
+      expect_error(forecast(hm, h = h, xreg = xreg), NA)
+      modelComparison[[as.character(parallel)]] <- hm
+    }
+    # Compare the results from parallel = TRUE and parallel = FALSE
     tol <- 10^-8
     testSeries <- ts(rnorm(len), f = freq)
     cols <- c("a", "b", "c")
